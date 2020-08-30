@@ -5,11 +5,11 @@ begin
 
 section \<open>Queues\<close>
 
-lemma (in Queue) size_tail:
+lemma (in Queue) length_tail:
   assumes "invar q"
-  assumes "mset q \<noteq> {#}"
-  shows "size (mset (tail q)) = size (mset q) - 1"
-  using assms mset_head
-  by (simp add: mset_tail size_Diff_singleton)
+  assumes "list q \<noteq> Nil"
+  shows "length (list (tail q)) = length (list q) - 1"
+  using assms list_head
+  by (simp add: list_tail)
 
 end

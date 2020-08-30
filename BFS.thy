@@ -68,7 +68,7 @@ locale bfs_invar = bfs where G = G and (* fold = fold and *) snoc = snoc
     (* fold :: "('v \<Rightarrow> ('q, 'v) state \<Rightarrow> ('q, 'v) state) \<Rightarrow> 'v set \<Rightarrow> ('q, 'v) state \<Rightarrow> ('q, 'v) state" and *)
     snoc :: "'q \<Rightarrow> 'v \<Rightarrow> 'q" +
   fixes s :: "('q, 'v) state"
-  assumes queue_subset_V: "set_mset (mset (queue s)) \<subseteq> dVs G"
+  assumes queue_subset_V: "set (list (queue s)) \<subseteq> dVs G"
   assumes distance_src: "distance s src = Some 0"
   assumes parent_src: "parent s src = Some src"
   assumes parent_edge: "\<lbrakk> v \<noteq> src; parent s v = Some u \<rbrakk> \<Longrightarrow> (u, v) \<in> G"
@@ -79,11 +79,11 @@ locale bfs_invar = bfs where G = G and (* fold = fold and *) snoc = snoc
 subsection \<open>\<close>
 
 lemma (in bfs) init_queue_subset_V:
-  shows "set_mset (mset (queue init)) \<subseteq> dVs G"
+  shows "set (list (queue init)) \<subseteq> dVs G"
 proof -
-  have "set_mset (mset (queue init)) = {src}"
+  have "set (list (queue init)) = {src}"
     using invar_empty
-    by (simp add: init_def mset_snoc mset_empty)
+    by (simp add: init_def list_snoc list_empty)
   also have "... \<subseteq> dVs G"
     using src_in_V
     by (simp add: dVs_def)
@@ -119,7 +119,7 @@ lemma (in bfs) init_distance_min:
   by (simp add: init_def shortest_dpath_length_singleton split: if_splits)
 
 lemma (in bfs) init_bfs_invar:
-  shows "bfs_invar empty is_empty head tail invar mset src G snoc init"
+  shows "bfs_invar empty is_empty head tail invar list src G snoc init"
   using
     bfs_axioms
     init_queue_subset_V init_distance_src init_parent_src init_parent_edge init_distance_parent
@@ -213,17 +213,17 @@ subsubsection \<open>queue\<close>
 
 lemma (in bfs) queue_discover_cong:
   shows
-    "mset (queue (discover u v s)) =
-      mset (queue s) + (if discovered v s then {#} else {#v#})"
+    "list (queue (discover u v s)) =
+      list (queue s) @ (if discovered v s then Nil else [v])"
   using invar_queue[where ?s = s]
-  by (simp add: discover_def mset_snoc)
+  by (simp add: discover_def list_snoc)
 
 lemma (in bfs) queue_fold_discover_insert:
   assumes "finite N"
   assumes "v \<notin> N"
   shows
-    "mset (queue (Finite_Set.fold (discover u) s (insert v N))) =
-      mset (queue (Finite_Set.fold (discover u) s N)) +
+    "mset (list (queue (Finite_Set.fold (discover u) s (insert v N)))) =
+      mset (list (queue (Finite_Set.fold (discover u) s N))) +
       (if discovered v s then {#} else {#v#})"
   using assms
   by (simp add: fold_insert queue_discover_cong discovered_fold_cong)
@@ -231,32 +231,52 @@ lemma (in bfs) queue_fold_discover_insert:
 lemma (in bfs) queue_fold_discover_cong:
   assumes "finite N"
   shows
-    "mset (queue (Finite_Set.fold (discover u) s N)) =
-      mset (queue s) + {#v \<in># mset_set N. \<not> discovered v s#}"
+    "mset (list (queue (Finite_Set.fold (discover u) s N))) =
+      mset (list (queue s)) + {#v \<in># mset_set N. \<not> discovered v s#}"
   using assms
   by (induct N) (simp_all add: queue_fold_discover_insert)
 
 lemma (in bfs) termination_aux:
+  assumes "S = {v \<in> (out_neighborhood G u). \<not> discovered v s}"
+  assumes
+    "dom (parent s ++
+      (\<lambda>v. if v \<in> (out_neighborhood G u) \<and> \<not> discovered v s then Some u else None)) =
+      dom (parent s) \<union> S"
+  shows
+    "card (dom (parent s ++
+      (\<lambda>v. if v \<in> (out_neighborhood G u) \<and> \<not> discovered v s then Some u else None))) =
+      card (dom (parent s)) + card S"
+proof -
+  have "finite (dom (parent s))"
+    using dom_parent_subset_V[where ?s = s] vertices_finite
+    by (auto intro: finite_subset)
+  moreover have "finite {v \<in> (out_neighborhood G u). \<not> discovered v s}"
+    using out_neighborhood_finite
+    by simp
+  moreover have "dom (parent s) \<inter> S = {}"
+    by (auto simp add: assms discovered_def)
+  ultimately show ?thesis
+    using assms
+    by (simp add: card_Un_disjoint)
+qed
+
+lemma (in bfs) termination_aux2:
   fixes s :: "('q, 'v) state"
   assumes "cond s"
   shows
     "card (dVs G) +
-      size (mset (queue (s\<lparr>queue := (tail (queue s))\<rparr>))) -
+      length (list (queue (s\<lparr>queue := (tail (queue s))\<rparr>))) -
       card (dom (parent (s\<lparr>queue := (tail (queue s))\<rparr>))) <
       card (dVs G) +
-      size (mset (queue s)) -
+      length (list (queue s)) -
       card (dom (parent s))"
 proof -
-  have queue_nonempty: "mset (queue s) \<noteq> {#}"
+  have "list (queue s) \<noteq> Nil"
     using invar_queue[where ?s = s] assms
     by (simp add: is_empty cond_def)
-
-  have "0 < size (mset (queue s))"
-    using queue_nonempty
-    by (simp add: nonempty_has_size)
-  moreover have "size (mset (queue (s\<lparr>queue := (tail (queue s))\<rparr>))) = size (mset (queue s)) - 1"
-    using invar_queue[where ?s = s] queue_nonempty
-    by (simp add: size_tail)
+  hence "length (list (queue (s\<lparr>queue := (tail (queue s))\<rparr>))) < length (list (queue s))"
+    using invar_queue[where ?s = s]
+    by (simp add: length_tail)
   moreover have "card (dom (parent s)) \<le> card (dVs G)"
     using vertices_finite dom_parent_subset_V
     by (intro card_mono)
@@ -265,21 +285,14 @@ proof -
 qed
 
 termination (in bfs) loop
-proof (relation "measure (\<lambda>s. card (dVs G) + size (mset (queue s)) - card (dom (parent s)))")
+proof (relation "measure (\<lambda>s. card (dVs G) + length (list (queue s)) - card (dom (parent s)))")
   fix s u q
   assume assms:
     "cond s"
     "u = head (queue s)"
     "q = tail (queue s)"
-
-  have dom_parent_finite: "finite (dom (parent (s\<lparr>queue := q\<rparr>)))"
-    using dom_parent_subset_V[where ?s = s] vertices_finite
-    by (auto intro: finite_subset)
-  hence S_finite: "finite {v \<in> (out_neighborhood G u). \<not> discovered v (s\<lparr>queue := q\<rparr>)}" (is "finite ?S")
-    using out_neighborhood_finite
-    by simp
-  have dom_parent_S_disjoint: "dom (parent (s\<lparr>queue := q\<rparr>)) \<inter> ?S = {}"
-    by (auto simp add: discovered_def)
+  
+  define S :: "'v set" where "S \<equiv> {v \<in> (out_neighborhood G u). \<not> discovered v (s\<lparr>queue := q\<rparr>)}"
   
   have
     "dom (\<lambda>v. if v \<in> (out_neighborhood G u) \<and> \<not> discovered v (s\<lparr>queue := q\<rparr>) then Some u else None) =
@@ -288,41 +301,41 @@ proof (relation "measure (\<lambda>s. card (dVs G) + size (mset (queue s)) - car
   hence
     "dom (parent (s\<lparr>queue := q\<rparr>) ++
       (\<lambda>v. if v \<in> (out_neighborhood G u) \<and> \<not> discovered v (s\<lparr>queue := q\<rparr>) then Some u else None)) =
-      dom (parent (s\<lparr>queue := q\<rparr>)) \<union> ?S"
-    by auto
-  hence
+      dom (parent (s\<lparr>queue := q\<rparr>)) \<union> S"
+    by (auto simp add: S_def)
+  with S_def have
     "card (dom (parent (s\<lparr>queue := q\<rparr>) ++
       (\<lambda>v. if v \<in> (out_neighborhood G u) \<and> \<not> discovered v (s\<lparr>queue := q\<rparr>) then Some u else None))) =
-      card (dom (parent (s\<lparr>queue := q\<rparr>))) + card ?S"
-    using dom_parent_finite S_finite dom_parent_S_disjoint
-    by (simp add: card_Un_disjoint)
+      card (dom (parent (s\<lparr>queue := q\<rparr>))) + card S"
+    by (intro termination_aux) blast+
   hence
     "card (dom (parent (Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)))) =
-      card (dom (parent (s\<lparr>queue := q\<rparr>))) + card ?S"
+      card (dom (parent (s\<lparr>queue := q\<rparr>))) + card S"
     using out_neighborhood_finite
     by (simp add: parent_fold_discover_cong)
   moreover have
-    "size (mset (queue (Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)))) =
-      size (mset (queue (s\<lparr>queue := q\<rparr>))) + card ?S"
+    "length (list (queue (Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)))) =
+      length (list (queue (s\<lparr>queue := q\<rparr>))) + card S"
+    unfolding size_mset[symmetric]
     using out_neighborhood_finite
-    by (simp add: queue_fold_discover_cong)
+    by (simp add: S_def queue_fold_discover_cong)
   ultimately have
     "card (dVs G) +
-      size (mset (queue (Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)))) -
+      length (list (queue (Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)))) -
       card (dom (parent (Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)))) =
       card (dVs G) +
-      size (mset (queue (s\<lparr>queue := q\<rparr>))) + card (out_neighborhood G u - dom (parent (s\<lparr>queue := q\<rparr>))) -
+      length (list (queue (s\<lparr>queue := q\<rparr>))) + card (out_neighborhood G u - dom (parent (s\<lparr>queue := q\<rparr>))) -
       (card (dom (parent (s\<lparr>queue := q\<rparr>))) + card (out_neighborhood G u - dom (parent (s\<lparr>queue := q\<rparr>))))"
     by simp
-  also have "... = card (dVs G) + size (mset (queue (s\<lparr>queue := q\<rparr>))) - card (dom (parent (s\<lparr>queue := q\<rparr>)))"
+  also have "... = card (dVs G) + length (list (queue (s\<lparr>queue := q\<rparr>))) - card (dom (parent (s\<lparr>queue := q\<rparr>)))"
     by simp
-  also have "... < card (dVs G) + size (mset (queue s)) - card (dom (parent s))"
+  also have "... < card (dVs G) + length (list (queue s)) - card (dom (parent s))"
     unfolding assms(3)
     using assms(1)
-    by (intro termination_aux)
+    by (intro termination_aux2)
   finally show
     "Finite_Set.fold (discover u) (s\<lparr>queue := q\<rparr>) (out_neighborhood G u)
-      \<rightarrow>\<^bsub>measure (\<lambda>s. card (dVs G) + size (mset (queue s)) - card (dom (parent s)))\<^esub>s"
+      \<rightarrow>\<^bsub>measure (\<lambda>s. card (dVs G) + length (list (queue s)) - card (dom (parent s)))\<^esub>s"
     by simp
 qed simp
 
