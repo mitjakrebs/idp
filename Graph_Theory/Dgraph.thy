@@ -4,10 +4,10 @@ begin
 
 section \<open>Graphs\<close>
 
-type_synonym 'v dgraph = "('v \<times> 'v) set"
+type_synonym 'a dgraph = "('a \<times> 'a) set"
 
 locale dgraph =
-  fixes G :: "'v dgraph"
+  fixes G :: "'a dgraph"
 
 locale finite_dgraph = dgraph G for G +
   assumes edges_finite: "finite G"
@@ -33,12 +33,21 @@ qed
 
 section \<open>Neighborhood\<close>
 
-definition out_neighborhood :: "'v dgraph \<Rightarrow> 'v \<Rightarrow> 'v set" where
+definition out_neighborhood :: "'a dgraph \<Rightarrow> 'a \<Rightarrow> 'a set" where
   "out_neighborhood G u \<equiv> {v \<in> dVs G. (u, v) \<in> G}"
+
+lemma (in dgraph) in_out_neighborhood_iff_edge:
+  shows "v \<in> out_neighborhood G u \<longleftrightarrow> (u, v) \<in> G"
+  using dVsI(2)
+  by (auto simp add: out_neighborhood_def)
+
+lemma (in dgraph) out_neighborhood_subset_vertices:
+  shows "out_neighborhood G u \<subseteq> dVs G"
+  by (simp add: out_neighborhood_def)
 
 lemma (in finite_dgraph) out_neighborhood_finite:
   shows "finite (out_neighborhood G u)"
-  using vertices_finite
-  by (simp add: out_neighborhood_def)
+  using out_neighborhood_subset_vertices vertices_finite
+  by (rule finite_subset)
 
 end
