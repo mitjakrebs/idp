@@ -463,7 +463,7 @@ lemma (in finite_dgraph) shortest_dpathE_2:
   unfolding dpath_length_eq_dpath_weight dist_eq_\<delta> is_shortest_dpath_def[symmetric]
   by (elim shortest_dpathE)
 
-lemma (in finite_dgraph) rename_me:
+lemma (in finite_dgraph) dist_triangle_inequality_edge:
   assumes "(v, w) \<in> G"
   shows "dist G u w \<le> dist G u v + 1"
 proof -
