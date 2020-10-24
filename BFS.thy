@@ -1,19 +1,33 @@
 theory BFS
   imports
     "Graph_Theory/Graph_Theory"
+    "HOL-Data_Structures.Map_Specs"
     Queue_Specs
     Tbd
 begin
 
-record ('q, 'a) state =
+(* TODO: move somewhere else *)
+definition (in Map) dom :: "'m \<Rightarrow> 'a set" where
+  "dom m \<equiv> {a. lookup m a \<noteq> None}"
+thm ran_def
+
+(* TODO: move somewhere else *)
+definition (in Map) ran :: "'m \<Rightarrow> 'b set" where
+  "ran m \<equiv> {b. \<exists>a. lookup m a = Some b}"
+
+record ('q, 'm) state =
   queue :: 'q
-  parent :: "'a \<rightharpoonup> 'a"
+  parent :: "'m"
 
 locale bfs =
   finite_dgraph G +
+  Map where empty = Map_empty and update = update and invar = Map_invar +
   Queue where snoc = snoc
   for
     G :: "'a::linorder dgraph" and
+    Map_empty and
+    update :: "'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" and
+    Map_invar and
     snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" +
   fixes src :: 'a
   assumes src_in_vertices: "src \<in> dVs G"
@@ -23,28 +37,28 @@ abbreviation (in bfs) dist :: "'a \<Rightarrow> enat" where
 
 section \<open>BFS Algorithm\<close>
 
-definition (in bfs) init :: "('q, 'a) state" where
+definition (in bfs) init :: "('q, 'm) state" where
   "init \<equiv>
    \<lparr>queue = snoc empty src,
-    parent = Map.empty\<rparr>"
+    parent = Map_empty\<rparr>"
 
-definition (in bfs) cond :: "('q, 'a) state \<Rightarrow> bool" where
+definition (in bfs) cond :: "('q, 'm) state \<Rightarrow> bool" where
   "cond s \<longleftrightarrow> \<not> is_empty (queue s)"
 
-definition (in bfs) discovered :: "('q, 'a) state \<Rightarrow> 'a \<Rightarrow> bool" where
+definition (in bfs) discovered :: "('q, 'm) state \<Rightarrow> 'a \<Rightarrow> bool" where
   "discovered s v \<longleftrightarrow> v = src \<or> v \<in> dom (parent s)"
 
-definition (in bfs) discover :: "'a \<Rightarrow> 'a \<Rightarrow> ('q, 'a) state \<Rightarrow> ('q, 'a) state" where
+definition (in bfs) discover :: "'a \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> ('q, 'm) state" where
   "discover u v s \<equiv>
    \<lparr>queue = snoc (queue s) v,
-    parent = parent s(v \<mapsto> u)\<rparr>"
+    parent = update v u (parent s)\<rparr>"
 
-definition (in bfs) traverse_edge :: "'a \<Rightarrow> 'a \<Rightarrow> ('q, 'a) state \<Rightarrow> ('q, 'a) state" where
+definition (in bfs) traverse_edge :: "'a \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> ('q, 'm) state" where
   "traverse_edge u v s \<equiv>
    if \<not> discovered s v then discover u v s
    else s"
 
-function (in bfs) (domintros) loop :: "('q, 'a) state \<Rightarrow> ('q, 'a) state" where
+function (in bfs) (domintros) loop :: "('q, 'm) state \<Rightarrow> ('q, 'm) state" where
   "loop s =
    (if cond s
     then let
@@ -54,20 +68,20 @@ function (in bfs) (domintros) loop :: "('q, 'a) state \<Rightarrow> ('q, 'a) sta
     else s)"
   by pat_completeness simp
 
-abbreviation (in bfs) bfs :: "('q, 'a) state" where
+abbreviation (in bfs) bfs :: "('q, 'm) state" where
   "bfs \<equiv> loop init"
 
 section \<open>\<close>
 
-abbreviation (in bfs) fold :: "('q, 'a) state \<Rightarrow> ('q, 'a) state" where
+abbreviation (in bfs) fold :: "('q, 'm) state \<Rightarrow> ('q, 'm) state" where
   "fold s \<equiv>
    List.fold
     (traverse_edge (head (queue s)))
     (sorted_list_of_set (out_neighborhood G (head (queue s))))
     (s\<lparr>queue := tail (queue s)\<rparr>)"
 
-abbreviation (in bfs) T :: "('q, 'a) state \<Rightarrow> 'a dgraph" where
-  "T s \<equiv> {(u, v) |u v. parent s v = Some u}"
+abbreviation (in bfs) T :: "('q, 'm) state \<Rightarrow> 'a dgraph" where
+  "T s \<equiv> {(u, v) |u v. lookup (parent s) v = Some u}"
 
 section \<open>Convenience Lemmas\<close>
 
@@ -102,7 +116,7 @@ lemma (in bfs) queue_discover_cong [simp]:
 subsubsection \<open>parent\<close>
 
 lemma (in bfs) parent_discover_cong [simp]:
-  shows "parent (discover u v s) = parent s ++ [v \<mapsto> u]"
+  shows "parent (discover u v s) = update v u (parent s)"
   by (simp add: discover_def)
 
 subsection \<open>@{term bfs.traverse_edge}\<close>
@@ -131,19 +145,34 @@ lemma (in bfs) list_queue_traverse_edge_cong:
   using assms
   by (simp add: queue_traverse_edge_cong list_snoc)
 
-subsubsection \<open>parent\<close>
+subsubsection \<open>lookup \<circ> parent\<close>
 
-lemma (in bfs) parent_traverse_edge_cong:
+lemma (in bfs) lookup_parent_traverse_edge_cong:
+  assumes "Map_invar (parent s)"
   shows
-    "parent (traverse_edge u v s) =
-     parent s ++ (if \<not> discovered s v then [v \<mapsto> u] else Map.empty)"
+    "lookup (parent (traverse_edge u v s)) =
+     override_on
+      (lookup (parent s))
+      (\<lambda>_. Some u)
+      (if \<not> discovered s v then {v} else {})"
+  using assms
+  by (simp add: traverse_edge_def map_update override_on_insert')
+
+subsubsection \<open>Map_invar \<circ> parent\<close>
+
+lemma (in bfs) Map_invar_parent_traverse_edge:
+  assumes "Map_invar (parent s)"
+  shows "Map_invar (parent (traverse_edge u v s))"
+  using assms invar_update
   by (simp add: traverse_edge_def)
 
 subsubsection \<open>@{term bfs.T}\<close>
 
 lemma (in bfs) T_traverse_edge_cong:
+  assumes "Map_invar (parent s)"
   shows "T (traverse_edge u v s) = T s \<union> (if \<not> discovered s v then {(u, v)} else {})"
-  by (auto simp add: traverse_edge_def discovered_def discover_def)
+  using assms
+  by (auto simp add: lookup_parent_traverse_edge_cong override_on_def discovered_def dom_def)
 
 subsection \<open>@{term bfs.fold}\<close>
 
@@ -166,14 +195,22 @@ lemma (in bfs) invar_queue_fold_2:
 subsubsection \<open>list \<circ> queue\<close>
 
 lemma (in bfs) list_queue_fold_cong_aux:
+  assumes "Map_invar (parent s)"
   assumes "distinct (v # vs)"
-  assumes "w \<in> set vs"
-  shows "discovered (traverse_edge u v s) w = discovered s w"
-  using assms
-  by (auto simp add: discovered_def parent_traverse_edge_cong)
+  shows "filter (Not \<circ> discovered (traverse_edge u v s)) vs = filter (Not \<circ> discovered s) vs"
+proof (rule filter_cong)
+  fix w
+  assume "w \<in> set vs"
+  hence "discovered (traverse_edge u v s) w = discovered s w"
+    using assms
+    by (auto simp add: discovered_def dom_def lookup_parent_traverse_edge_cong override_on_insert')
+  thus "(Not \<circ> discovered (traverse_edge u v s)) w = (Not \<circ> discovered s) w"
+    by simp
+qed simp
 
 lemma (in bfs) list_queue_fold_cong:
   assumes "invar (queue s)"
+  assumes "Map_invar (parent s)"
   assumes "distinct l"
   shows
     "list (queue (List.fold (traverse_edge u) l s)) =
@@ -194,7 +231,7 @@ next
      list (queue (traverse_edge u v s)) @
      filter (Not \<circ> discovered (traverse_edge u v s)) vs"
     using Cons.prems
-    by (auto intro: invar_queue_traverse_edge Cons.hyps)
+    by (auto intro: invar_queue_traverse_edge Map_invar_parent_traverse_edge Cons.hyps)
   also have
     "... =
      list (queue s) @
@@ -207,9 +244,8 @@ next
      list (queue s) @
      (if \<not> discovered s v then [v] else []) @
      filter (Not \<circ> discovered s) vs"
-    unfolding comp_apply
-    using Cons.prems(2)
-    by (auto simp add: list_queue_fold_cong_aux intro: filter_cong)
+    using Cons.prems(2, 3)
+    by (simp add: list_queue_fold_cong_aux)
   also have "... = list (queue s) @ filter (Not \<circ> discovered s) (v # vs)"
     by simp
   finally show ?case
@@ -218,6 +254,7 @@ qed
 
 lemma (in bfs) list_queue_fold_cong_2:
   assumes "invar (queue s)"
+  assumes "Map_invar (parent s)"
   assumes "cond s"
   shows
     "list (queue (fold s)) =
@@ -232,31 +269,22 @@ proof -
       (sorted_list_of_set (out_neighborhood G (head (queue s))))"
     using assms
     by (intro invar_tail list_queue_fold_cong) simp+
-  also have
-    "... =
-     list (tail (queue s)) @
-     filter
-      (Not \<circ> discovered s)
-      (sorted_list_of_set (out_neighborhood G (head (queue s))))"
+  thus ?thesis
     unfolding comp_apply
     by (simp add: discovered_def)
-  finally show ?thesis
-    .
 qed
 
 subsubsection \<open>parent\<close>
 
-lemma (in bfs) parent_fold_cong_aux:
-  assumes "distinct (v # vs)"
-  shows "w \<in> set vs \<and> \<not> discovered (traverse_edge u v s) w \<longleftrightarrow> w \<in> set vs \<and> \<not> discovered s w"
-  using assms
-  by (auto simp add: discovered_def parent_traverse_edge_cong)
-
-lemma (in bfs) parent_fold_cong:
+lemma (in bfs) lookup_parent_fold_cong:
+  assumes "Map_invar (parent s)"
   assumes "distinct l"
   shows
-    "parent (List.fold (traverse_edge u) l s) =
-     parent s ++ (\<lambda>v. if v \<in> set l \<and> \<not> discovered s v then Some u else None)"
+    "lookup (parent (List.fold (traverse_edge u) l s)) =
+     override_on
+      (lookup (parent s))
+      (\<lambda>_. Some u)
+      (set (filter (Not \<circ> discovered s) l))"
   using assms
 proof (induct l arbitrary: s)
   case Nil
@@ -265,82 +293,106 @@ proof (induct l arbitrary: s)
 next
   case (Cons v vs)
   have
-    "parent (List.fold (traverse_edge u) (v # vs) s) =
-     parent (List.fold (traverse_edge u) vs (traverse_edge u v s))"
+    "lookup (parent (List.fold (traverse_edge u) (v # vs) s)) =
+     lookup (parent (List.fold (traverse_edge u) vs (traverse_edge u v s)))"
     by simp
   also have
     "... =
-     parent (traverse_edge u v s) ++
-     (\<lambda>w. if w \<in> set vs \<and> \<not> discovered (traverse_edge u v s) w then Some u else None)"
+     override_on
+      (lookup (parent (traverse_edge u v s)))
+      (\<lambda>_. Some u)
+      (set (filter (Not \<circ> discovered (traverse_edge u v s)) vs))"
     using Cons.prems
-    by (intro Cons.hyps) simp
+    by (fastforce intro: Map_invar_parent_traverse_edge Cons.hyps)
   also have
     "... =
-     parent s ++
-     (if \<not> discovered s v then [v \<mapsto> u] else Map.empty) ++
-     (\<lambda>w. if w \<in> set vs \<and> \<not> discovered (traverse_edge u v s) w then Some u else None)"
-    by (simp add: parent_traverse_edge_cong)
+     override_on
+      (override_on (lookup (parent s)) (\<lambda>_. Some u) (if \<not> discovered s v then {v} else {}))
+      (\<lambda>_. Some u)
+      (set (filter (Not \<circ> discovered (traverse_edge u v s)) vs))"
+    using Cons.prems(1)
+    by (simp add: lookup_parent_traverse_edge_cong)
   also have
     "... =
-     parent s ++
-     (if \<not> discovered s v then [v \<mapsto> u] else Map.empty) ++
-     (\<lambda>w. if w \<in> set vs \<and> \<not> discovered s w then Some u else None)"
+     override_on
+      (override_on (lookup (parent s)) (\<lambda>_. Some u) (if \<not> discovered s v then {v} else {}))
+      (\<lambda>_. Some u)
+      (set (filter (Not \<circ> discovered s) vs))"
     using Cons.prems
-    by (simp add: parent_fold_cong_aux)
-  also have
-    "... =
-     parent s ++
-     (\<lambda>w. if w \<in> set (v # vs) \<and> \<not> discovered s w then Some u else None)"
-    using Cons.prems
-    by (auto simp add: map_add_def)
+    by (simp add: list_queue_fold_cong_aux)
   finally show ?case
-    .
+    by (simp add: override_on_insert')
 qed
 
-lemma (in bfs) parent_fold_cong_2:
+lemma (in bfs) lookup_parent_fold_cong_2:
+  assumes "Map_invar (parent s)"
   shows
-    "parent (fold s) =
-     parent s ++
-     (\<lambda>v. if v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and> \<not> discovered s v
-          then Some (head (queue s))
-          else None)"
+    "lookup (parent (fold s)) =
+     override_on
+      (lookup (parent s))
+      (\<lambda>_. Some (head (queue s)))
+      (set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s))))))"
 proof -
   have
-    "parent (fold s) =
-     parent (s\<lparr>queue := tail (queue s)\<rparr>) ++
-     (\<lambda>v. if v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and>
-             \<not> discovered (s\<lparr>queue := tail (queue s)\<rparr>) v
-          then Some (head (queue s))
-          else None)"
-    by (simp add: parent_fold_cong)
+    "lookup (parent (fold s)) =
+     override_on
+      (lookup (parent (s\<lparr>queue := tail (queue s)\<rparr>)))
+      (\<lambda>_. Some (head (queue s)))
+      (set (filter (Not \<circ> discovered (s\<lparr>queue := tail (queue s)\<rparr>)) (sorted_list_of_set (out_neighborhood G (head (queue s))))))"
+    using assms
+    by (intro lookup_parent_fold_cong) simp+
   thus ?thesis
     by (simp add: discovered_def)
 qed
 
-(* TODO: remove? *)
-lemma (in bfs) parent_le_parent_fold:
-  shows "parent s \<subseteq>\<^sub>m parent (fold s)"
-  unfolding map_le_def
-proof
-  fix v
-  assume "v \<in> dom (parent s)"
-  hence "discovered s v"
-    by (simp add: discovered_def)
-  thus "parent s v = parent (fold s) v"
-    by (simp add: parent_fold_cong_2 map_add_def)
-qed
+subsubsection \<open>Map_invar \<circ> parent\<close>
+
+lemma (in bfs) Map_invar_parent_fold:
+  assumes "Map_invar (parent s)"
+  assumes "distinct l"
+  shows "Map_invar (parent (List.fold (traverse_edge u) l s))"
+  using assms
+  by (induct l arbitrary: s) (simp_all add: Map_invar_parent_traverse_edge)
+
+lemma (in bfs) Map_invar_parent_fold_2:
+  assumes "Map_invar (parent s)"
+  shows "Map_invar (parent (fold s))"
+  using assms
+  by (intro Map_invar_parent_fold) simp+
 
 subsubsection \<open>dom \<circ> parent\<close>
 
 lemma (in bfs) dom_parent_fold_subset_vertices:
-  assumes "dom (parent s) \<subseteq> dVs G"
+  assumes "Map_invar (parent s)"
   assumes "distinct l"
+  assumes "dom (parent s) \<subseteq> dVs G"
   assumes "set l \<subseteq> dVs G"
   shows "dom (parent (List.fold (traverse_edge u) l s)) \<subseteq> dVs G"
-  using assms
-  by (auto simp add: parent_fold_cong split: if_splits(2))
+proof
+  fix v
+  assume assm: "v \<in> dom (parent (List.fold (traverse_edge u) l s))"
+  show "v \<in> dVs G"
+  proof (cases "v \<in> set (filter (Not \<circ> discovered s) l)")
+    case True
+    thus ?thesis
+      using assms(4)
+      by auto
+  next
+    case False
+    have "lookup (parent (List.fold (traverse_edge u) l s)) v \<noteq> None"
+      using assm
+      by (simp add: dom_def)
+    hence "lookup (parent s) v \<noteq> None"
+      using assms(1, 2) False
+      by (simp add: lookup_parent_fold_cong)
+    thus ?thesis
+      using assms(3)
+      by (auto simp add: dom_def)
+  qed
+qed
 
 lemma (in bfs) dom_parent_fold_subset_vertices_2:
+  assumes "Map_invar (parent s)"
   assumes "dom (parent s) \<subseteq> dVs G"
   shows "dom (parent (fold s)) \<subseteq> dVs G"
 proof -
@@ -352,9 +404,63 @@ proof -
     by simp
 qed
 
+subsubsection \<open>ran \<circ> parent\<close>
+
+lemma (in bfs) ran_parent_fold_cong:
+  assumes "Map_invar (parent s)"
+  shows
+    "ran (parent (fold s)) =
+     ran (parent s) \<union>
+     (if set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s))))) = {}
+      then {}
+      else {head (queue s)})"
+proof
+  let ?S = "set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
+  show "ran (parent (fold s)) \<subseteq> ran (parent s) \<union> (if ?S = {} then {} else {head (queue s)})"
+    using assms
+    by (auto simp add: ran_def lookup_parent_fold_cong_2 override_on_def)
+  show "ran (parent s) \<union> (if ?S = {} then {} else {head (queue s)}) \<subseteq> ran (parent (fold s))"
+  proof
+    fix u
+    assume assm: "u \<in> ran (parent s) \<union> (if ?S = {} then {} else {head (queue s)})"
+    show "u \<in> ran (parent (fold s))"
+    proof (cases "u \<in> ran (parent s)")
+      case True
+      then obtain v where
+        "lookup (parent s) v = Some u"
+        by (auto simp add: ran_def)
+      moreover hence "discovered s v"
+        by (simp add: discovered_def dom_def)
+      ultimately show ?thesis
+        using assms
+        by (auto simp add: ran_def lookup_parent_fold_cong_2 override_on_def)
+    next
+      case False
+      then obtain v where
+        "v \<in> ?S"
+        using assm
+        by (auto split: if_splits(2))
+      moreover have "u = head (queue s)"
+        using assm False
+        by (simp split: if_splits(2))
+      ultimately show ?thesis
+        using assms
+        by (auto simp add: ran_def lookup_parent_fold_cong_2 override_on_def)
+    qed
+  qed
+qed
+
 subsubsection \<open>@{term bfs.T}\<close>
 
+lemma (in bfs) T_fold_cong_aux:
+  assumes "Map_invar (parent s)"
+  assumes "distinct (v # vs)"
+  shows "w \<in> set vs \<and> \<not> discovered (traverse_edge u v s) w \<longleftrightarrow> w \<in> set vs \<and> \<not> discovered s w"
+  using assms
+  by (auto simp add: discovered_def dom_def lookup_parent_traverse_edge_cong override_on_def)
+
 lemma (in bfs) T_fold_cong:
+  assumes "Map_invar (parent s)"
   assumes "distinct l"
   shows "T (List.fold (traverse_edge u) l s) = T s \<union> {(u, v) |v. v \<in> set l \<and> \<not> discovered s v}"
   using assms
@@ -373,13 +479,13 @@ next
      T (traverse_edge u v s) \<union>
      {(u, w) |w. w \<in> set vs \<and> \<not> discovered (traverse_edge u v s) w}"
     using Cons.prems
-    by (intro Cons.hyps) simp
+    by (intro Map_invar_parent_traverse_edge Cons.hyps) simp+
   also have
     "... =
      T s \<union>
      (if \<not> discovered s v then {(u, v)} else {}) \<union>
      {(u, w) |w. w \<in> set vs \<and> \<not> discovered (traverse_edge u v s) w}"
-    unfolding T_traverse_edge_cong
+    unfolding T_traverse_edge_cong[OF Cons.prems(1)]
     by blast
   also have
     "... =
@@ -387,7 +493,7 @@ next
      (if \<not> discovered s v then {(u, v)} else {}) \<union>
      {(u, w) |w. w \<in> set vs \<and> \<not> discovered s w}"
     using Cons.prems
-    by (simp add: parent_fold_cong_aux)
+    by (simp add: T_fold_cong_aux)
   also have "... = T s \<union> {(u, w) |w. w \<in> set (v # vs) \<and> \<not> discovered s w}"
     by force
   finally show ?case
@@ -395,6 +501,7 @@ next
 qed
 
 lemma (in bfs) T_fold_cong_2:
+  assumes "Map_invar (parent s)"
   shows
     "T (fold s) =
      T s \<union>
@@ -407,7 +514,8 @@ proof -
      {(head (queue s), v) |v.
       v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and>
       \<not> discovered (s\<lparr>queue := tail (queue s)\<rparr>) v}"
-    by (intro T_fold_cong) simp
+    using assms
+    by (intro T_fold_cong) simp+
   thus ?thesis
     by (simp add: discovered_def)
 qed
@@ -415,17 +523,19 @@ qed
 section \<open>Termination\<close>
 
 lemma (in bfs) loop_dom_aux:
+  assumes "Map_invar (parent s)"
   assumes "dom (parent s) \<subseteq> dVs G"
   shows
     "card (dom (parent (fold s))) =
      card (dom (parent s)) +
-     card {v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))). \<not> discovered s v}"
+     card (set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s))))))"
 proof -
-  let ?S = "{v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))). \<not> discovered s v}"
+  let ?S = "set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
   have "dom (parent (fold s)) = dom (parent s) \<union> ?S"
-    by (auto simp add: parent_fold_cong_2 domIff)
+    using assms(1)
+    by (auto simp add: dom_def lookup_parent_fold_cong_2 override_on_def)
   moreover have "finite (dom (parent s))"
-    using assms vertices_finite
+    using assms(2) vertices_finite
     by (rule finite_subset)
   moreover have "finite ?S"
     using out_neighborhood_finite
@@ -463,6 +573,7 @@ qed
 
 lemma (in bfs) loop_dom:
   assumes "invar (queue s)"
+  assumes "Map_invar (parent s)"
   assumes "dom (parent s) \<subseteq> dVs G"
   shows "loop_dom s"
   using assms
@@ -473,15 +584,17 @@ proof (induct "card (dVs G) + length (list (queue s)) - card (dom (parent s))"
   show ?case
   proof (cases "cond s")
     case True
+    thm list_queue_fold_cong_2
+    thm lookup_parent_fold_cong_2
     let ?u = "head (queue s)"
     let ?q = "tail (queue s)"
-    let ?S = "{v \<in> set (sorted_list_of_set (out_neighborhood G ?u)). \<not> discovered s v}"
+    let ?S = "set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
 
     have "length (list (queue (fold s))) = length (list ?q) + card ?S"
-      using less.prems(1) True
+      using less.prems(1, 2) True
       by (simp add: list_queue_fold_cong_2 distinct_card[symmetric])
     moreover have "card (dom (parent (fold s))) = card (dom (parent s)) + card ?S"
-      using less.prems(2)
+      using less.prems(2, 3)
       by (intro loop_dom_aux)
     ultimately have
       "card (dVs G) + length (list (queue (fold s))) - card (dom (parent (fold s))) =
@@ -497,8 +610,9 @@ proof (induct "card (dVs G) + length (list (queue s)) - card (dom (parent s))"
        card (dVs G) + length (list (queue s)) - card (dom (parent s))"
       .
     thus ?thesis
+      thm less.hyps
       using less.prems
-      by (intro invar_queue_fold_2 dom_parent_fold_subset_vertices_2 less.hyps loop.domintros)
+      by (intro invar_queue_fold_2 Map_invar_parent_fold_2 dom_parent_fold_subset_vertices_2 less.hyps loop.domintros)
   next
     case False
     thus ?thesis
@@ -510,10 +624,10 @@ section \<open>Invariants\<close>
 
 subsection \<open>\<close>
 
-abbreviation (in bfs) white :: "('q, 'a) state \<Rightarrow> 'a \<Rightarrow> bool" where
+abbreviation (in bfs) white :: "('q, 'm) state \<Rightarrow> 'a \<Rightarrow> bool" where
   "white s v \<equiv> \<not> discovered s v"
 
-abbreviation (in bfs) gray :: "('q, 'a) state \<Rightarrow> 'a \<Rightarrow> bool" where
+abbreviation (in bfs) gray :: "('q, 'm) state \<Rightarrow> 'a \<Rightarrow> bool" where
   "gray s v \<equiv> discovered s v \<and> v \<in> set (list (queue s))"
 
 lemma (in bfs) gray_imp_not_white:
@@ -522,7 +636,7 @@ lemma (in bfs) gray_imp_not_white:
   using assms
   by simp
 
-abbreviation (in bfs) black :: "('q, 'a) state \<Rightarrow> 'a \<Rightarrow> bool" where
+abbreviation (in bfs) black :: "('q, 'm) state \<Rightarrow> 'a \<Rightarrow> bool" where
   "black s v \<equiv> discovered s v \<and> v \<notin> set (list (queue s))"
 
 lemma (in bfs) black_imp_not_white:
@@ -540,15 +654,17 @@ lemma (in bfs) vertex_color_induct [case_names white gray black]:
   by blast
 
 locale bfs_invar =
-  bfs where G = G and snoc = snoc +
-  parent "state.parent s"
+  bfs where G = G and update = update and snoc = snoc +
+  parent "lookup (parent s)"
   for
     G :: "'a::linorder dgraph" and
+    update :: "'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" and
     snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" and
-    s :: "('q, 'a) state" +
+    s :: "('q, 'm) state" +
   assumes invar_queue: "invar (queue s)"
   assumes queue_distinct: "distinct (list (queue s))"
-  assumes parent_src: "parent s src = None"
+  assumes Map_invar_parent: "Map_invar (parent s)"
+  assumes parent_src: "lookup (parent s) src = None"
   assumes gray_if_mem_queue: "v \<in> set (list (queue s)) \<Longrightarrow> gray s v"
   assumes black_if_mem_ran: "v \<in> ran (parent s) \<Longrightarrow> black s v"
   assumes queue_sorted_wrt_dpath_length:
@@ -560,6 +676,34 @@ locale bfs_invar =
   assumes black_imp_out_neighborhood_not_white: "black s v \<Longrightarrow> \<forall>w\<in>out_neighborhood G v. \<not> white s w"
 
 subsection \<open>Convenience Lemmas\<close>
+
+lemma (in bfs_invar) list_queue_fold_cong:
+  assumes "cond s"
+  shows
+    "list (queue (fold s)) =
+     list (tail (queue s)) @
+     filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s))))"
+  using invar_queue Map_invar_parent assms
+  by (intro list_queue_fold_cong_2)
+
+lemma (in bfs_invar) lookup_parent_fold_cong:
+  shows
+    "lookup (parent (fold s)) =
+     override_on
+      (lookup (parent s))
+      (\<lambda>_. Some (head (queue s)))
+      (set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s))))))"
+  using Map_invar_parent
+  by (intro lookup_parent_fold_cong_2)
+
+lemma (in bfs_invar) T_fold_cong:
+  shows
+    "T (fold s) =
+     T s \<union>
+     {(head (queue s), v) |v.
+      v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and> \<not> discovered s v}"
+  using Map_invar_parent
+  by (intro T_fold_cong_2)
 
 lemma (in bfs_invar) src_not_white:
   shows "\<not> white s src"
@@ -739,7 +883,7 @@ lemma (in bfs_invar) mem_queue_distI:
 subsection \<open>Basic Lemmas\<close>
 
 lemma (in bfs_invar) parent_imp_edge:
-  assumes "parent s v = Some u"
+  assumes "lookup (parent s) v = Some u"
   shows "(u, v) \<in> G"
 proof -
   have "rev (follow v) = rev (follow u) @ [v]"
@@ -752,7 +896,7 @@ proof -
     by simp
   moreover have "dpath_bet G (rev (follow v)) src v"
     using assms not_white_imp_shortest_dpath
-    by (simp add: discovered_def domIff)
+    by (simp add: discovered_def dom_def)
   ultimately have "dpath_bet G (rev (tl (follow u)) @ [u, v]) src v"
     by simp
   thus ?thesis
@@ -765,8 +909,8 @@ proof
   fix v
   assume "v \<in> dom (parent s)"
   then obtain u where
-    "parent s v = Some u"
-    by (auto simp add: domIff)
+    "lookup (parent s) v = Some u"
+    by (auto simp add: dom_def)
   hence "(u, v) \<in> G"
     by (intro parent_imp_edge)
   thus "v \<in> dVs G"
@@ -950,12 +1094,12 @@ subsection \<open>@{term bfs.init}\<close>
 subsubsection \<open>\<close>
 
 lemma (in bfs) follow_invar'_parent_init:
-  shows "follow_invar' (parent init)"
+  shows "follow_invar' (lookup (parent init))"
   using wf_empty
-  by (simp add: follow_invar'_def init_def)
+  by (simp add: init_def map_empty follow_invar'_def)
 
 lemma (in bfs) parent_init:
-  shows "Tbd.parent (parent init)"
+  shows "Tbd.parent (lookup (parent init))"
   using follow_invar'_parent_init
   by unfold_locales
 
@@ -973,11 +1117,18 @@ lemma (in bfs) queue_distinct_init:
   using invar_empty
   by (simp add: init_def list_snoc list_empty)
 
+subsubsection \<open>@{thm bfs_invar.Map_invar_parent}\<close>
+
+lemma (in bfs) Map_invar_parent_init:
+  shows "Map_invar (parent init)"
+  using map_specs(4)
+  by (simp add: init_def)
+
 subsubsection \<open>@{thm bfs_invar.parent_src}\<close>
 
 lemma (in bfs) parent_src_init:
-  shows "parent init src = None"
-  by (simp add: init_def)
+  shows "lookup (parent init) src = None"
+  by (simp add: init_def map_empty)
 
 subsubsection \<open>@{thm bfs_invar.gray_if_mem_queue}\<close>
 
@@ -993,7 +1144,7 @@ lemma (in bfs) black_if_mem_ran_init:
   assumes "v \<in> ran (parent init)"
   shows "black init v"
   using assms
-  by (simp add: init_def)
+  by (simp add: init_def ran_def map_empty)
 
 subsubsection \<open>@{thm bfs_invar.queue_sorted_wrt_dpath_length}\<close>
 
@@ -1001,11 +1152,11 @@ lemma (in bfs) queue_sorted_wrt_dpath_length_init:
   assumes "\<not> is_empty (queue init)"
   shows
     "sorted_wrt
-      (\<lambda>u v. dpath_length (rev (parent.follow (parent init) u)) \<le>
-             dpath_length (rev (parent.follow (parent init) v)))
+      (\<lambda>u v. dpath_length (rev (parent.follow (lookup (parent init)) u)) \<le>
+             dpath_length (rev (parent.follow (lookup (parent init)) v)))
       (list (queue init)) \<and>
-     dpath_length (rev (parent.follow (parent init) (last (list (queue init))))) \<le>
-     dpath_length (rev (parent.follow (parent init) (head (queue init)))) + 1"
+     dpath_length (rev (parent.follow (lookup (parent init)) (last (list (queue init))))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent init)) (head (queue init)))) + 1"
   using invar_empty invar_queue_init
   by (simp add: init_def list_snoc list_empty list_head)
 
@@ -1014,8 +1165,8 @@ subsubsection \<open>@{thm bfs_invar.not_white_imp_shortest_dpath}\<close>
 lemma (in bfs) not_white_imp_shortest_dpath_init:
   assumes "\<not> white init v"
   shows
-    "dpath_bet G (rev (parent.follow (parent init) v)) src v \<and>
-     dpath_length (rev (parent.follow (parent init) v)) = dist v"
+    "dpath_bet G (rev (parent.follow (lookup (parent init)) v)) src v \<and>
+     dpath_length (rev (parent.follow (lookup (parent init)) v)) = dist v"
 proof -
   have dpath_bet: "dpath_bet G [src] src src"
     using src_in_vertices
@@ -1032,8 +1183,8 @@ proof -
     by (intro dist_le_dpath_length antisym)
   moreover have "v = src"
     using assms
-    by (simp add: discovered_def init_def)
-  moreover have "rev (parent.follow (parent init) src) = [src]"
+    by (simp add: discovered_def dom_def init_def map_empty)
+  moreover have "rev (parent.follow (lookup (parent init)) src) = [src]"
     using parent_init
     by (simp add: parent_src_init parent.follow_psimps)
   ultimately show ?thesis
@@ -1049,7 +1200,7 @@ lemma (in bfs) black_imp_out_neighborhood_not_white_init:
 proof -
   have "v = src"
     using assms
-    by (simp add: discovered_def init_def)
+    by (simp add: discovered_def dom_def init_def map_empty)
   moreover have "src \<in> set (list (queue init))"
     using invar_empty
     by (simp add: init_def list_snoc)
@@ -1061,12 +1212,12 @@ qed
 subsubsection \<open>\<close>
 
 lemma (in bfs) bfs_invar_init:
-  shows "bfs_invar empty is_empty head tail invar list src G snoc init"
+  shows "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc init"
   using bfs_axioms
   using follow_invar'_parent_init
-  using invar_queue_init queue_distinct_init parent_src_init gray_if_mem_queue_init
-  using black_if_mem_ran_init queue_sorted_wrt_dpath_length_init not_white_imp_shortest_dpath_init
-  using black_imp_out_neighborhood_not_white_init
+  using invar_queue_init queue_distinct_init Map_invar_parent_init parent_src_init
+  using gray_if_mem_queue_init black_if_mem_ran_init queue_sorted_wrt_dpath_length_init
+  using not_white_imp_shortest_dpath_init black_imp_out_neighborhood_not_white_init
   by unfold_locales
 
 subsection \<open>@{term bfs.fold}\<close>
@@ -1104,8 +1255,8 @@ proof -
     using queue_distinct
     by (simp add: list_queue[OF invar_queue list_queue_non_empty[OF assms]])
   ultimately show "?u \<notin> set (list (queue (fold s)))"
-    using invar_queue assms
-    by (simp add: list_queue_fold_cong_2)
+    using assms
+    by (simp add: list_queue_fold_cong)
 qed
 
 lemma (in bfs_invar) head_queue_if:
@@ -1118,8 +1269,8 @@ proof -
     using invar_queue assms(1)
     by (intro list_queue_non_empty list_queue)
   thus ?thesis
-    using invar_queue assms
-    by (simp add: list_queue_fold_cong_2)
+    using assms
+    by (simp add: list_queue_fold_cong)
 qed
 
 lemma (in bfs_invar) head_queue_iff:
@@ -1142,14 +1293,29 @@ lemma (in bfs_invar) not_white_imp_not_white_fold:
   assumes "\<not> white s v"
   shows "\<not> white (fold s) v"
   using assms
-  by (auto simp add: discovered_def parent_fold_cong_2)
+  by (auto simp add: discovered_def dom_def lookup_parent_fold_cong)
+
+lemma (in bfs_invar) white_not_white_fold_imp:
+  assumes "white s v"
+  assumes "\<not> white (fold s) v"
+  shows
+    "v \<in> out_neighborhood G (head (queue s))"
+    "lookup (parent (fold s)) v = Some (head (queue s))"
+proof -
+  show "v \<in> out_neighborhood G (head (queue s))"
+    using assms out_neighborhood_finite
+    by (fastforce simp add: discovered_def dom_def lookup_parent_fold_cong)
+  thus "lookup (parent (fold s)) v = Some (head (queue s))"
+    using assms(1) out_neighborhood_finite
+    by (auto simp add: lookup_parent_fold_cong)
+qed
 
 subsubsection \<open>\<close>
 
 lemma (in bfs_invar) follow_invar'_parent_fold:
   assumes "cond s"
-  shows "follow_invar' (parent (fold s))"
-  unfolding follow_invar'_def T_fold_cong_2
+  shows "follow_invar' (lookup (parent (fold s)))"
+  unfolding follow_invar'_def T_fold_cong
 proof (rule wf_Un[unfolded follow_invar'_def])
   let ?r =
     "{(head (queue s), v) |v.
@@ -1169,7 +1335,7 @@ qed
 
 lemma (in bfs_invar) parent_fold:
   assumes "cond s"
-  shows "Tbd.parent (parent (fold s))"
+  shows "Tbd.parent (lookup (parent (fold s)))"
   using assms
   by unfold_locales (intro follow_invar'_parent_fold)
 
@@ -1203,16 +1369,23 @@ proof -
   moreover have "distinct ?l2"
     by fastforce
   ultimately show ?thesis
-    using invar_queue assms
-    by (simp add: list_queue_fold_cong_2)
+    using assms
+    by (simp add: list_queue_fold_cong)
 qed
+
+subsubsection \<open>@{thm bfs_invar.Map_invar_parent}\<close>
+
+lemma (in bfs_invar) Map_invar_parent_fold:
+  shows "Map_invar (parent (fold s))"
+  using Map_invar_parent
+  by (intro Map_invar_parent_fold_2)
 
 subsubsection \<open>@{thm bfs_invar.parent_src}\<close>
 
 lemma (in bfs_invar) parent_src_fold:
-  shows "parent (fold s) src = None"
-  using src_not_white
-  by (simp add: parent_fold_cong_2 parent_src)
+  shows "lookup (parent (fold s)) src = None"
+  using Map_invar_parent src_not_white
+  by (simp add: lookup_parent_fold_cong_2 parent_src)
 
 subsubsection \<open>@{thm bfs_invar.gray_if_mem_queue}\<close>
 
@@ -1236,10 +1409,10 @@ next
     using False invar_queue
     by (auto simp add: list_tail intro: list.set_sel(2))
   hence "v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and> \<not> discovered s v"
-    using mem_queue_fold invar_queue cond
-    by (simp add: list_queue_fold_cong_2)
+    using mem_queue_fold cond
+    by (simp add: list_queue_fold_cong)
   hence "\<not> white (fold s) v"
-    by (fastforce simp add: discovered_def parent_fold_cong_2)
+    by (fastforce simp add: discovered_def dom_def lookup_parent_fold_cong)
   thus ?thesis
     using mem_queue_fold
     by blast
@@ -1251,22 +1424,8 @@ lemma (in bfs_invar) head_queue_if_2:
   assumes "v \<notin> ran (parent s)"
   assumes "v \<in> ran (parent (fold s))"
   shows "v = head (queue s)"
-proof -
-  have
-    "dom (parent s) \<inter>
-     dom (\<lambda>v. if v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and> \<not> discovered s v
-              then Some (head (queue s)) else None) = {}"
-    by (auto simp add: domIff discovered_def)
-  hence
-    "ran (parent (fold s)) =
-     ran (parent s) \<union>
-     ran (\<lambda>v. if v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and> \<not> discovered s v
-              then Some (head (queue s)) else None)"
-    by (simp add: parent_fold_cong_2 ran_map_add)
-  thus ?thesis
-    using assms
-    by (auto simp add: ran_def split: if_splits(2))
-qed
+  using Map_invar_parent assms
+  by (auto simp add: ran_parent_fold_cong split: if_splits(2))
 
 lemma (in bfs_invar) black_if_mem_ran_fold:
   assumes cond: "cond s"
@@ -1293,8 +1452,8 @@ proof (cases "v \<in> ran (parent s)")
       using assm not_white_fold
       by blast
     ultimately have "white (fold s) v"
-      using invar_queue cond black
-      by (simp add: discovered_def list_queue_fold_cong_2)
+      using cond black
+      by (simp add: discovered_def list_queue_fold_cong)
     thus "False"
       using not_white_fold
       by blast
@@ -1325,7 +1484,7 @@ subsubsection \<open>@{thm bfs_invar.queue_sorted_wrt_dpath_length}\<close>
 lemma (in bfs_invar) not_white_imp_rev_follow_fold_eq_rev_follow:
   assumes "cond s"
   assumes "\<not> white s v"
-  shows "rev (parent.follow (parent (fold s)) v) = rev (follow v)"
+  shows "rev (parent.follow (lookup (parent (fold s))) v) = rev (follow v)"
   using assms
 proof (induct v rule: follow.pinduct[OF follow_dom])
   case (1 v)
@@ -1333,13 +1492,13 @@ proof (induct v rule: follow.pinduct[OF follow_dom])
   proof (cases "v = src")
     case True
     hence
-      "parent s v = None"
-      "parent (fold s) v = None"
+      "lookup (parent s) v = None"
+      "lookup (parent (fold s)) v = None"
       using parent_src parent_src_fold
       by simp+
     hence
       "rev (follow v) = [v]"
-      "rev (parent.follow (parent (fold s)) v) = [v]"
+      "rev (parent.follow (lookup (parent (fold s))) v) = [v]"
       using "1.prems"(1) parent_fold
       by (simp_all add: follow_psimps parent.follow_psimps)
     thus ?thesis
@@ -1347,16 +1506,17 @@ proof (induct v rule: follow.pinduct[OF follow_dom])
   next
     case False
     then obtain u where u:
-      "parent s v = Some u"
+      "lookup (parent s) v = Some u"
       "\<not> white s u"
       using False "1.prems"(2) black_if_mem_ran
-      by (auto simp add: discovered_def ran_def)
-    moreover hence "parent (fold s) v = Some u"
+      by (auto simp add: discovered_def dom_def ran_def)
+    moreover hence "lookup (parent (fold s)) v = Some u"
       using "1.prems"(2)
-      by (simp add: parent_fold_cong_2 map_add_Some_iff)
+      by (simp add: lookup_parent_fold_cong map_add_Some_iff)
     ultimately have
       "rev (follow v) = rev (follow u) @ [v]"
-      "rev (parent.follow (parent (fold s)) v) = rev (parent.follow (parent (fold s)) u) @ [v]"
+      "rev (parent.follow (lookup (parent (fold s))) v) =
+       rev (parent.follow (lookup (parent (fold s))) u) @ [v]"
       using "1.prems"(1) parent_fold
       by (simp_all add: follow_psimps parent.follow_psimps)
     thus ?thesis
@@ -1369,41 +1529,43 @@ lemma (in bfs_invar) mem_filter_imp_dpath_length:
   assumes "cond s"
   assumes "v \<in> set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
   shows
-    "dpath_length (rev (parent.follow (parent (fold s)) v)) =
-     dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) + 1"
-    "dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue s))))) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) v))"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) v)) =
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) + 1"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue s))))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
 proof -
   let ?u = "head (queue s)"
-  have "parent (fold s) v = Some ?u"
+  have "lookup (parent (fold s)) v = Some ?u"
     using assms(2)
-    by (simp add: parent_fold_cong_2)
-  hence "rev (parent.follow (parent (fold s)) v) = rev (parent.follow (parent (fold s)) ?u) @ [v]"
+    by (simp add: lookup_parent_fold_cong)
+  hence
+    "rev (parent.follow (lookup (parent (fold s))) v) =
+     rev (parent.follow (lookup (parent (fold s))) ?u) @ [v]"
     using assms(1) parent_fold
     by (simp add: parent.follow_psimps)
   thus dpath_length_eq:
-    "dpath_length (rev (parent.follow (parent (fold s)) v)) =
-     dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) + 1"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) v)) =
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) + 1"
     using assms(1) parent_fold parent.follow_non_empty
     by (fastforce simp add: dpath_length_snoc)
 
   have
-    "dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue s))))) =
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue s))))) =
      dpath_length (rev (follow (last (list (queue s)))))"
     using assms list_queue_non_empty gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
   also have "... \<le> dpath_length (rev (follow ?u)) + 1"
     using assms queue_sorted_wrt_dpath_length
     by (simp add: cond_def)
-  also have "... = dpath_length (rev (parent.follow (parent (fold s)) ?u)) + 1"
+  also have "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) ?u)) + 1"
     using assms head_queue_imp(1) gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
-  also have "... = dpath_length (rev (parent.follow (parent (fold s)) v))"
+  also have "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
     unfolding dpath_length_eq
     ..
   finally show
-    "dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue s))))) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) v))"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue s))))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
     .
 qed
 
@@ -1420,24 +1582,24 @@ lemma (in bfs_invar) queue_sorted_wrt_dpath_length_fold_case_1_aux:
   assumes v_mem_filter:
     "v \<in> set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
   shows
-    "dpath_length (rev (parent.follow (parent (fold s)) u)) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) v))"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) u)) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
 proof -
   have u_mem_queue: "u \<in> set (list (queue s))"
     using u_mem_tail_queue invar_queue cond list_queue_non_empty
     by (auto simp add: list_tail intro: list.set_sel(2))
   have
-    "dpath_length (rev (parent.follow (parent (fold s)) u)) =
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) u)) =
      dpath_length (rev (follow u))"
     using cond u_mem_queue gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
   also have "... \<le> dpath_length (rev (follow (last (list (queue s)))))"
     using u_mem_queue
     by (intro mem_queue_imp_dpath_length_last_queue)
-  also have "... = dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue s)))))"
+  also have "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue s)))))"
     using cond list_queue_non_empty gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
-  also have "... \<le> dpath_length (rev (parent.follow (parent (fold s)) v))"
+  also have "... \<le> dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
     using cond v_mem_filter
     by (intro mem_filter_imp_dpath_length(2))
   finally show ?thesis
@@ -1448,28 +1610,28 @@ lemma (in bfs_invar) queue_sorted_wrt_dpath_length_fold_case_2_aux:
   assumes cond: "cond s"
   assumes "\<not> is_empty (queue (fold s))"
   shows
-    "dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue (fold s)))))) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) + 1"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue (fold s)))))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) + 1"
 proof (cases "filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))) = []")
   case True
   hence list_tail_non_empty: "list (tail (queue s)) \<noteq> []"
     using invar_queue assms invar_queue_fold_2
-    by (simp add: list_queue_fold_cong_2 is_empty)
+    by (simp add: list_queue_fold_cong is_empty)
   hence "last (list (queue (fold s))) = last (list (tail (queue s)))"
-    unfolding list_queue_fold_cong_2[OF invar_queue assms(1)] last_appendL[OF True]
+    unfolding list_queue_fold_cong[OF cond] last_appendL[OF True]
     by blast
   hence "last (list (queue (fold s))) = last (list (queue s))"
     using list_tail_non_empty
     by (simp add: list_queue[OF invar_queue list_queue_non_empty[OF assms(1)]])
   hence
-    "dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue (fold s)))))) =
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue (fold s)))))) =
      dpath_length (rev (follow (last (list (queue s)))))"
     using cond list_queue_non_empty gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
   also have "... \<le> dpath_length (rev (follow (head (queue s)))) + 1"
     using invar_queue cond list_queue_non_empty queue_sorted_wrt_dpath_length
     by (simp add: is_empty)
-  also have "... = dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) + 1"
+  also have "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) + 1"
     using cond head_queue_imp(1) gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
   finally show ?thesis
@@ -1479,7 +1641,7 @@ next
   hence
     "last (list (queue (fold s))) \<in>
      set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
-    unfolding list_queue_fold_cong_2[OF invar_queue cond] last_appendR[OF False]
+    unfolding list_queue_fold_cong[OF cond] last_appendR[OF False]
     by (intro last_in_set)
   with cond
   show ?thesis
@@ -1490,8 +1652,8 @@ lemma (in bfs_invar) queue_sorted_wrt_dpath_length_fold_case_2_aux_2:
   assumes cond: "cond s"
   assumes "\<not> is_empty (queue (fold s))"
   shows
-    "dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) (head (queue (fold s)))))"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue (fold s)))))"
 proof (cases "list (tail (queue s)) = []")
   case True
   have "head (queue (fold s)) = hd (list (queue (fold s)))"
@@ -1500,12 +1662,12 @@ proof (cases "list (tail (queue s)) = []")
   hence
     "head (queue (fold s)) =
      hd (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
-    using invar_queue cond True
-    by (simp add: list_queue_fold_cong_2)
+    using cond True
+    by (simp add: list_queue_fold_cong)
   moreover have
     "filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<noteq> []"
     using invar_queue assms invar_queue_fold_2 True
-    by (simp add: is_empty list_queue_fold_cong_2)
+    by (simp add: is_empty list_queue_fold_cong)
   ultimately have head_queue_fold_mem_filter:
     "head (queue (fold s)) \<in>
      set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s)))))"
@@ -1513,7 +1675,7 @@ proof (cases "list (tail (queue s)) = []")
     by metis
 
   have
-    "dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) =
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) =
      dpath_length (rev (follow (head (queue s))))"
     using cond head_queue_imp(1) gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
@@ -1521,10 +1683,10 @@ proof (cases "list (tail (queue s)) = []")
     using cond
     by (intro head_queue_imp(1) mem_queue_imp_dpath_length_last_queue)
   also have
-    "... = dpath_length (rev (parent.follow (state.parent (local.fold s)) (last (list (queue s)))))"
+    "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue s)))))"
     using cond list_queue_non_empty gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
-  also have "... \<le> dpath_length (rev (parent.follow (parent (fold s)) (head (queue (fold s)))))"
+  also have "... \<le> dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue (fold s)))))"
     using cond head_queue_fold_mem_filter
     by (intro mem_filter_imp_dpath_length(2))
   finally show ?thesis
@@ -1535,21 +1697,21 @@ next
     using assms invar_queue invar_queue_fold_2
     by (simp add: is_empty list_head)
   hence "head (queue (fold s)) = hd (list (tail (queue s)))"
-    using invar_queue cond False
-    by (simp add: list_queue_fold_cong_2)
+    using cond False
+    by (simp add: list_queue_fold_cong)
   hence head_queue_fold_mem_list_queue: "head (queue (fold s)) \<in> set (list (queue s))"
     using False invar_queue cond list_queue_non_empty
     by (auto simp add: list_tail intro: list.set_sel(2))
 
   have
-    "dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) =
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) =
      dpath_length (rev (follow (head (queue s))))"
     using cond head_queue_imp(1) gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
   also have "... \<le> dpath_length (rev (follow (head (queue (fold s)))))"
     using head_queue_fold_mem_list_queue
     by (intro mem_queue_imp_dpath_length_head_queue)
-  also have "... = dpath_length (rev (parent.follow (parent (fold s)) (head (queue (fold s)))))"
+  also have "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue (fold s)))))"
     using cond head_queue_fold_mem_list_queue gray_if_mem_queue
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
   finally show ?thesis
@@ -1561,16 +1723,16 @@ lemma (in bfs_invar) queue_sorted_wrt_dpath_length_fold:
   assumes "\<not> is_empty (queue (fold s))"
   shows
     "sorted_wrt
-      (\<lambda>u v. dpath_length (rev (parent.follow (parent (fold s)) u)) \<le>
-             dpath_length (rev (parent.follow (parent (fold s)) v)))
+      (\<lambda>u v. dpath_length (rev (parent.follow (lookup (parent (fold s))) u)) \<le>
+             dpath_length (rev (parent.follow (lookup (parent (fold s))) v)))
       (list (queue (fold s))) \<and>
-     dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue (fold s)))))) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) (head (queue (fold s))))) + 1"
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue (fold s)))))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue (fold s))))) + 1"
 proof (rule conjI, goal_cases)
   case 1
   let ?P =
-    "\<lambda>u v. dpath_length (rev (parent.follow (parent (fold s)) u)) \<le>
-           dpath_length (rev (parent.follow (parent (fold s)) v))"
+    "\<lambda>u v. dpath_length (rev (parent.follow (lookup (parent (fold s))) u)) \<le>
+           dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
   have list_queue_non_empty: "list (queue s) \<noteq> []"
     using cond
     by (intro list_queue_non_empty)
@@ -1594,21 +1756,21 @@ proof (rule conjI, goal_cases)
   moreover have
     "\<forall>u\<in>set (list (tail (queue s))).
       \<forall>v\<in>set (filter (Not \<circ> discovered s) (sorted_list_of_set (out_neighborhood G (head (queue s))))).
-       dpath_length (rev (parent.follow (parent (fold s)) u)) \<le>
-       dpath_length (rev (parent.follow (parent (fold s)) v))"
+       dpath_length (rev (parent.follow (lookup (parent (fold s))) u)) \<le>
+       dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
     using cond
     by (blast intro: queue_sorted_wrt_dpath_length_fold_case_1_aux)
   ultimately show ?case 
-    using invar_queue cond
-    by (simp add: list_queue_fold_cong_2 sorted_wrt_append)
+    using cond
+    by (simp add: list_queue_fold_cong sorted_wrt_append)
 next
   case 2
   have
-    "dpath_length (rev (parent.follow (parent (fold s)) (last (list (queue (fold s)))))) \<le>
-     dpath_length (rev (parent.follow (parent (fold s)) (head (queue s)))) + 1"
+    "dpath_length (rev (parent.follow (lookup (parent (fold s))) (last (list (queue (fold s)))))) \<le>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue s)))) + 1"
     using assms
     by (intro queue_sorted_wrt_dpath_length_fold_case_2_aux)
-  also have "... \<le> dpath_length (rev (parent.follow (parent (fold s)) (head (queue (fold s))))) + 1"
+  also have "... \<le> dpath_length (rev (parent.follow (lookup (parent (fold s))) (head (queue (fold s))))) + 1"
     using assms
     by (auto intro: queue_sorted_wrt_dpath_length_fold_case_2_aux_2)
   finally show ?case
@@ -1616,26 +1778,6 @@ next
 qed
 
 subsubsection \<open>@{thm bfs_invar.not_white_imp_shortest_dpath}\<close>
-
-lemma (in bfs_invar) white_not_white_fold_imp:
-  assumes "white s v"
-  assumes "\<not> white (fold s) v"
-  shows
-    "v \<in> out_neighborhood G (head (queue s))"
-    "parent (fold s) v = Some (head (queue s))"
-proof -
-  have
-    "parent (fold s) v =
-     (\<lambda>v. if v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s)))) \<and> \<not> discovered s v
-          then Some (head (queue s)) else None) v"
-    using assms(1)
-    by (simp add: discovered_def domIff parent_fold_cong_2)
-  thus
-    "v \<in> out_neighborhood G (head (queue s))"
-    "parent (fold s) v = Some (head (queue s))"
-    using assms out_neighborhood_finite
-    by (auto simp add: discovered_def)
-qed
 
 lemma (in bfs_invar) not_white_imp_shortest_dpath_fold_case_1_subcase_3_aux:
   assumes cond: "cond s"
@@ -1740,14 +1882,14 @@ lemma (in bfs_invar) not_white_imp_shortest_dpath_fold:
   assumes cond: "cond s"
   assumes not_white_fold: "\<not> white (fold s) v"
   shows
-    "dpath_bet G (rev (parent.follow (parent (fold s)) v)) src v \<and>
-     dpath_length (rev (parent.follow (parent (fold s)) v)) = dist v"
+    "dpath_bet G (rev (parent.follow (lookup (parent (fold s))) v)) src v \<and>
+     dpath_length (rev (parent.follow (lookup (parent (fold s))) v)) = dist v"
 proof (cases "white s v", standard)
   let ?u = "head (queue s)"
   case True
   hence
     v_mem_out_neighborhood_head_queue: "v \<in> out_neighborhood G ?u" and
-    parent_fold_v_eq_head_queue: "parent (fold s) v = Some ?u"
+    parent_fold_v_eq_head_queue: "lookup (parent (fold s)) v = Some ?u"
     using not_white_fold
     by (auto intro: white_not_white_fold_imp)
   have head_queue_not_white: "\<not> white s ?u"
@@ -1756,13 +1898,15 @@ proof (cases "white s v", standard)
   hence rev_follow_head_queue_shortest_dpath:
     "dpath_bet G (rev (follow ?u)) src ?u \<and> dpath_length (rev (follow ?u)) = dist ?u"
     by (intro not_white_imp_shortest_dpath)
-  have "rev (parent.follow (parent (fold s)) v) = rev (parent.follow (parent (fold s)) ?u) @ [v]"
+  have
+    "rev (parent.follow (lookup (parent (fold s))) v) =
+     rev (parent.follow (lookup (parent (fold s))) ?u) @ [v]"
     using cond parent_fold
     by (simp add: parent.follow_psimps parent_fold_v_eq_head_queue)
-  hence rev_follow_fold_eq: "rev (parent.follow (parent (fold s)) v) = rev (follow ?u) @ [v]"
+  hence rev_follow_fold_eq: "rev (parent.follow (lookup (parent (fold s))) v) = rev (follow ?u) @ [v]"
     using cond head_queue_not_white
     by (simp add: not_white_imp_rev_follow_fold_eq_rev_follow)
-  thus "dpath_bet G (rev (parent.follow (parent (fold s)) v)) src v"
+  thus "dpath_bet G (rev (parent.follow (lookup (parent (fold s))) v)) src v"
     using rev_follow_head_queue_shortest_dpath
     using v_mem_out_neighborhood_head_queue dpath_bet_transitive
     by (fastforce simp add: in_out_neighborhood_iff_edge edge_iff_dpath_bet)
@@ -1775,10 +1919,10 @@ proof (cases "white s v", standard)
   also have "... = dpath_length (rev (follow ?u)) + 1"
     unfolding plus_enat_simps(1)[symmetric]
     by (simp add: rev_follow_head_queue_shortest_dpath)
-  also have "... = dpath_length (rev (parent.follow (parent (fold s)) v))"
+  also have "... = dpath_length (rev (parent.follow (lookup (parent (fold s))) v))"
     using follow_non_empty
     by (simp add: rev_follow_fold_eq dpath_length_snoc)
-  finally show "dpath_length (rev (parent.follow (state.parent (local.fold s)) v)) = dist v"
+  finally show "dpath_length (rev (parent.follow (lookup (parent (fold s))) v)) = dist v"
     by simp
 next
   case False
@@ -1796,11 +1940,11 @@ lemma (in bfs_invar) black_imp_out_neighborhood_not_white_fold:
 proof (induct s v rule: vertex_color_induct)
   case white
   hence "v \<in> set (sorted_list_of_set (out_neighborhood G (head (queue s))))"
-    using black_fold
-    by (fastforce simp add: discovered_def parent_fold_cong_2)
+    using black_fold out_neighborhood_finite
+    by (auto intro: white_not_white_fold_imp(1))
   hence "v \<in> set (list (queue (fold s)))"
-    using white invar_queue cond
-    by (simp add: discovered_def list_queue_fold_cong_2)
+    using white cond
+    by (simp add: discovered_def list_queue_fold_cong)
   thus ?case
     using black_fold
     by blast
@@ -1811,7 +1955,7 @@ next
     by (intro head_queue_if) simp+
   thus ?case
     using out_neighborhood_finite
-    by (auto simp add: discovered_def parent_fold_cong_2)
+    by (auto simp add: discovered_def dom_def lookup_parent_fold_cong override_on_def)
 next
   case black
   hence "\<forall>w\<in>out_neighborhood G v. \<not> white s w"
@@ -1825,24 +1969,27 @@ subsubsection \<open>\<close>
 
 lemma (in bfs_invar) bfs_invar_fold:
   assumes "cond s"
-  shows "bfs_invar empty is_empty head tail invar list src G snoc (fold s)"
+  shows "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc (fold s)"
   using assms
   using bfs_axioms
   using follow_invar'_parent_fold
-  using invar_queue_fold queue_distinct_fold parent_src_fold gray_if_mem_queue_fold
-  using black_if_mem_ran_fold queue_sorted_wrt_dpath_length_fold not_white_imp_shortest_dpath_fold
-  using black_imp_out_neighborhood_not_white_fold
+  using invar_queue_fold queue_distinct_fold Map_invar_parent_fold parent_src_fold
+  using gray_if_mem_queue_fold black_if_mem_ran_fold queue_sorted_wrt_dpath_length_fold
+  using not_white_imp_shortest_dpath_fold black_imp_out_neighborhood_not_white_fold
   by unfold_locales
 
 subsection \<open>@{term bfs.loop}\<close>
 
 lemma (in bfs) loop_psimps:
-  assumes "bfs_invar empty is_empty head tail invar list src G snoc s"
+  assumes "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc s"
   shows "loop s = (if cond s then loop (fold s) else s)"
 proof -
   have "invar (queue s)"
     using assms
     by (intro bfs_invar.invar_queue)
+  moreover have "Map_invar (parent s)"
+    using assms
+    by (intro bfs_invar.Map_invar_parent)
   moreover have "dom (parent s) \<subseteq> dVs G"
     using assms
     by (intro bfs_invar.dom_parent_subset_vertices)
@@ -1852,13 +1999,16 @@ proof -
 qed
 
 lemma (in bfs) bfs_induct:
-  assumes "bfs_invar empty is_empty head tail invar list src G snoc s"
+  assumes "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc s"
   assumes "\<And>s. loop_dom s \<Longrightarrow> (cond s \<Longrightarrow> P (fold s)) \<Longrightarrow> P s"
   shows "P s"
 proof -
   have "invar (queue s)"
     using assms(1)
     by (intro bfs_invar.invar_queue)
+  moreover have "Map_invar (parent s)"
+    using assms(1)
+    by (intro bfs_invar.Map_invar_parent)
   moreover have "dom (parent s) \<subseteq> dVs G"
     using assms(1)
     by (intro bfs_invar.dom_parent_subset_vertices)
@@ -1868,8 +2018,8 @@ proof -
 qed
 
 lemma (in bfs) bfs_invar_loop:
-  assumes "bfs_invar empty is_empty head tail invar list src G snoc s"
-  shows "bfs_invar empty is_empty head tail invar list src G snoc (loop s)"
+  assumes "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc s"
+  shows "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc (loop s)"
   using assms
 proof (induct rule: bfs_induct[OF assms])
   case (1 s)
@@ -1880,23 +2030,23 @@ qed
 subsection \<open>@{term bfs.bfs}\<close>
 
 lemma (in bfs) bfs_invar_bfs:
-  shows "bfs_invar empty is_empty head tail invar list src G snoc bfs"
+  shows "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc bfs"
   using bfs_invar_init
   by (intro bfs_invar_loop)
 
 section \<open>Correctness\<close>
 
 lemma (in bfs) soundness:
-  assumes "bfs_invar empty is_empty head tail invar list src G snoc s"
+  assumes "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc s"
   assumes "discovered (loop s) v"
   shows
-    "dpath_bet G (rev (parent.follow (parent (loop s)) v)) src v \<and>
-     dpath_length (rev (parent.follow (parent (loop s)) v)) = dist v"
+    "dpath_bet G (rev (parent.follow (lookup (parent (loop s))) v)) src v \<and>
+     dpath_length (rev (parent.follow (lookup (parent (loop s))) v)) = dist v"
   using assms bfs_invar_loop bfs_invar.not_white_imp_shortest_dpath
   by fast
 
 lemma (in bfs) completeness:
-  assumes "bfs_invar empty is_empty head tail invar list src G snoc s"
+  assumes "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc s"
   assumes "\<not> discovered (loop s) v"
   shows "\<not> reachable G src v"
   using assms
@@ -1923,12 +2073,12 @@ proof (induct rule: bfs_induct[OF assms(1)])
 qed
 
 lemma (in bfs) correctness:
-  assumes "bfs_invar empty is_empty head tail invar list src G snoc s"
+  assumes "bfs_invar delete lookup empty is_empty head tail invar list Map_empty Map_invar src G update snoc s"
   shows
     "\<And>v.
       discovered (loop s) v \<Longrightarrow>
-      dpath_bet G (rev (parent.follow (parent (loop s)) v)) src v \<and>
-      dpath_length (rev (parent.follow (parent (loop s)) v)) = dist v"
+      dpath_bet G (rev (parent.follow (lookup (parent (loop s))) v)) src v \<and>
+      dpath_length (rev (parent.follow (lookup (parent (loop s))) v)) = dist v"
     "\<And>v. \<not> discovered (loop s) v \<Longrightarrow> \<not> reachable G src v"
   using assms soundness completeness
   by simp+
@@ -1937,8 +2087,8 @@ lemma (in bfs) bfs_correct:
   shows
     "\<And>v.
       discovered bfs v \<Longrightarrow>
-      dpath_bet G (rev (parent.follow (parent bfs) v)) src v \<and>
-      dpath_length (rev (parent.follow (parent bfs) v)) = dist v"
+      dpath_bet G (rev (parent.follow (lookup (parent bfs)) v)) src v \<and>
+      dpath_length (rev (parent.follow (lookup (parent bfs)) v)) = dist v"
     "\<And>v. \<not> discovered bfs v \<Longrightarrow> \<not> reachable G src v"
   using bfs_invar_init correctness
   by simp+
