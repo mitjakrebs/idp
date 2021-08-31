@@ -1,5 +1,5 @@
 theory Queue_Specs
-  imports "HOL-Library.Multiset"
+  imports Main
 begin
 
 locale Queue =
