@@ -2,20 +2,35 @@ theory BFS_Impl
   imports
     BFS
     "HOL-Data_Structures.RBT_Set2"
-    Tbd_Graph_Tbd
+    "../Queue"
+    "../Tbd_Graph_Impl"
 begin
 
-locale agublagu =
-  fixes out_neighborhood :: "'a::linorder \<Rightarrow> 'a rbt"
-  assumes invar_out_neighborhood: "v \<in> dVs G \<Longrightarrow> rbt (out_neighborhood v) \<and> sorted (inorder (out_neighborhood v))"
-  assumes isin_out_neighborhood_iff_edge: "rbt (out_neighborhood u) \<and> sorted (inorder (out_neighborhood u)) \<Longrightarrow> isin (out_neighborhood u) v \<longleftrightarrow> (u, v) \<in> G"
-begin
-
-interpretation finite_dgraph_tbd empty delete isin inorder rbt G insert out_neighborhood
-  using finite_dgraph_axioms RBT_Set2.S.Set_by_Ordered_axioms
-  using invar_out_neighborhood isin_out_neighborhood_iff_edge
-  by (intro finite_dgraph_tbd.intro finite_dgraph_tbd_axioms.intro) (simp_all add: RBT_Set2.S.invar_def)
-
-end
+interpretation bfs where
+  Map_empty = empty and
+  Map_delete = RBT_Map.delete and
+  Map_lookup = lookup and
+  Map_inorder = inorder and
+  Map_inv = rbt and
+  Set_empty = empty and
+  Set_insert = insert and
+  Set_delete = delete and
+  Set_isin = isin and
+  Set_inorder = inorder and
+  Set_inv = rbt and
+  Map_update = update and
+  P_empty = empty and
+  P_update = update and
+  P_delete = RBT_Map.delete and
+  P_lookup = lookup and
+  P_invar = M.invar and
+  Q_empty = Queue.empty and
+  Q_is_empty = is_empty and
+  Q_snoc = snoc and
+  Q_head = head and
+  Q_tail = tail and
+  Q_invar = invar and
+  Q_list = list
+  ..
 
 end

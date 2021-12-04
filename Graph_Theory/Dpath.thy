@@ -6,6 +6,8 @@ theory Dpath
     Ports.Noschinski_to_DDFS
 begin
 
+section \<open>Directed paths\<close>
+
 type_synonym 'a dpath = "'a list"
 
 lemmas dpath_induct = edges_of_dpath.induct
@@ -44,7 +46,6 @@ text \<open>The length of a @{term dpath} is the number of its edges.\<close>
 abbreviation dpath_length :: "'a dpath \<Rightarrow> nat" where
   "dpath_length p \<equiv> length (edges_of_dpath p)"
 
-
 lemma dpath_length_Cons:
   assumes "vs \<noteq> []"
   shows "dpath_length (v # vs) = dpath_length vs + 1"
@@ -74,6 +75,79 @@ lemma dpath_length_append_2:
   shows "dpath_length (p @ tl q) = dpath_length p + dpath_length q"
   using assms
   by (simp add: dpath_length_append)
+
+section \<open>Distinct directed paths\<close>
+
+subsection \<open>Transforming directed paths into distinct directed paths\<close>
+
+lemma closed_dpath_bet_decompE_3:
+  assumes "dpath_bet G p u v"
+  assumes "\<not> distinct p"
+  assumes "closed_dpath_bet_decomp G p = (q, r, s)"
+  obtains
+    "q \<noteq> []"
+    "s \<noteq> []"
+    "last q = hd s"
+proof
+  have
+    "p = q @ tl r @ tl s"
+    "\<exists>w. dpath_bet G q u w \<and> closed_dpath_bet G r w \<and> dpath_bet G s w v"
+    using assms
+    by (blast elim: closed_dpath_bet_decompE_2)+
+  thus
+    "q \<noteq> []"
+    "s \<noteq> []"
+    "last q = hd s"
+    by (auto dest: dpath_bet_nonempty_dpath(2-4))
+qed
+
+lemma edges_of_dpath_decomp:
+  assumes "dpath_bet G p u v"
+  assumes "\<not> distinct p"
+  assumes "closed_dpath_bet_decomp G p = (q, r, s)"
+  shows "edges_of_dpath p = edges_of_dpath q @ edges_of_dpath r @ edges_of_dpath s"
+proof -
+  have
+    p_def: "p = q @ tl r @ tl s" and
+    "\<exists>w. dpath_bet G q u w \<and> closed_dpath_bet G r w \<and> dpath_bet G s w v"
+    using assms
+    by (blast elim: closed_dpath_bet_decompE_2)+
+  hence
+    "q \<noteq> []"
+    "r \<noteq> []"
+    "s \<noteq> []"
+    "last q = hd r"
+    "last r = hd s"
+    by (auto dest: dpath_bet_nonempty_dpath(2-4))
+  thus ?thesis
+    by (auto simp add: p_def edges_of_dpath_append_3 append_Cons[symmetric])
+qed
+
+lemma distinct_dpath_length_le_dpath_length:
+  assumes "dpath_bet G p u v"
+  shows "dpath_length (dpath_bet_to_distinct G p) \<le> dpath_length p"
+  using assms
+proof (induction rule: dpath_bet_to_distinct_induct)
+  case (path p)
+  thus ?case
+    by simp
+next
+  case (decomp p q r s)
+  hence "dpath_length (dpath_bet_to_distinct G p) = dpath_length (dpath_bet_to_distinct G (q @ tl s))"
+    by (auto simp add: decomp.hyps(3))
+  also have "... \<le> dpath_length (q @ tl s)"
+    by (intro decomp.IH)
+  also have "... = dpath_length q + dpath_length s"
+    using decomp.hyps
+    by (blast elim: closed_dpath_bet_decompE_3 intro: dpath_length_append_2)
+  also have "... \<le> dpath_length q + dpath_length r + dpath_length s"
+    by simp
+  also have "... = dpath_length p"
+    using decomp.hyps
+    by (simp add: edges_of_dpath_decomp)
+  finally show ?case
+    .
+qed
 
 section \<open>Reachability\<close>
 

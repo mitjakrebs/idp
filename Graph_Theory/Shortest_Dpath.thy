@@ -131,7 +131,7 @@ proof (rule antisym)
     by (simp add: \<delta>_def)
 qed
 
-(* TODO: move somewhere else *)
+(* TODO Move somewhere else. *)
 lemma INF_in_image:
   fixes f :: "'a \<Rightarrow> enat"
   assumes S_finite: "finite S"
@@ -155,36 +155,38 @@ proof -
     by simp
 qed
 
-lemma (in finite_dgraph) \<delta>_distinct_dpath_bet:
-  assumes "reachable G u v"
+lemma \<delta>_distinct_dpath_bet:
+  assumes finite: "finite G"
+  assumes reachable: "reachable G u v"
   shows "\<exists>p. distinct_dpath_bet G p u v \<and> dpath_weight f p = \<delta> G f u v"
 proof -
   have distinct_dpaths_non_empty: "{p. distinct_dpath_bet G p u v} \<noteq> {}"
     (is "?A \<noteq> {}")
-    using assms
+    using reachable
     by (auto simp add: reachable_iff_dpath_bet intro: dpath_bet_to_distinct_is_distinct_dpath_bet)
 
   have "\<delta> G f u v = (INF p\<in>?A. enat (dpath_weight f p))"
     by (intro \<delta>_eq_shortest_distinct_dpath_bet_weight)
   also have "... \<in> (\<lambda>p. enat (dpath_weight f p)) ` ?A"
-    using edges_finite distinct_dpaths_non_empty
+    using finite distinct_dpaths_non_empty
     by (intro distinct_dpath_bets_finite INF_in_image)
   finally show ?thesis
     by (auto simp add: image_def)
 qed
 
-lemma (in finite_dgraph) \<delta>_dpath_betE:
+lemma \<delta>_dpath_betE:
+  assumes "finite G"
   assumes "reachable G u v"
   obtains p where
     "dpath_bet G p u v"
     "dpath_weight f p = \<delta> G f u v"
   using assms \<delta>_distinct_dpath_bet
-  unfolding distinct_dpath_bet_def
-  by blast
+  by (force simp add: distinct_dpath_bet_def)
 
 subsection \<open>Triangle inequality\<close>
 
-lemma (in finite_dgraph) \<delta>_triangle_inequality_case_enat:
+lemma \<delta>_triangle_inequality_case_enat:
+  assumes finite: "finite G"
   assumes assm: "\<delta> G f u v + \<delta> G f v w < \<delta> G f u w"
     (is "?b + ?c < ?a")
   assumes enat: "\<delta> G f u w = enat n"
@@ -200,7 +202,8 @@ proof -
     "reachable G v w"
     unfolding \<delta>_reachable_conv
     by simp+
-  then obtain p q where
+  with finite finite
+  obtain p q where
     p_dpath_bet: "dpath_bet G p u v" and
     p_weight: "dpath_weight f p = ?b" and
     q_dpath_bet: "dpath_bet G q v w" and
@@ -222,7 +225,7 @@ proof -
     by simp
 qed
 
-lemma (in finite_dgraph) \<delta>_triangle_inequality_case_infinity:
+lemma \<delta>_triangle_inequality_case_infinity:
   assumes assm: "\<delta> G f u v + \<delta> G f v w < \<delta> G f u w"
     (is "?b + ?c < ?a")
   assumes infinity: "\<delta> G f u w = \<infinity>"
@@ -248,7 +251,8 @@ proof -
     by simp
 qed
 
-theorem (in finite_dgraph) \<delta>_triangle_inequality:
+theorem \<delta>_triangle_inequality:
+  assumes "finite G"
   shows "\<delta> G f u w \<le> \<delta> G f u v + \<delta> G f v w"
     (is "?a \<le> ?b + ?c")
 proof (rule ccontr)
@@ -260,6 +264,7 @@ proof (rule ccontr)
     case (enat _)
     with assm
     show ?thesis
+      using assms
       by (intro \<delta>_triangle_inequality_case_enat)
   next
     case infinity
@@ -271,7 +276,7 @@ qed
 
 section \<open>\<close>
 
-(* TODO: move somewhere else *)
+(* TODO Move somewhere else. *)
 lemma enat_add_strict_right_mono:
   fixes a b c :: enat
   assumes "a < b"
@@ -280,7 +285,7 @@ lemma enat_add_strict_right_mono:
   using assms
   by (metis enat_add_left_cancel_less add.commute)
 
-(* TODO: move somewhere else *)
+(* TODO Move somewhere else. *)
 lemma enat_add_strict_left_mono:
   fixes a b c :: enat
   assumes "b < c"
@@ -303,19 +308,21 @@ lemma shortest_dpath_prefix_is_shortest_dpath_aux_2:
   using assms dpath_bet_transitive
   by (fastforce intro: split_dpath)
 
-lemma (in finite_dgraph) shortest_dpath_prefix_is_shortest_dpath:
+lemma shortest_dpath_prefix_is_shortest_dpath:
+  assumes "finite G"
   assumes "is_shortest_dpath G f (p @ [v] @ q) u w"
   shows "is_shortest_dpath G f (p @ [v]) u v"
 proof (rule ccontr)
   assume assm: "\<not> is_shortest_dpath G f (p @ [v]) u v"
   have p_snoc_v_dpath_bet: "dpath_bet G (p @ [v]) u v"
-    using assms
+    using assms(2)
     by (auto simp add: is_shortest_dpath_def intro: dpath_bet_pref)
   
   have "reachable G u v"
     using p_snoc_v_dpath_bet
     by (auto simp add: reachable_iff_dpath_bet)
-  then obtain p' where
+  with assms(1)
+  obtain p' where
     p'_dpath_bet: "dpath_bet G p' u v" and
     p'_dpath_weight_eq_\<delta>: "dpath_weight f p' = \<delta> G f u v"
     by (elim \<delta>_dpath_betE)
@@ -362,19 +369,21 @@ proof -
     by (fastforce simp add: q')
 qed
 
-lemma (in finite_dgraph) shortest_dpath_suffix_is_shortest_dpath:
+lemma shortest_dpath_suffix_is_shortest_dpath:
+  assumes "finite G"
   assumes "is_shortest_dpath G f (p @ [v] @ q) u w"
   shows "is_shortest_dpath G f (v # q) v w"
 proof (rule ccontr)
   assume assm: "\<not> is_shortest_dpath G f (v # q) v w"
   have v_Cons_q_dpath_bet: "dpath_bet G (v # q) v w"
-    using assms
+    using assms(2)
     by (auto simp add: is_shortest_dpath_def intro: dpath_bet_suff)
   
   have "reachable G v w"
     using v_Cons_q_dpath_bet
     by (auto simp add: reachable_iff_dpath_bet)
-  then obtain q' where
+  with assms(1)
+  obtain q' where
     q'_dpath_bet: "dpath_bet G q' v w" and
     q'_dpath_weight_eq_\<delta>: "dpath_weight f q' = \<delta> G f v w"
     by (elim \<delta>_dpath_betE)
@@ -404,7 +413,8 @@ proof (rule ccontr)
         intro: shortest_dpath_suffix_is_shortest_dpath_aux \<delta>_le_dpath_weight)
 qed
 
-lemma (in finite_dgraph) shortest_dpathE:
+lemma shortest_dpathE:
+  assumes "finite G"
   assumes "is_shortest_dpath G f (p @ [v] @ q) u w"
   obtains
     "is_shortest_dpath G f (p @ [v]) u v"
@@ -418,7 +428,7 @@ proof
     using assms
     by (intro shortest_dpath_suffix_is_shortest_dpath)
   have "\<delta> G f u w = dpath_weight f (p @ [v] @ q)"
-    using assms
+    using assms(2)
     by (simp add: is_shortest_dpath_def)
   also have "... = dpath_weight f (p @ [v]) + dpath_weight f (v # q)"
     using dpath_weight_append[where ?p = "p @ [v]" and ?q = q]
@@ -439,13 +449,15 @@ theorem dist_eq_\<delta>:
   shows "dist G = \<delta> G (\<lambda>_. 1)"
   by (standard, standard) (simp add: dist_def dpath_length_eq_dpath_weight \<delta>_def)
 
-lemma (in finite_dgraph) dist_le_dpath_length:
+lemma dist_le_dpath_length:
+  assumes "finite G"
   assumes "dpath_bet G p u v"
   shows "dist G u v \<le> dpath_length p"
   using assms
   by (auto simp add: dist_eq_\<delta> dpath_length_eq_dpath_weight intro: \<delta>_le_dpath_weight)
 
-lemma (in finite_dgraph) dist_dpath_betE:
+lemma dist_dpath_betE:
+  assumes "finite G"
   assumes "reachable G u v"
   obtains p where
     "dpath_bet G p u v"
@@ -453,7 +465,8 @@ lemma (in finite_dgraph) dist_dpath_betE:
   using assms
   by (auto simp add: dpath_length_eq_dpath_weight dist_eq_\<delta> elim: \<delta>_dpath_betE)
 
-lemma (in finite_dgraph) shortest_dpathE_2:
+lemma shortest_dpathE_2:
+  assumes "finite G"
   assumes "dpath_bet G (p @ [v] @ q) u w \<and> dpath_length (p @ [v] @ q) = dist G u w"
   obtains
     "dpath_bet G (p @ [v]) u v \<and> dpath_length (p @ [v]) = dist G u v"
@@ -463,17 +476,18 @@ lemma (in finite_dgraph) shortest_dpathE_2:
   unfolding dpath_length_eq_dpath_weight dist_eq_\<delta> is_shortest_dpath_def[symmetric]
   by (elim shortest_dpathE)
 
-lemma (in finite_dgraph) dist_triangle_inequality_edge:
+lemma dist_triangle_inequality_edge:
+  assumes "finite G"
   assumes "(v, w) \<in> G"
   shows "dist G u w \<le> dist G u v + 1"
 proof -
   have "dist G u w \<le> dist G u v + dist G v w"
     unfolding dist_eq_\<delta>
-    using \<delta>_triangle_inequality
-    .
+    using assms(1)
+    by (intro \<delta>_triangle_inequality)
   also have "... \<le> dist G u v + 1"
     unfolding dist_eq_\<delta> one_enat_def
-    using assms
+    using assms(2)
     by (intro \<delta>_edge_le_weight conjI add_mono_thms_linordered_semiring(2)) simp
   finally show ?thesis
     .

@@ -5,7 +5,7 @@ begin
 section \<open>\<close>
 
 text \<open>
-This implementation is taken from
+This implementation is based on
 Okasaki, C. (1999). Purely functional data structures. Cambridge University Press.
 \<close>
 
