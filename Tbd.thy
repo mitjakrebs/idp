@@ -5,13 +5,13 @@ begin
 (* TODO *)
 definition follow_invar :: "('a \<rightharpoonup> 'a) \<Rightarrow> bool" where
   "follow_invar parent \<equiv>
-    (\<forall>v. \<exists>u. (u = v \<or> (u, v) \<in> {(u, v) |u v. parent v = Some u}\<^sup>+) \<and> parent u = None) \<and>
-    (\<forall>u v. parent v = Some u \<longrightarrow> v \<noteq> u) \<and> 
-    finite {(u, v) |u v. parent v = Some u}"
+   (\<forall>v. \<exists>u. (u = v \<or> (u, v) \<in> {(u, v). parent v = Some u}\<^sup>+) \<and> parent u = None) \<and>
+   (\<forall>u v. parent v = Some u \<longrightarrow> v \<noteq> u) \<and> 
+   finite {(u, v). parent v = Some u}"
 
 (* TODO *)
 definition follow_invar' :: "('a \<rightharpoonup> 'a) \<Rightarrow> bool" where
-  "follow_invar' parent \<equiv> wf {(u, v) |u v. parent v = Some u}"
+  "follow_invar' parent \<equiv> wf {(u, v). parent v = Some u}"
 
 locale parent = 
   fixes parent :: "'a \<rightharpoonup> 'a"
@@ -44,7 +44,7 @@ lemma (in parent) follow_dom_if_follow_rel_wfP:
   by (intro accp_wfPD)
 
 lemma (in parent) follow_dom_if_follow_rel_wf:
-  assumes "wf {(u, v) |u v. follow_rel u v}"
+  assumes "wf {(u, v). follow_rel u v}"
   shows "follow_dom v"
   using assms
   by (intro follow_dom_if_follow_rel_wfP) (simp add: wfP_def)
@@ -54,7 +54,7 @@ lemma (in parent) follow_rel_eq_parent:
   by (fastforce simp add: follow_rel.simps)
 
 lemma (in parent) follow_rel_wf:
-  shows "wf {(u, v) |u v. follow_rel u v}"
+  shows "wf {(u, v). follow_rel u v}"
   using follow_invar'
   by (simp add: follow_invar'_def follow_rel_eq_parent)
 
@@ -65,8 +65,15 @@ lemma (in parent) follow_dom:
 
 section \<open>\<close>
 
+lemma (in parent) follow_pinduct:
+  assumes "\<And>v. follow_dom v \<Longrightarrow> (\<And>u. parent v = Some u \<Longrightarrow> P u) \<Longrightarrow> P v"
+  shows "P v"
+  using follow_dom assms
+  by (rule follow.pinduct)
+
 lemma (in parent) follow_psimps:
   shows "follow v = (case parent v of None \<Rightarrow> [v] | Some u \<Rightarrow> v # follow u)"
+  thm follow.pinduct
   using follow_dom
   by (intro follow.psimps)
 
@@ -90,10 +97,16 @@ lemma (in parent) follow_Cons_ConsD:
 
 lemma (in parent) follow_Cons_ConsE:
   assumes "follow v = v # p"
-  assumes "p \<noteq> Nil"
+  assumes "p \<noteq> []"
   obtains u where "follow u = p"
   using assms
   by (simp add: follow_psimps split: option.splits(2))
+
+lemma (in parent) parentE:
+  assumes "parent v = Some u"
+  obtains p where "follow v = v # u # p"
+  using assms
+  by (fastforce simp add: follow_psimps split: option.split)
 
 lemma (in parent) follow_appendD:
   assumes "follow v = p @ u # p'"
@@ -108,5 +121,76 @@ lemma (in parent) tbd:
   shows "p1' = p2'"
   using follow_appendD[OF assms(1)] follow_appendD[OF assms(2)]
   by simp
+
+(**)
+lemma (in parent) parent_last_eq_None:
+  shows "parent (last (follow v)) = None"
+proof -
+  have "follow v = butlast (follow v) @ [last (follow v)]"
+    using follow_non_empty
+    by (intro append_butlast_last_id[symmetric])
+  hence "follow (last (follow v)) = [last (follow v)]"
+    by (simp add: follow_appendD)
+  thus ?thesis
+    by (simp add: follow_psimps split: option.splits(2))
+qed
+
+(**)
+lemma (in parent) parentD:
+  assumes "parent v = Some u"
+  shows
+    "u \<noteq> v"
+    "v \<notin> set (follow u)"
+proof (goal_cases)
+  case 1
+  show ?case
+  proof
+    assume "u = v"
+    then obtain p where
+      "follow v = v # v # p"
+      using assms
+      by (elim parentE) simp
+    moreover hence "follow v = v # p"
+      by (blast intro: follow_Cons_ConsD(1))
+    ultimately show False
+      using not_Cons_self
+      by simp
+  qed
+next
+  case 2
+  show ?case
+  proof
+    assume "v \<in> set (follow u)"
+    then obtain p p' where
+      "follow u = p @ v # p'"
+      by (blast dest: split_list)
+    hence
+      "follow v = v # (p @ v # p')"
+      "follow v = v # p'"
+      using assms
+      by (fastforce simp add: follow_psimps dest: follow_appendD)+
+    thus False
+      by simp
+  qed
+qed
+
+lemma (in parent) distinct_follow:
+  shows "distinct (follow v)"
+proof (induct v rule: follow_pinduct)
+  case (1 v)
+  show ?case
+  proof (cases "parent v")
+    case None
+    thus ?thesis
+      by (simp add: follow_psimps)
+  next
+    case (Some u)
+    hence "distinct (follow u)"
+      by (intro "1.hyps")
+    thus ?thesis
+      using Some
+      by (auto simp add: follow_psimps dest: parentD)
+  qed
+qed
 
 end

@@ -75,6 +75,34 @@ proof -
 qed
 
 (**)
+lemma walk_betw_ConsI:
+  assumes "walk_betw G v p w"
+  assumes "{u, v} \<in> G"
+  shows "walk_betw G u (u # p) w"
+proof (standard, goal_cases)
+  case 1
+  show ?case
+    using assms
+  proof (induct p rule: edges_of_path.induct)
+    case 1
+    thus ?case
+      by auto
+  next
+    case (2 v)
+    thus ?case
+      by (force dest: walk_between_nonempty_path(1, 3))
+  next
+    case (3 v v' l)
+    thus ?case
+      by (force dest: walk_between_nonempty_path(1, 3))
+  qed
+next
+  case 4
+  show ?case
+    using assms(1)
+    by fastforce
+qed simp+
+
 lemma walk_transitive_2:
   assumes "walk_betw G u p v"
   assumes "walk_betw G v q w"

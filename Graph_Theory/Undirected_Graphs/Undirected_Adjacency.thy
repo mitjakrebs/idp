@@ -161,7 +161,7 @@ proof -
   { fix u v
     have "{u, v} \<in> E (difference m1 m2) \<longleftrightarrow> v \<in> set (adjacency (difference m1 m2) u)"
       using assms
-      by (intro symmetric_adjacency.mem_adjacency_iff_edge[symmetric]) (auto intro: dunno)
+      by (intro symmetric_adjacency.mem_adjacency_iff_edge[symmetric]) (auto intro: symmetric_adjacency_difference)
     also have "... \<longleftrightarrow> v \<in> set (adjacency m1 u) - set (adjacency m2 u)"
       using assms
       by (fastforce simp add: adjacency_difference_cong dest: symmetric_adjacency.invar)

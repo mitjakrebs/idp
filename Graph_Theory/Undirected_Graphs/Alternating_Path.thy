@@ -103,8 +103,23 @@ lemma alt_path_ConsI:
   assumes "{u, v} \<in> G"
   assumes "Q {u, v}"
   shows "alt_path Q P G (u # p) u w"
-  using assms
-  by (smt (verit, best) alt_list.simps alt_pathD(1) alt_pathD(2) alt_pathI edges_of_path.elims last.simps list.sel(1) list.sel(3) list.simps(3) path_2 walk_betw_def)
+proof (rule alt_pathI, goal_cases)
+  case 1
+  have "alt_list Q P (edges_of_path [u, v])"
+    using assms(3)
+    by (simp add: alt_list_step alt_list_empty)
+  hence "alt_list Q P (edges_of_path [u, v] @ edges_of_path p)"
+    using assms(1)
+    by (auto dest: alt_pathD(1) alt_list_append_2)
+  thus ?case
+    using assms(1) edges_of_path_append_2[of p "[u]"]
+    by (auto simp add: walk_between_nonempty_path(3) dest: alt_pathD(2) walk_between_nonempty_path(2))
+next
+  case 2
+  show ?case
+    using assms(1, 2)
+    by (auto intro: walk_betw_ConsI dest: alt_pathD(2))
+qed
 
 subsection \<open>\<close>
 
@@ -290,6 +305,29 @@ lemma alt_path_revI:
   by (auto intro: alt_path_rev_oddI alt_path_rev_evenI)
 
 section \<open>\<close>
+
+(**)
+lemma alt_path_snoc_oddI:
+  assumes "alt_path P Q G p u v"
+  assumes "odd (path_length p)"
+  assumes "{v, w} \<in> G"
+  assumes "Q {v, w}"
+  shows "alt_path P Q G (p @ [w]) u w"
+proof -
+  have "alt_path P Q G (rev p) v u"
+    using assms(1, 2)
+    by (intro alt_path_rev_oddI)
+  moreover have
+    "{w, v} \<in> G"
+    "Q {w, v}"
+    using assms(3, 4)
+    by (metis doubleton_eq_iff)+
+  ultimately have "alt_path Q P G (w # rev p) w u"
+    by (intro alt_path_ConsI)
+  thus ?thesis
+    using assms(2)
+    by (auto simp add: edges_of_path_length dest: alt_path_rev_evenI)
+qed
 
 (* TODO Rename. *)
 lemma tbd':

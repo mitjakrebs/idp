@@ -6,7 +6,7 @@ theory BFS_Impl
     "../Tbd_Graph_Impl"
 begin
 
-interpretation bfs where
+global_interpretation B: bfs where
   Map_empty = empty and
   Map_delete = RBT_Map.delete and
   Map_lookup = lookup and

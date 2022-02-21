@@ -76,6 +76,27 @@ proof (standard, standard, standard)
     by (auto simp add: tbd dest: mem_V_imp_not_mem_U)
 qed
 
+lemma (in bipartite_graph) no_loop:
+  shows "{v, v} \<notin> G"
+proof (standard, goal_cases)
+  case 1
+  show ?case
+  proof (cases "v \<in> U")
+    case True
+    thus ?thesis
+      using 1 U_independent
+      by blast
+  next
+    case False
+    hence "v \<in> V"
+      using 1
+      by (auto intro: not_mem_U_imp_mem_V)
+    thus ?thesis
+      using 1 V_independent
+      by blast
+  qed
+qed
+
 (* TODO Move. *)
 (* TODO Rename. *)
 lemma lolol:
@@ -136,6 +157,45 @@ next
   case (Suc i)
   hence "p ! Suc i \<in> U \<longleftrightarrow> p ! i \<notin> U"
     by (auto simp add: xoxo)
+  also have "... \<longleftrightarrow> odd i"
+    using Suc.prems
+    by (simp add: Suc.hyps)
+  also have "... \<longleftrightarrow> even (Suc i)"
+    by simp
+  finally show ?case
+    .
+qed
+
+(* TODO Rename. *)
+lemma (in bipartite_graph) xuxu:
+  assumes "path G p"
+  assumes "hd p \<in> V"
+  assumes "i < length p"
+  shows "p ! i \<in> V \<longleftrightarrow> even i"
+  using assms
+proof (induct i)
+  case 0
+  thus ?case
+    by (simp add: hd_conv_nth)
+next
+  case (Suc i)
+  hence "p ! Suc i \<in> V \<longleftrightarrow> p ! i \<in> U"
+    by (simp add: xaxa)
+  also have "... \<longleftrightarrow> p ! i \<notin> V"
+  proof (standard, goal_cases)
+    case 1
+    thus ?case
+      using U_subset_Vs
+      by (auto dest: mem_U_imp_not_mem_V)
+  next
+    case 2
+    have "p ! i \<in> Vs G"
+      using Suc.prems(1, 3)
+      by (fastforce intro: mem_path_Vs)
+    thus ?case
+      using 2
+      by (intro not_mem_V_imp_mem_U)
+  qed
   also have "... \<longleftrightarrow> odd i"
     using Suc.prems
     by (simp add: Suc.hyps)
