@@ -900,7 +900,7 @@ proof (induct v rule: follow_pinduct)
       using u
       by (intro "1.hyps")
     ultimately show ?thesis
-      by (auto intro: dpath_bet_snoc_edge)
+      by (auto intro: dpath_bet_snocI)
   qed
 qed
 
@@ -1651,7 +1651,7 @@ proof -
     case white_not_white
     hence dpath_Cons: "dpath_bet (G.dE G) (Q_head (queue s) # p) (Q_head (queue s)) v"
       using not_white_fold_u white_not_white_foldD(1) dpath_p
-      by (auto simp add: G.mem_adjacency_iff_edge intro: dpath_bet_Cons_edge)
+      by (auto simp add: G.mem_adjacency_iff_edge intro: dpath_bet_ConsI)
     have "d (parent (fold G src s)) v = d (parent s) v"
       using white_not_white
       by (simp add: not_whiteD(3))
@@ -1685,7 +1685,7 @@ proof -
       by (simp add: not_whiteD(3))
     also have "... \<le> d (parent (fold G src s)) u + dpath_length p"
       using dpath_p gray_white
-      by (fastforce intro: dpath_length_hd_noteq_last add_left_mono)
+      by (fastforce intro: dpath_length_geq_1I add_left_mono)
     finally show ?thesis
       .
   next
@@ -1717,7 +1717,7 @@ proof -
       using dpath_q black_white gray_w
       by (auto intro: d_triangle_inequality add_right_mono)
     also have "... \<le> d (parent s) u + dpath_length p"
-      using dpath_r gray_w black_white dpath_length_hd_noteq_last
+      using dpath_r gray_w black_white dpath_length_geq_1I
       by (fastforce simp add: dpath_length_p)
     also have "... = d (parent (fold G src s)) u + dpath_length p"
       using black_white

@@ -6,13 +6,16 @@ theory Dpath
     Ports.Noschinski_to_DDFS
 begin
 
+text \<open>This theory extends the formalization of directed paths.\<close>
+
 section \<open>Directed paths\<close>
 
 type_synonym 'a dpath = "'a list"
 
 lemmas dpath_induct = edges_of_dpath.induct
 
-(**)
+subsection \<open>Convenience lemmas\<close>
+
 lemma dpath_betD:
   assumes "dpath_bet G p u v"
   shows
@@ -32,9 +35,7 @@ lemma dpath_betI:
   using assms
   by (simp add: dpath_bet_def)
 
-(**)
-
-lemma dpath_bet_Cons_edge:
+lemma dpath_bet_ConsI:
   assumes "(u, v) \<in> G"
   assumes "dpath_bet G p v w"
   shows "dpath_bet G (u # p) u w"
@@ -47,7 +48,7 @@ proof (rule dpath_betI)
     by (auto dest: dpath_betD(4))
 qed simp+
 
-lemma dpath_bet_snoc_edge:
+lemma dpath_bet_snocI:
   assumes "dpath_bet G p u v"
   assumes "(v, w) \<in> G"
   shows "dpath_bet G (p @ [w]) u w"
@@ -60,7 +61,8 @@ proof (rule dpath_betI)
     by (auto dest: dpath_betD(3))
 qed simp+
 
-(**)
+subsection \<open>\<close>
+
 lemma dpath_rev_induct:
   assumes "P []"
   assumes "\<And>v. P [v]"
@@ -90,10 +92,24 @@ next
     by simp
 qed
 
+subsection \<open>\<close>
+
 text \<open>The length of a @{term dpath} is the number of its edges.\<close>
 
 abbreviation dpath_length :: "'a dpath \<Rightarrow> nat" where
   "dpath_length p \<equiv> length (edges_of_dpath p)"
+
+lemma dpath_length_geq_1I:
+  assumes "dpath_bet G p u v"
+  assumes "u \<noteq> v"
+  shows "1 \<le> dpath_length p"
+  using assms
+proof (induct p rule: dpath_induct)
+  case 2
+  thus ?case
+    using hd_of_dpath_bet' last_of_dpath_bet
+    by fastforce
+qed simp+
 
 lemma dpath_length_Cons:
   assumes "vs \<noteq> []"
@@ -124,19 +140,6 @@ lemma dpath_length_append_2:
   shows "dpath_length (p @ tl q) = dpath_length p + dpath_length q"
   using assms
   by (simp add: dpath_length_append)
-
-(**)
-lemma dpath_length_hd_noteq_last:
-  assumes "dpath_bet G p u v"
-  assumes "u \<noteq> v"
-  shows "1 \<le> dpath_length p"
-  using assms
-proof (induct p rule: dpath_induct)
-  case 2
-  thus ?case
-    using hd_of_dpath_bet' last_of_dpath_bet
-    by fastforce
-qed simp+
 
 section \<open>Distinct directed paths\<close>
 

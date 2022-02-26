@@ -5,6 +5,13 @@ theory Adjacency
     "../Orderings_Tbd"
 begin
 
+text \<open>
+This theory formalizes the representation of a graph as a map from vertices to their
+adjacencies represented as sets.
+\<close>
+
+section \<open>Definitions\<close>
+
 locale adjacency =
   M: Map_by_Ordered where
   empty = Map_empty and
@@ -39,9 +46,9 @@ definition (in adjacency) invar :: "'m \<Rightarrow> bool" where
 definition (in adjacency) adjacency :: "'m \<Rightarrow> 'a \<Rightarrow> 'a list" where
   "adjacency G u \<equiv> case Map_lookup G u of None \<Rightarrow> [] | Some s \<Rightarrow> Set_inorder s"
 
-subsection \<open>\<close>
+section \<open>Basic lemmas\<close>
 
-subsubsection \<open>@{term adjacency.invar}\<close>
+subsection \<open>@{term adjacency.invar}\<close>
 
 lemma (in adjacency) invarD:
   assumes "invar G"
@@ -91,7 +98,7 @@ next
   qed
 qed
 
-subsubsection \<open>@{term adjacency.adjacency}\<close>
+subsection \<open>@{term adjacency.adjacency}\<close>
 
 lemma (in adjacency) finite_adjacency:
   shows "finite (set (adjacency G v))"
@@ -105,7 +112,7 @@ lemma (in adjacency) distinct_adjacency:
   unfolding adjacency_def
   by (cases "Map_lookup G v") (auto simp add: invar_def M.ran_def S.invar_def intro: sorted_imp_distinct)
 
-lemma (in adjacency) mem_adjacency_iff:
+lemma (in adjacency) mem_adjacency_iff_lookup_eq_Some:
   shows "v \<in> set (adjacency G u) \<longleftrightarrow> (\<exists>s. Map_lookup G u = Some s \<and> v \<in> S.set s)"
   by (force simp add: adjacency_def S.set_def)
 
@@ -115,9 +122,9 @@ lemma (in adjacency) mem_adjacencyE:
     "Map_lookup G u = Some s"
     "v \<in> S.set s"
   using assms
-  by (auto simp add: mem_adjacency_iff)
+  by (auto simp add: mem_adjacency_iff_lookup_eq_Some)
 
-lemma (in adjacency) mem_adjacency_iff_2:
+lemma (in adjacency) mem_adjacency_iff_mem_inorder:
   assumes "invar G"
   shows "v \<in> set (adjacency G u) \<longleftrightarrow> (\<exists>s. (u, s) \<in> set (Map_inorder G) \<and> v \<in> S.set s)"
 proof (standard, goal_cases)
@@ -148,7 +155,7 @@ proof -
   { fix b
     have "b \<in> set (adjacency m a) \<longleftrightarrow> (\<exists>s. (a, s) \<in> set (Map_inorder m) \<and> b \<in> S.set s)"
       using assms
-      by (intro mem_adjacency_iff_2)
+      by (intro mem_adjacency_iff_mem_inorder)
     also have "... \<longleftrightarrow> (\<exists>p\<in>set (Map_inorder m). a = fst p \<and> b \<in> S.set (snd p))"
       by force
     also have "... \<longleftrightarrow> b \<in> (\<Union>p\<in>set (Map_inorder m). if a = fst p then S.set (snd p) else {})"
@@ -158,6 +165,8 @@ proof -
   thus ?thesis
     by blast
 qed
+
+section \<open>Basic operations\<close>
 
 subsection \<open>Union\<close>
 
@@ -224,7 +233,7 @@ next
     by (auto simp add: f_def Some intro: invar_fold_insert invar_update)
 qed
 
-lemma (in adjacency) f_cong:
+lemma (in adjacency) adjacency_f_cong:
   assumes "invar m"
   assumes "S.invar (snd p)"
   shows "set (adjacency (f p m) a) = set (adjacency m a) \<union> (if a = fst p then S.set (snd p) else {})"
@@ -234,12 +243,12 @@ proof (cases "Map_lookup m (fst p)")
     have "b \<in> set (adjacency (f p m) a) \<longleftrightarrow> b \<in> set (adjacency (Map_update (fst p) (snd p) m) a)"
       by (simp add: f_def None)
     also have "... \<longleftrightarrow> (\<exists>s. Map_lookup (Map_update (fst p) (snd p) m) a = Some s \<and> b \<in> S.set s)"
-      by (simp add: mem_adjacency_iff)
+      by (simp add: mem_adjacency_iff_lookup_eq_Some)
     also have "... \<longleftrightarrow> (\<exists>s. (Map_lookup m(fst p \<mapsto> snd p)) a = Some s \<and> b \<in> S.set s)"
       using assms(1)
       by (auto simp add: M.map_update dest: invarD(1))
     also have "... \<longleftrightarrow> b \<in> set (adjacency m a) \<union> (if a = fst p then S.set (snd p) else {})"
-      by (auto simp add: None mem_adjacency_iff)
+      by (auto simp add: None mem_adjacency_iff_lookup_eq_Some)
     finally have
       "b \<in> set (adjacency (f p m) a) \<longleftrightarrow>
        b \<in> set (adjacency m a) \<union> (if a = fst p then S.set (snd p) else {})"
@@ -257,13 +266,13 @@ next
       "b \<in> set (adjacency (f p m) a) \<longleftrightarrow> b \<in> set (adjacency (Map_update (fst p) ?fold m) a)"
       by (simp add: f_def Some)
     also have "... \<longleftrightarrow> (\<exists>s. Map_lookup (Map_update (fst p) ?fold m) a = Some s \<and> b \<in> S.set s)"
-      by (simp add: mem_adjacency_iff)
+      by (simp add: mem_adjacency_iff_lookup_eq_Some)
     also have "... \<longleftrightarrow> (\<exists>s. (Map_lookup m(fst p \<mapsto> ?fold)) a = Some s \<and> b \<in> S.set s)"
       using assms(1)
       by (auto simp add: M.map_update dest: invarD(1))
     also have "... \<longleftrightarrow> b \<in> set (adjacency m a) \<union> (if a = fst p then S.set (snd p) else {})"
       using invar fold_insert_cong Some
-      by (simp add: S.set_def mem_adjacency_iff)
+      by (simp add: S.set_def mem_adjacency_iff_lookup_eq_Some)
     finally have
       "b \<in> set (adjacency (f p m) a) \<longleftrightarrow>
        b \<in> set (adjacency m a) \<union> (if a = fst p then S.set (snd p) else {})"
@@ -294,7 +303,7 @@ next
     by (fastforce intro: invar_f Cons.hyps)
 qed
 
-lemma (in adjacency) fold_f_cong:
+lemma (in adjacency) adjacency_fold_f_cong:
   assumes "invar m"
   assumes "Ball (set l) (S.invar \<circ> snd)"
   shows
@@ -323,7 +332,7 @@ next
      (if a = fst p then S.set (snd p) else {}) \<union>
      (\<Union>p\<in>set ps. if a = fst p then S.set (snd p) else {})"
     using Cons.prems(1) prems(1)
-    by (simp add: f_cong)
+    by (simp add: adjacency_f_cong)
   also have "... = set (local.adjacency m a) \<union> (\<Union>p\<in>set (p # ps). if a = fst p then S.set (snd p) else {})"
     by force
   finally show ?case
@@ -357,7 +366,7 @@ proof -
   have
     "set (adjacency (union m1 m2) a) =
      set (adjacency m1 a) \<union> (\<Union>p\<in>set (Map_inorder m2). if a = fst p then S.set (snd p) else {})"
-    by (intro fold_f_cong)
+    by (intro adjacency_fold_f_cong)
   also have "... = set (adjacency m1 a) \<union> set (adjacency m2 a)"
     using assms(2)
     by (simp add: adjacency_inorder_cong)
@@ -429,7 +438,7 @@ next
     by (auto simp add: g_def Some intro: invar_fold_delete invar_update)
 qed
 
-lemma (in adjacency) g_cong:
+lemma (in adjacency) adjacency_g_cong:
   assumes "invar m"
   shows "set (adjacency (g p m) a) = set (adjacency m a) - (if a = fst p then S.set (snd p) else {})"
 proof (cases "Map_lookup m (fst p)")
@@ -446,13 +455,13 @@ next
     have "b \<in> set (adjacency (g p m) a) \<longleftrightarrow> b \<in> set (adjacency (Map_update (fst p) ?fold m) a)"
       by (simp add: g_def Some)
     also have "... \<longleftrightarrow> (\<exists>s. Map_lookup (Map_update (fst p) ?fold m) a = Some s \<and> b \<in> S.set s)"
-      by (simp add: mem_adjacency_iff)
+      by (simp add: mem_adjacency_iff_lookup_eq_Some)
     also have "... \<longleftrightarrow> (\<exists>s. (Map_lookup m(fst p \<mapsto> ?fold)) a = Some s \<and> b \<in> S.set s)"
       using assms
       by (auto simp add: M.map_update dest: invarD(1))
     also have "... \<longleftrightarrow> b \<in> set (adjacency m a) - (if a = fst p then S.set (snd p) else {})"
       using invar fold_delete_cong Some
-      by (simp add: S.set_def mem_adjacency_iff)
+      by (simp add: S.set_def mem_adjacency_iff_lookup_eq_Some)
     finally have
       "b \<in> set (adjacency (g p m) a) \<longleftrightarrow>
        b \<in> set (adjacency m a) - (if a = fst p then S.set (snd p) else {})"
@@ -484,7 +493,7 @@ next
     by (fastforce intro: invar_g Cons.hyps)
 qed
 
-lemma (in adjacency) fold_g_cong:
+lemma (in adjacency) adjacency_fold_g_cong:
   assumes "invar m"
   assumes "Ball (set l) (S.invar \<circ> snd)"
   shows
@@ -513,7 +522,7 @@ next
      (if a = fst p then S.set (snd p) else {}) -
      (\<Union>p\<in>set ps. if a = fst p then S.set (snd p) else {})"
     using Cons.prems(1) prems(1)
-    by (simp add: g_cong)
+    by (simp add: adjacency_g_cong)
   also have "... = set (local.adjacency m a) - (\<Union>p\<in>set (p # ps). if a = fst p then S.set (snd p) else {})"
     by force
   finally show ?case
@@ -547,7 +556,7 @@ proof -
   have
     "set (adjacency (difference m1 m2) a) =
      set (adjacency m1 a) - (\<Union>p\<in>set (Map_inorder m2). if a = fst p then S.set (snd p) else {})"
-    by (intro fold_g_cong)
+    by (intro adjacency_fold_g_cong)
   also have "... = set (adjacency m1 a) - set (adjacency m2 a)"
     using assms(2)
     by (simp add: adjacency_inorder_cong)
@@ -562,6 +571,8 @@ locale adjacency' = adjacency where
   Map_update :: "'a::linorder \<Rightarrow> 't \<Rightarrow> 'm \<Rightarrow> 'm" +
   fixes G :: 'm
   assumes invar: "invar G"
+
+text \<open>This locale is used for the formalization of undirected graphs.\<close>
 
 locale symmetric_adjacency = adjacency' where
   Map_update = Map_update for
@@ -579,6 +590,13 @@ abbreviation (in adjacency) symmetric_adjacency' :: "'m \<Rightarrow> bool" wher
     Map_update"
 
 section \<open>\<close>
+
+text \<open>
+In this locale, we convert a graph from its representation as a map from vertices to their
+adjacencies to its representation as a set of edges.
+
+As of 2022-02-21, the locale is not used anywhere outside of this theory.
+\<close>
 
 locale fukakyo =
   G: adjacency where Map_update = Map_update +
@@ -611,7 +629,7 @@ subsection \<open>@{term f}\<close>
 
 subsubsection \<open>@{term E.invar}\<close>
 
-lemma f_invar:
+lemma invar_f:
   assumes "E.invar s"
   shows "E.invar (f u v s)"
   using assms
@@ -629,17 +647,17 @@ subsection \<open>@{term g}\<close>
 
 subsubsection \<open>@{term E.invar}\<close>
 
-lemma fold_f_invar:
+lemma invar_fold_f:
   assumes "E.invar s"
   shows "E.invar (fold (f u) l s)"
   using assms
-  by (induct l arbitrary: s) (auto intro: f_invar)
+  by (induct l arbitrary: s) (auto intro: invar_f)
 
-lemma g_invar:
+lemma invar_g:
   assumes "E.invar s"
   shows "E.invar (g p s)"
   using assms
-  by (intro fold_f_invar)
+  by (intro invar_fold_f)
 
 subsubsection \<open>@{term E.set}\<close>
 
@@ -657,7 +675,7 @@ next
     by simp
   also have "... = E.set (f u v s) \<union> {u} \<times> set vs"
     using Cons.prems
-    by (intro f_invar Cons.hyps)
+    by (intro invar_f Cons.hyps)
   also have "... = E.set s \<union> {(u, v)} \<union> {u} \<times> set vs"
     using Cons.prems
     by (simp add: set_f_cong)
@@ -677,16 +695,16 @@ subsection \<open>@{term E}\<close>
 
 subsubsection \<open>@{term E.invar}\<close>
 
-lemma fold_g_invar:
+lemma invar_fold_g:
   assumes "E.invar s"
   shows "E.invar (fold g l s)"
   using assms
-  by (induct l arbitrary: s) (auto intro: g_invar)
+  by (induct l arbitrary: s) (auto intro: invar_g)
 
-lemma E_invar:
+lemma invar_E:
   shows "E.invar (E G)"
   using E.invar_empty
-  by (intro fold_g_invar)
+  by (intro invar_fold_g)
 
 subsubsection \<open>@{term E.set}\<close>
 
@@ -704,7 +722,7 @@ next
     by simp
   also have "... = E.set (g p s) \<union> (\<Union>p\<in>set ps. {fst p} \<times> G.S.set (snd p))"
     using Cons.prems
-    by (intro g_invar Cons.hyps)
+    by (intro invar_g Cons.hyps)
   also have "... = E.set s \<union> {fst p} \<times> G.S.set (snd p) \<union> (\<Union>p\<in>set ps. {fst p} \<times> G.S.set (snd p))"
     using Cons.prems
     by (simp add: set_g_cong)
@@ -714,35 +732,11 @@ next
     .
 qed
 
-lemma mem_adjacency_iff_2:
-  assumes "G.invar G"
-  shows "v \<in> set (G.adjacency G u) \<longleftrightarrow> (\<exists>s. (u, s) \<in> set (Map_inorder G) \<and> v \<in> G.S.set s)"
-proof (standard, goal_cases)
-  case 1
-  then obtain s where
-    "Map_lookup G u = Some s"
-    "v \<in> G.S.set s"
-    by (elim G.mem_adjacencyE)
-  thus ?case
-    using assms
-    by (force simp add: G.M.mem_inorder_iff_lookup_eq_Some dest: G.invarD(1))
-next
-  case 2
-  then obtain s where
-    "(u, s) \<in> set (Map_inorder G) \<and> v \<in> G.S.set s"
-    by (elim exE)
-  hence "Map_lookup G u = Some s \<and> v \<in> G.S.set s"
-    using assms
-    by (auto simp add: G.M.mem_inorder_iff_lookup_eq_Some dest: G.invarD(1))
-  thus ?case
-    by (simp add: G.S.set_def G.adjacency_def)
-qed
-
 lemma set_E_cong:
   assumes "G.invar G"
   shows "E.set (E G) = {(u, v). v \<in> set (G.adjacency G u)}"
   using assms E.invar_empty
-  by (auto simp add: mem_adjacency_iff_2 set_fold_g_cong E.set_empty)
+  by (auto simp add: G.mem_adjacency_iff_mem_inorder set_fold_g_cong E.set_empty)
 
 end
 

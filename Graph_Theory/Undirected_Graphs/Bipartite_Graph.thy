@@ -276,27 +276,4 @@ proof (standard, elim exE)
   qed
 qed
 
-theorem bipartite_if_no_odd_cycle:
-  assumes "\<nexists>c. path G c \<and> odd_cycle c"
-  shows "\<exists>U V. bipartite_graph G U V"
-  sorry
-
-lemma
-  assumes "\<nexists>c. path G c \<and> odd_cycle c"
-  obtains U V where "bipartite_graph G U V"
-  using assms
-  by (fastforce intro: bipartite_if_no_odd_cycle)
-
-corollary bipartite_iff_no_odd_cycle:
-  shows "(\<exists>U V. bipartite_graph G U V) \<longleftrightarrow> (\<nexists>c. path G c \<and> odd_cycle c)"
-proof (standard, goal_cases)
-  case 1
-  thus ?case
-    by (auto dest: bipartite_graph.no_odd_cycle)
-next
-  case 2
-  thus ?case
-    by (intro bipartite_if_no_odd_cycle)
-qed
-
 end

@@ -1,10 +1,11 @@
 theory Dgraph
   imports
     AGF.DDFS
-    "HOL-Data_Structures.Set_Specs"
 begin
 
-section \<open>Graphs\<close>
+text \<open>This theory extends the formalization of directed graphs.\<close>
+
+section \<open>Definitions\<close>
 
 type_synonym 'a dgraph = "('a \<times> 'a) set"
 
@@ -19,6 +20,8 @@ locale simple_dgraph = dgraph G for G +
 
 locale symmetric_dgraph = dgraph G for G +
   assumes symmetric: "(u, v) \<in> G \<longleftrightarrow> (v, u) \<in> G"
+
+section \<open>Basic lemmas\<close>
 
 subsection \<open>Vertices\<close>
 

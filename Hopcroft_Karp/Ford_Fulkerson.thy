@@ -25,7 +25,15 @@ locale ford_fulkerson =
   M_delete and
   M_lookup and
   M_inorder and
-  M_inv
+  M_inv +
+  fixes bipartition :: "'n \<Rightarrow> 's \<times> 's"
+  fixes new_vertices :: "'n \<Rightarrow> 'a \<times> 'a"
+  assumes bipartition:
+    "\<exists>U V. bipartite_graph (G.E G) U V \<Longrightarrow>
+     let (U, V) = bipartition G in bipartite_graph (G.E G) (G.S.set U) (G.S.set V)"
+  assumes new_vertices:
+    "G.symmetric_adjacency' G \<Longrightarrow>
+     let (s, t) = new_vertices G in Map_lookup G s = None \<and> Map_lookup G t = None \<and> s \<noteq> t"
 begin
 
 section \<open>Algorithm\<close>
@@ -82,17 +90,6 @@ fun augment :: "'m \<Rightarrow> 'a path \<Rightarrow> 'm" where
   "augment M (u # v # w # ws) = augment (M_update v u (M_update u v (M_delete w M))) (w # ws)"
 
 (* Should G1 be defined independently of G2? *)
-(*
-function (domintros) loop' where
-  "loop' G U V s t M =
-   (if done_1 U V M then M
-    else let G2 = G2 U V s t M
-         in let G1 = G1 G G2
-            in let m = alt_bfs G1 G2 s
-               in if done_2 t m then M else loop' G U V s t (augment M (butlast (tl (rev_follow m t)))))"
-  by pat_completeness simp
-*)
-
 function (domintros) loop' where
   "loop' G U V s t M =
    (if done_1 U V M then M
@@ -100,8 +97,8 @@ function (domintros) loop' where
          else loop' G U V s t (augment M (butlast (tl (rev_follow (alt_bfs (G1 G (G2 U V s t M)) (G2 U V s t M) s) t)))))"
   by pat_completeness simp
 
-abbreviation ford_fulkerson :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm" where
-  "ford_fulkerson G U V s t \<equiv> loop' G U V s t M_empty"
+abbreviation ford_fulkerson :: "'n \<Rightarrow> 'm" where
+  "ford_fulkerson G \<equiv> loop' G (fst (bipartition G)) (snd (bipartition G)) (fst (new_vertices G)) (snd (new_vertices G)) M_empty"
 
 (* Take G1 G2 s as input? *)
 abbreviation m_tbd :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" where
@@ -163,7 +160,7 @@ next
     by (auto simp add: f_def Some intro: G.S.invar_insert G.invar_update)
 qed
 
-lemma f_cong:
+lemma adjacency_f_cong:
   assumes "G.invar G"
   shows "set (G.adjacency (f p G) v) = set (G.adjacency G v) \<union> (if v = fst p then {snd p} else {})"
 proof (cases "Map_lookup G (fst p)")
@@ -173,13 +170,13 @@ proof (cases "Map_lookup G (fst p)")
     have "u \<in> set (G.adjacency (f p G) v) \<longleftrightarrow> u \<in> set (G.adjacency (Map_update (fst p) ?singleton G) v)"
       by (simp add: f_def None)
     also have "... \<longleftrightarrow> (\<exists>s. Map_lookup (Map_update (fst p) ?singleton G) v = Some s \<and> u \<in> G.S.set s)"
-      by (simp add: G.mem_adjacency_iff)
+      by (simp add: G.mem_adjacency_iff_lookup_eq_Some)
     also have "... \<longleftrightarrow> (\<exists>s. (Map_lookup G(fst p \<mapsto> ?singleton)) v = Some s \<and> u \<in> G.S.set s)"
       using assms(1)
       by (auto simp add: G.M.map_update dest: G.invarD(1))
     also have "... \<longleftrightarrow> u \<in> set (G.adjacency G v) \<union> (if v = fst p then {snd p} else {})"
       using G.S.invar_empty
-      by (simp add: None G.mem_adjacency_iff G.S.set_insert G.S.set_empty)
+      by (simp add: None G.mem_adjacency_iff_lookup_eq_Some G.S.set_insert G.S.set_empty)
     finally have
       "u \<in> set (G.adjacency (f p G) v) \<longleftrightarrow>
        u \<in> set (G.adjacency G v) \<union> (if v = fst p then {snd p} else {})"
@@ -196,13 +193,13 @@ next
     have "u \<in> set (G.adjacency (f p G) v) \<longleftrightarrow> u \<in> set (G.adjacency (Map_update (fst p) ?insert G) v)"
       by (simp add: f_def Some)
     also have "... \<longleftrightarrow> (\<exists>s. Map_lookup (Map_update (fst p) ?insert G) v = Some s \<and> u \<in> G.S.set s)"
-      by (simp add: G.mem_adjacency_iff)
+      by (simp add: G.mem_adjacency_iff_lookup_eq_Some)
     also have "... \<longleftrightarrow> (\<exists>s. (Map_lookup G(fst p \<mapsto> ?insert)) v = Some s \<and> u \<in> G.S.set s)"
       using assms(1)
       by (auto simp add: G.M.map_update dest: G.invarD(1))
     also have "... \<longleftrightarrow> u \<in> set (G.adjacency G v) \<union> (if v = fst p then {snd p} else {})"
       using invar
-      by (auto simp add: Some G.mem_adjacency_iff G.S.set_insert)
+      by (auto simp add: Some G.mem_adjacency_iff_lookup_eq_Some G.S.set_insert)
     finally have
       "u \<in> set (G.adjacency (f p G) v) \<longleftrightarrow>
        u \<in> set (G.adjacency G v) \<union> (if v = fst p then {snd p} else {})"
@@ -219,11 +216,11 @@ lemma invar_g:
   using assms
   by (auto simp add: g_def intro: invar_f)
 
-lemma g_cong:
+lemma adjacency_g_cong:
   assumes "G.invar G"
   shows "set (G.adjacency (g u v G) w) = set (G.adjacency G w) \<union> (if w = u then {v} else {})"
   using assms
-  by (simp add: g_def f_cong)
+  by (simp add: g_def adjacency_f_cong)
 
 subsection \<open>@{term h}\<close>
 
@@ -233,11 +230,11 @@ lemma invar_h:
   using assms
   by (auto simp add: h_def intro: invar_g)
 
-lemma h_cong:
+lemma adjacency_h_cong:
   assumes "G.invar G"
   shows "set (G.adjacency (h v u G) w) = set (G.adjacency G w) \<union> (if w = u then {v} else {})"
   using assms
-  by (simp add: h_def g_cong)
+  by (simp add: h_def adjacency_g_cong)
 
 subsection \<open>@{term "List.fold f"}\<close>
 
@@ -255,7 +252,7 @@ next
     by (auto intro: invar_f Cons.hyps)
 qed
 
-lemma fold_f_cong:
+lemma adjacency_fold_f_cong:
   assumes "G.invar G"
   shows
     "set (G.adjacency (List.fold f l G) v) =
@@ -278,7 +275,7 @@ next
      (if v = fst p then {snd p} else {}) \<union>
      (\<Union>p\<in>set ps. if v = fst p then {snd p} else {})"
     using Cons.prems
-    by (simp add: f_cong)
+    by (simp add: adjacency_f_cong)
   also have "... = set (G.adjacency G v) \<union> (\<Union>p\<in>set (p # ps). if v = fst p then {snd p} else {})"
     by force
   finally show ?case
@@ -301,7 +298,7 @@ next
     by (auto intro: invar_g Cons.hyps)
 qed
 
-lemma fold_g_cong:
+lemma adjacency_fold_g_cong:
   assumes "G.invar G"
   shows
     "set (G.adjacency (List.fold (g u) l G) v) =
@@ -326,7 +323,7 @@ next
      (if v = u then {w} else {}) \<union>
      (\<Union>x\<in>set ws. if v = u then {x} else {})"
     using Cons.prems
-    by (simp add: g_cong)
+    by (simp add: adjacency_g_cong)
   also have "... = set (G.adjacency G v) \<union> (\<Union>x\<in>set (w # ws). if v = u then {x} else {})"
     by force
   finally show ?case
@@ -349,7 +346,7 @@ next
     by (auto intro: invar_h Cons.hyps)
 qed
 
-lemma fold_h_cong:
+lemma adjacency_fold_h_cong:
   assumes "G.invar G"
   shows
     "set (G.adjacency (List.fold (h u) l G) v) =
@@ -374,7 +371,7 @@ next
      (if v = w then {u} else {}) \<union>
      (\<Union>x\<in>set ws. if v = x then {u} else {})"
     using Cons.prems
-    by (simp add: h_cong)
+    by (simp add: adjacency_h_cong)
   also have "... = set (G.adjacency G v) \<union> (\<Union>x\<in>set (w # ws). if v = x then {u} else {})"
     by force
   finally show ?case
@@ -397,7 +394,7 @@ proof -
       "v \<in> set (G.adjacency (G2_1 M) u) \<longleftrightarrow>
        v \<in> set (G.adjacency Map_empty u) \<union> (\<Union>p\<in>set (M_inorder M). if u = fst p then {snd p} else {})"
       using G.invar_empty
-      by (simp add: G2_1_def fold_f_cong)
+      by (simp add: G2_1_def adjacency_fold_f_cong)
     also have "... \<longleftrightarrow> v \<in> (\<Union>p\<in>set (M_inorder M). if u = fst p then {snd p} else {})"
       by (simp add: G.adjacency_def G.M.map_empty)
     also have "... \<longleftrightarrow> (\<exists>p\<in>set (M_inorder M). u = fst p \<and> v = snd p)"
@@ -459,7 +456,7 @@ lemma adjacency_G2_2_cong:
     "set (G.adjacency (G2_2 U s M) u) =
      set (G.adjacency (G2_1 M) u) \<union> (\<Union>v\<in>set (free_vertices U M). if u = s then {v} else {})"
   using invar_G2_1
-  by (simp add: G2_2_def fold_g_cong)
+  by (simp add: G2_2_def adjacency_fold_g_cong)
 
 lemma E2_2_cong:
   shows "G.E (G2_2 U s M) = G.E (G2_1 M) \<union> {{s, v} |v. v \<in> set (free_vertices U M)}"
@@ -494,7 +491,7 @@ lemma adjacency_G2_3_cong:
     "set (G.adjacency (G2_3 U s M) u) =
      set (G.adjacency (G2_2 U s M) u) \<union> (\<Union>v\<in>set (free_vertices U M). if u = v then {s} else {})"
   using invar_G2_2
-  by (simp add: G2_3_def fold_h_cong)
+  by (simp add: G2_3_def adjacency_fold_h_cong)
 
 lemma adjacency_G2_3_G2_1_cong:
   shows
@@ -566,7 +563,7 @@ lemma adjacency_G2_4_cong:
     "set (G.adjacency (G2_4 U V s t M) u) =
      set (G.adjacency (G2_3 U s M) u) \<union> (\<Union>v\<in>set (free_vertices V M). if u = t then {v} else {})"
   using invar_G2_3
-  by (simp add: G2_4_def fold_g_cong)
+  by (simp add: G2_4_def adjacency_fold_g_cong)
 
 lemma E2_4_cong:
   shows "G.E (G2_4 U V s t M) = G.E (G2_3 U s M) \<union> {{t, v} |v. v \<in> set (free_vertices V M)}"
@@ -601,7 +598,7 @@ lemma adjacency_G2_5_cong:
     "set (G.adjacency (G2_5 U V s t M) u) =
      set (G.adjacency (G2_4 U V s t M) u) \<union> (\<Union>v\<in>set (free_vertices V M). if u = v then {t} else {})"
   using invar_G2_4
-  by (simp add: G2_5_def fold_h_cong)
+  by (simp add: G2_5_def adjacency_fold_h_cong)
 
 lemma adjacency_G2_5_G2_3_cong:
   shows
@@ -900,7 +897,7 @@ section \<open>Basic Lemmas\<close>
 
 subsection \<open>@{term M_tbd}\<close>
 
-sublocale graph "M_tbd M"
+sublocale M: graph "M_tbd M"
 proof (standard, goal_cases)
   case 1
   then show ?case
@@ -1013,7 +1010,7 @@ lemma mem_Vs_M_tbd_iff:
   shows "v \<notin> Vs (M_tbd M) \<longleftrightarrow> M_lookup M v = None"
 proof -
   { have "v \<in> Vs (M_tbd M) \<longleftrightarrow> (\<exists>u. {v, u} \<in> M_tbd M)"
-      using graph
+      using M.graph
       by (auto simp add: Vs_def)
     also have "... \<longleftrightarrow> (\<exists>u. M_lookup M v = Some u)"
       using assms
@@ -1469,46 +1466,73 @@ locale ford_fulkerson_valid_input = ford_fulkerson where
   Q_snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" and
   M_update :: "'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" +
   fixes G :: 'n
+  assumes symmetric_adjacency_G: "G.symmetric_adjacency' G"
+  assumes bipartite_G: "\<exists>U V. bipartite_graph (G.E G) U V"
+
+locale ford_fulkerson_valid_input_2 = ford_fulkerson_valid_input where
+  Map_update = Map_update and
+  P_update = P_update and
+  Q_snoc = Q_snoc and
+  M_update = M_update for
+  Map_update :: "'a::linorder \<Rightarrow> 's \<Rightarrow> 'n \<Rightarrow> 'n" and
+  P_update :: "'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" and
+  Q_snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" and
+  M_update :: "'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" +
   fixes U V :: 's
   fixes s t :: 'a
-  assumes symmetric_adjacency_G: "G.symmetric_adjacency' G"
   assumes bipartite_graph: "bipartite_graph (G.E G) (G.S.set U) (G.S.set V)"
   assumes s_not_mem_Vs: "s \<notin> G.V G"
   assumes t_not_mem_Vs: "t \<notin> G.V G"
   assumes s_neq_t: "s \<noteq> t"
 
-abbreviation (in ford_fulkerson) ford_fulkerson_valid_input' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
-  "ford_fulkerson_valid_input' G U V s t \<equiv>
+abbreviation (in ford_fulkerson) ford_fulkerson_valid_input' :: "'n \<Rightarrow> bool" where
+  "ford_fulkerson_valid_input' \<equiv>
    ford_fulkerson_valid_input
     Map_empty Map_delete Map_lookup Map_inorder Map_inv
     Set_empty Set_insert Set_delete Set_isin Set_inorder Set_inv
     P_empty P_delete P_lookup P_invar
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
-    M_empty M_delete M_lookup M_inorder M_inv Map_update
-    P_update Q_snoc M_update
-    G U V s t"
+    M_empty M_delete M_lookup M_inorder M_inv
+    bipartition new_vertices
+    Map_update P_update Q_snoc M_update"
+
+abbreviation (in ford_fulkerson) ford_fulkerson_valid_input_2' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
+  "ford_fulkerson_valid_input_2' G U V s t \<equiv>
+   ford_fulkerson_valid_input_2
+    Map_empty Map_delete Map_lookup Map_inorder Map_inv
+    Set_empty Set_insert Set_delete Set_isin Set_inorder Set_inv
+    P_empty P_delete P_lookup P_invar
+    Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
+    M_empty M_delete M_lookup M_inorder M_inv
+    bipartition new_vertices G
+    Map_update P_update Q_snoc M_update
+    U V s t"
+
+abbreviation (in ford_fulkerson) U' :: "'n \<Rightarrow> 's" where
+  "U' G \<equiv> fst (bipartition G)"
+
+abbreviation (in ford_fulkerson) V' :: "'n \<Rightarrow> 's" where
+  "V' G \<equiv> snd (bipartition G)"
+
+abbreviation (in ford_fulkerson) s' :: "'n \<Rightarrow> 'a" where
+  "s' G \<equiv> fst (new_vertices G)"
+
+abbreviation (in ford_fulkerson) t' :: "'n \<Rightarrow> 'a" where
+  "t' G \<equiv> snd (new_vertices G)"
 
 subsection \<open>Convenience Lemmas\<close>
+
+subsubsection \<open>@{term ford_fulkerson_valid_input}\<close>
 
 lemma (in ford_fulkerson_valid_input) invar_G:
   shows "G.invar G"
   using symmetric_adjacency_G
   by (intro symmetric_adjacency.invar)
 
-lemma (in ford_fulkerson_valid_input) symmetric_G:
-  shows "v \<in> set (G.adjacency G u) \<longleftrightarrow> u \<in> set (G.adjacency G v)"
-  using symmetric_adjacency_G
-  by (intro symmetric_adjacency.symmetric)
-
-lemma (in ford_fulkerson_valid_input) finite_E:
-  shows "finite (G.E G)"
-  using invar_G
-  by (intro G.finite_E)
-
-lemma (in ford_fulkerson_valid_input) finite_Vs:
-  shows "finite (G.V G)"
-  using invar_G
-  by (intro G.finite_V)
+lemma (in ford_fulkerson_valid_input) bipartite_graph:
+  shows "bipartite_graph (G.E G) (G.S.set (U' G)) (G.S.set (V' G))"
+  using bipartite_G bipartition
+  by fastforce
 
 lemma (in ford_fulkerson_valid_input) graph_G:
   shows "\<forall>e\<in>G.E G. \<exists>u v. e = {u, v} \<and> u \<noteq> v"
@@ -1521,42 +1545,104 @@ proof -
     by (fastforce dest: bipartite_graph.no_loop)
 qed
 
-lemma (in ford_fulkerson_valid_input) U_union_V_eq_Vs:
+lemma (in ford_fulkerson_valid_input) s_not_mem_Vs:
+  shows "s' G \<notin> G.V G"
+proof (standard, goal_cases)
+  case 1
+  then obtain v where
+    "{s' G, v} \<in> G.E G \<or> {v, s' G} \<in> G.E G"
+    using graph_G
+    by (fastforce elim: vs_member_elim)
+  hence "{s' G, v} \<in> G.E G"
+    by (metis doubleton_eq_iff)
+  hence "v \<in> set (G.adjacency G (s' G))"
+    using symmetric_adjacency_G
+    by (simp add: symmetric_adjacency.mem_adjacency_iff_edge)
+  hence "(\<exists>S. Map_lookup G (s' G) = Some S)"
+    by (auto simp add: G.mem_adjacency_iff_lookup_eq_Some)
+  thus False
+    using symmetric_adjacency_G new_vertices
+    by fastforce
+qed
+
+lemma (in ford_fulkerson_valid_input) t_not_mem_Vs:
+  shows "t' G \<notin> G.V G"
+proof (standard, goal_cases)
+  case 1
+  then obtain v where
+    "{t' G, v} \<in> G.E G \<or> {v, t' G} \<in> G.E G"
+    using graph_G
+    by (fastforce elim: vs_member_elim)
+  hence "{t' G, v} \<in> G.E G"
+    by (metis doubleton_eq_iff)
+  hence "v \<in> set (G.adjacency G (t' G))"
+    using symmetric_adjacency_G
+    by (simp add: symmetric_adjacency.mem_adjacency_iff_edge)
+  hence "(\<exists>S. Map_lookup G (t' G) = Some S)"
+    by (auto simp add: G.mem_adjacency_iff_lookup_eq_Some)
+  thus False
+    using symmetric_adjacency_G new_vertices
+    by fastforce
+qed
+
+lemma (in ford_fulkerson_valid_input) s_neq_t:
+  shows "s' G \<noteq> t' G"
+  using symmetric_adjacency_G new_vertices
+  by force
+
+subsubsection \<open>@{term ford_fulkerson_valid_input_2}\<close>
+
+lemma (in ford_fulkerson_valid_input_2) symmetric_G:
+  shows "v \<in> set (G.adjacency G u) \<longleftrightarrow> u \<in> set (G.adjacency G v)"
+  using symmetric_adjacency_G
+  by (intro symmetric_adjacency.symmetric)
+
+lemma (in ford_fulkerson_valid_input_2) finite_E:
+  shows "finite (G.E G)"
+  using invar_G
+  by (intro G.finite_E)
+
+lemma (in ford_fulkerson_valid_input_2) finite_Vs:
+  shows "finite (G.V G)"
+  using invar_G
+  by (intro G.finite_V)
+
+lemma (in ford_fulkerson_valid_input_2) U_union_V_eq_Vs:
   shows "G.S.set U \<union> G.S.set V = G.V G"
   using bipartite_graph
   by (intro bipartite_graph.U_union_V_eq_Vs)
 
-lemma (in ford_fulkerson_valid_input) U_V_disjoint:
+lemma (in ford_fulkerson_valid_input_2) U_V_disjoint:
   shows "G.S.set U \<inter> G.S.set V = {}"
   using bipartite_graph
   by (intro bipartite_graph.U_V_disjoint)
 
-lemma (in ford_fulkerson_valid_input) U_subset_Vs:
+lemma (in ford_fulkerson_valid_input_2) U_subset_Vs:
   shows "G.S.set U \<subseteq> G.V G"
   using bipartite_graph
   by (intro bipartite_graph.U_subset_Vs)
 
-lemma (in ford_fulkerson_valid_input) V_subset_Vs:
+lemma (in ford_fulkerson_valid_input_2) V_subset_Vs:
   shows "G.S.set V \<subseteq> G.V G"
   using bipartite_graph
   by (intro bipartite_graph.V_subset_Vs)
 
-lemma (in ford_fulkerson_valid_input) s_not_mem_U:
+lemma (in ford_fulkerson_valid_input_2) s_not_mem_U:
   shows "s \<notin> G.S.set U"
   using U_subset_Vs s_not_mem_Vs
   by blast
 
-lemma (in ford_fulkerson_valid_input) s_not_mem_V:
+lemma (in ford_fulkerson_valid_input_2) s_not_mem_V:
   shows "s \<notin> G.S.set V"
   using V_subset_Vs s_not_mem_Vs
   by blast
 
-lemma (in ford_fulkerson_valid_input) t_not_mem_U:
+lemma (in ford_fulkerson_valid_input_2) t_not_mem_U:
   shows "t \<notin> G.S.set U"
   using U_subset_Vs t_not_mem_Vs
   by blast
 
-lemma (in ford_fulkerson_valid_input) t_not_mem_V:
+lemma (in ford_fulkerson_valid_input_2) t_not_mem_V:
   shows "t \<notin> G.S.set V"
   using V_subset_Vs t_not_mem_Vs
   by blast
@@ -1565,7 +1651,7 @@ section \<open>Invariants\<close>
 
 subsection \<open>Definitions\<close>
 
-locale ford_fulkerson_invar = ford_fulkerson_valid_input where
+locale ford_fulkerson_invar = ford_fulkerson_valid_input_2 where
   Map_update = Map_update and
   P_update = P_update and
   Q_snoc = Q_snoc and
@@ -1624,18 +1710,17 @@ locale ford_fulkerson_invar_done_2 = ford_fulkerson_invar_not_done_1 where
   assumes done_2: "done_2 t (m_tbd G U V s t M)"
 
 abbreviation (in ford_fulkerson) ford_fulkerson_invar' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> bool" where
-  "ford_fulkerson_invar' G U V s t M \<equiv>
+  "ford_fulkerson_invar' G U V s t \<equiv>
    ford_fulkerson_invar
     Map_empty Map_delete Map_lookup Map_inorder Map_inv
     Set_empty Set_insert Set_delete Set_isin Set_inorder Set_inv
     P_empty P_delete P_lookup P_invar
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     M_empty M_delete M_lookup M_inorder M_inv
-    G U V s t
-    Map_update P_update Q_snoc M_update
-    M"
+    bipartition new_vertices G U V s t
+    Map_update P_update Q_snoc M_update"
 
-abbreviation (in ford_fulkerson_valid_input) ford_fulkerson_invar'' :: "'m \<Rightarrow> bool" where
+abbreviation (in ford_fulkerson_valid_input_2) ford_fulkerson_invar'' :: "'m \<Rightarrow> bool" where
   "ford_fulkerson_invar'' \<equiv> ford_fulkerson_invar' G U V s t"
 
 abbreviation (in ford_fulkerson) ford_fulkerson_invar_not_done_1' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> bool" where
@@ -1646,10 +1731,10 @@ abbreviation (in ford_fulkerson) ford_fulkerson_invar_not_done_1' :: "'n \<Right
     P_empty P_delete P_lookup P_invar
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     M_empty M_delete M_lookup M_inorder M_inv
-    G U V s t M
+    bipartition new_vertices G U V s t M
     Map_update P_update Q_snoc M_update"
 
-abbreviation (in ford_fulkerson_valid_input) ford_fulkerson_invar_not_done_1'' :: "'m \<Rightarrow> bool" where
+abbreviation (in ford_fulkerson_valid_input_2) ford_fulkerson_invar_not_done_1'' :: "'m \<Rightarrow> bool" where
   "ford_fulkerson_invar_not_done_1'' \<equiv> ford_fulkerson_invar_not_done_1' G U V s t"
 
 abbreviation (in ford_fulkerson) ford_fulkerson_invar_done_1' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> bool" where
@@ -1660,10 +1745,10 @@ abbreviation (in ford_fulkerson) ford_fulkerson_invar_done_1' :: "'n \<Rightarro
     P_empty P_delete P_lookup P_invar
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     M_empty M_delete M_lookup M_inorder M_inv
-    G U V s t M
+    bipartition new_vertices G U V s t M
     Map_update P_update Q_snoc M_update"
 
-abbreviation (in ford_fulkerson_valid_input) ford_fulkerson_invar_done_1'' :: "'m \<Rightarrow> bool" where
+abbreviation (in ford_fulkerson_valid_input_2) ford_fulkerson_invar_done_1'' :: "'m \<Rightarrow> bool" where
   "ford_fulkerson_invar_done_1'' \<equiv> ford_fulkerson_invar_done_1' G U V s t"
 
 abbreviation (in ford_fulkerson) ford_fulkerson_invar_not_done_2' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> bool" where
@@ -1674,10 +1759,10 @@ abbreviation (in ford_fulkerson) ford_fulkerson_invar_not_done_2' :: "'n \<Right
     P_empty P_delete P_lookup P_invar
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     M_empty M_delete M_lookup M_inorder M_inv
-    G U V s t M
+    bipartition new_vertices G U V s t M
     Map_update P_update Q_snoc M_update"
 
-abbreviation (in ford_fulkerson_valid_input) ford_fulkerson_invar_not_done_2'' :: "'m \<Rightarrow> bool" where
+abbreviation (in ford_fulkerson_valid_input_2) ford_fulkerson_invar_not_done_2'' :: "'m \<Rightarrow> bool" where
   "ford_fulkerson_invar_not_done_2'' \<equiv> ford_fulkerson_invar_not_done_2' G U V s t"
 
 abbreviation (in ford_fulkerson) ford_fulkerson_invar_done_2' :: "'n \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> bool" where
@@ -1688,10 +1773,10 @@ abbreviation (in ford_fulkerson) ford_fulkerson_invar_done_2' :: "'n \<Rightarro
     P_empty P_delete P_lookup P_invar
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     M_empty M_delete M_lookup M_inorder M_inv
-    G U V s t M
+    bipartition new_vertices G U V s t M
     Map_update P_update Q_snoc M_update"
 
-abbreviation (in ford_fulkerson_valid_input) ford_fulkerson_invar_done_2'' :: "'m \<Rightarrow> bool" where
+abbreviation (in ford_fulkerson_valid_input_2) ford_fulkerson_invar_done_2'' :: "'m \<Rightarrow> bool" where
   "ford_fulkerson_invar_done_2'' \<equiv> ford_fulkerson_invar_done_2' G U V s t"
 
 subsection \<open>Convenience Lemmas\<close>
@@ -1776,7 +1861,7 @@ proof -
       by simp }
   thus ?thesis
     unfolding matching_def
-    using graph
+    using M.graph
     by blast
 qed
 
@@ -1791,7 +1876,7 @@ proof -
     hence "{u, v} \<in> G.E G"
       by (intro match_imp_edge) }
   thus ?thesis
-    using graph
+    using M.graph
     by blast
 qed
 
@@ -2108,7 +2193,6 @@ proof -
     using assms
     by (meson discovered_def alt_bfs_invar.hd_rev_follow_eq_src)
 qed
-
 
 lemma (in ford_fulkerson_invar_not_done_1) shortest_alt_path_rev_follow:
   assumes "P_lookup (m_tbd G U V s t M) v \<noteq> None"
@@ -2689,7 +2773,7 @@ qed
 
 subsection \<open>\<close>
 
-lemma (in ford_fulkerson_valid_input) ford_fulkerson_invar_empty:
+lemma (in ford_fulkerson_valid_input_2) ford_fulkerson_invar_empty:
   shows "ford_fulkerson_invar'' M_empty"
 proof (standard, goal_cases)
   case 1
@@ -2739,7 +2823,7 @@ qed
 
 section \<open>Termination\<close>
 
-lemma (in ford_fulkerson_valid_input) loop'_dom:
+lemma (in ford_fulkerson_valid_input_2) loop'_dom:
   assumes "ford_fulkerson_invar'' M"
   shows "loop'_dom (G, U, V, s, t, M)"
   using assms
@@ -2776,6 +2860,8 @@ proof (induct "card (G.E G) - card (M_tbd M)" arbitrary: M rule: less_induct)
         unfolding m
         by (intro ford_fulkerson_invar_not_done_2.augpath_p_tbd)
       show ?thesis
+        thm less.hyps
+        thm loop'.domintros
       proof (rule loop'.domintros, rule less.hyps, goal_cases)
         case 1
         have "card (M_tbd M) < card (M_tbd ?M)"
@@ -2863,7 +2949,7 @@ section \<open>Correctness\<close>
 
 subsection \<open>Definitions\<close>
 
-abbreviation (in ford_fulkerson) maximum_matching :: "'a graph \<Rightarrow> 'a graph \<Rightarrow> bool" where
+abbreviation maximum_matching :: "'a graph \<Rightarrow> 'a graph \<Rightarrow> bool" where
   "maximum_matching G M \<equiv> graph_matching G M \<and> (\<forall>M'. graph_matching G M' \<longrightarrow> card M' \<le> card M)"
 
 subsection \<open>Convenience Lemmas\<close>
@@ -2920,7 +3006,6 @@ proof (rule loop'.pinduct, goal_cases)
   case 1
   show ?case
     using assms(1)
-    thm assms(2)
     by (intro ford_fulkerson_invar.loop'_dom)
 next
   case (2 G U V s t M)
@@ -2930,7 +3015,7 @@ next
   have m: "?m = m_tbd G U V s t M"
     by metis
   show ?case
-    using "2"
+    using 2
     unfolding m
     by (rule assms(2))
 qed
@@ -3192,7 +3277,6 @@ proof -
           by (auto simp add: E2_cong)
       qed
       thus ?thesis
-        thm alt_path_ConsI[where ?p = "p' @ [t]"]
       proof (rule alt_path_ConsI, goal_cases)
         case 1
         show ?case
@@ -3216,7 +3300,7 @@ proof -
     by force
 qed
 
-lemma (in ford_fulkerson_valid_input) correctness:
+lemma (in ford_fulkerson_valid_input_2) correctness:
   assumes "ford_fulkerson_invar'' M"
   shows "maximum_matching (G.E G) (M_tbd (loop' G U V s t M))"
   using assms
@@ -3260,14 +3344,68 @@ proof (induct rule: ford_fulkerson_induct[OF assms])
   qed
 qed
 
-theorem (in ford_fulkerson_valid_input) ford_fulkerson_correct:
-  shows "maximum_matching (G.E G) (M_tbd (ford_fulkerson G U V s t))"
+lemma (in ford_fulkerson_valid_input_2) ford_fulkerson_correct:
+  shows "maximum_matching (G.E G) (M_tbd (loop' G U V s t M_empty))"
   using ford_fulkerson_invar_empty
   by (intro correctness)
 
+context ford_fulkerson_valid_input
+begin
+sublocale F: ford_fulkerson_valid_input_2
+  Map_empty Map_delete Map_lookup Map_inorder Map_inv
+  Set_empty Set_insert Set_delete Set_isin Set_inorder Set_inv
+  P_empty P_delete P_lookup P_invar
+  Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
+  M_empty M_delete M_lookup M_inorder M_inv
+  bipartition new_vertices G
+  Map_update P_update Q_snoc M_update
+  "U' G" "V' G" "s' G" "t' G"
+proof (standard, goal_cases)
+  case 1
+  show ?case
+    using graph_G
+    by meson
+next
+  case 2
+  show ?case
+    using bipartite_graph
+    by (intro bipartite_graph.U_union_V_eq_Vs)
+next
+  case 3
+  show ?case
+    using bipartite_graph
+    by (intro bipartite_graph.U_V_disjoint)
+next
+  case (4 u v)
+  thus ?case
+    using bipartite_graph
+    by (intro bipartite_graph.tbd)
+next
+  case 5
+  show ?case
+    using s_not_mem_Vs
+    .
+next
+  case 6
+  show ?case
+    using t_not_mem_Vs
+    .
+next
+  case 7
+  show ?case
+    using s_neq_t
+    .
+qed
+end
+
+theorem (in ford_fulkerson_valid_input) ford_fulkerson_correct:
+  shows "maximum_matching (G.E G) (M_tbd (ford_fulkerson G))"
+  using F.ford_fulkerson_correct
+  .
+
 corollary (in ford_fulkerson) ford_fulkerson_correct:
-  assumes "ford_fulkerson_valid_input' G U V s t"
-  shows "maximum_matching (G.E G) (M_tbd (ford_fulkerson G U V s t))"
+  assumes "ford_fulkerson_valid_input' G"
+  shows "maximum_matching (G.E G) (M_tbd (ford_fulkerson G))"
   using assms
   by (intro ford_fulkerson_valid_input.ford_fulkerson_correct)
 
