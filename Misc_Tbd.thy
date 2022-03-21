@@ -1,11 +1,73 @@
 theory Misc_Tbd
   imports
+    "HOL-Library.Extended_Nat"
     "HOL-Data_Structures.List_Ins_Del"
     "HOL-Data_Structures.Set_Specs"
     Queue_Specs
 begin
 
+section \<open>Extended nat\<close>
+
+lemma enat_add_strict_right_mono:
+  fixes a b c :: enat
+  assumes "a < b"
+  assumes "c \<noteq> \<infinity>"
+  shows "a + c < b + c"
+  using assms
+  by (metis enat_add_left_cancel_less add.commute)
+
+lemma enat_add_strict_left_mono:
+  fixes a b c :: enat
+  assumes "b < c"
+  assumes "a \<noteq> \<infinity>"
+  shows "a + b < a + c"
+  using assms
+  by (simp add: enat_add_left_cancel_less)
+
+lemma INF_in_image:
+  fixes f :: "'a \<Rightarrow> enat"
+  assumes S_finite: "finite S"
+  assumes S_non_empty: "S \<noteq> {}"
+  shows "Inf (f ` S) \<in> f ` S"
+proof -
+  have image_finite: "finite (f ` S)"
+    using S_finite
+    by simp
+  have image_non_empty: "(f ` S) \<noteq> {}"
+    using S_non_empty
+    by simp
+
+  have "Inf (f ` S) = Min (f ` S)"
+    using image_finite image_non_empty
+    by (rule cInf_eq_Min)
+  moreover have "Min (f ` S) \<in> (f ` S)"
+    using image_finite image_non_empty
+    by (rule Min_in)
+  ultimately show ?thesis
+    by simp
+qed
+
 section \<open>list\<close>
+
+subsection \<open>\<close>
+
+lemma butlast_tl_conv:
+  assumes "l1 \<noteq> []"
+  assumes "l2 \<noteq> []"
+  assumes "last l1 = hd l2"
+  shows "butlast l1 @ l2 = l1 @ tl l2"
+proof -
+  have "butlast l1 @ l2 = butlast l1 @ hd l2 # tl l2"
+    using assms(2)
+    by simp
+  also have "... = butlast l1 @ last l1 # tl l2"
+    by (simp add: assms(3))
+  also have "... = l1 @ tl l2"
+    using assms(1)
+    by simp
+  finally show ?thesis
+    .
+qed
 
 subsection \<open>@{term ins_list}\<close>
 

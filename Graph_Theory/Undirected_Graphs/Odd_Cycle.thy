@@ -3,6 +3,16 @@ theory Odd_Cycle
     Path
 begin
 
+text \<open>This theory formalizes odd cycles.\<close>
+
+text \<open>
+We redefine odd cycles to also include loops for the following reason. We show that to find a
+shortest alternating path it suffices to consider a finite number of alternating paths. For this, we
+show that if there are no odd cycles, we can convert any alternating path into a simple alternating
+path by repeatedly removing cycles. If we allow loops, however, removing a single loop may destroy
+the alternation.
+\<close>
+
 definition odd_cycle where
   "odd_cycle p \<equiv> odd (path_length p) \<and> hd p = last p"
 
@@ -21,8 +31,7 @@ lemma odd_cycleI:
   using assms
   by (simp add: odd_cycle_def)
 
-(* TODO Rename. *)
-lemma tbd:
+lemma even_path_length_cycleI:
   assumes "\<nexists>c. path G c \<and> odd_cycle c"
   assumes "closed_path G c v"
   shows "even (path_length c)"

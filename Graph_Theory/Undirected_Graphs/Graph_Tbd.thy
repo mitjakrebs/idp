@@ -3,6 +3,8 @@ theory Graph_Tbd
     AGF.Berge
 begin
 
+text \<open>This theory extends the formalization of undirected graphs.\<close>
+
 section \<open>Graphs\<close>
 
 type_synonym 'a graph = "'a set set"
@@ -14,8 +16,7 @@ locale graph =
 locale finite_graph = graph G for G +
   assumes finite_edges: "finite G"
 
-(**)
-lemma eqI:
+lemma graphs_eqI:
   assumes "graph G1"
   assumes "graph G2"
   assumes "\<And>u v. {u, v} \<in> G1 \<longleftrightarrow> {u, v} \<in> G2"

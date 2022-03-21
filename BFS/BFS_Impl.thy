@@ -1,9 +1,9 @@
 theory BFS_Impl
   imports
-    BFS
+    BFS_Partial
     "HOL-Data_Structures.RBT_Set2"
     "../Queue"
-    "../Tbd_Graph_Impl"
+    "../Graph_Theory/Adjacency_Impl"
 begin
 
 global_interpretation B: bfs where
@@ -32,5 +32,7 @@ global_interpretation B: bfs where
   Q_invar = invar and
   Q_list = list
   ..
+
+(* value "B.bfs_partial (update (1::nat) (insert (2::nat) empty) empty) 1" *)
 
 end

@@ -5,6 +5,13 @@ theory Directed_Adjacency
     Dpath
 begin
 
+text \<open>
+This theory interprets the graph represented as a map from vertices to their adjacencies as a
+directed graph.
+\<close>
+
+section \<open>\<close>
+
 definition (in adjacency) dE :: "'m \<Rightarrow> ('a \<times> 'a) set" where
   "dE G \<equiv> {(u, v). v \<in> set (adjacency G u)}"
 
@@ -17,7 +24,7 @@ lemma (in adjacency) mem_adjacency_iff_edge:
   shows "v \<in> set (adjacency G u) \<longleftrightarrow> (u, v) \<in> dE G"
   by (simp add: dE_def)
 
-lemma (in adjacency) edgeI:
+lemma (in adjacency) edgeD:
   assumes "(u, v) \<in> dE G"
   shows
     "u \<in> dV G"
@@ -52,13 +59,15 @@ subsection \<open>Vertices\<close>
 
 lemma (in adjacency) adjacency_subset_dV:
   shows "set (adjacency G v) \<subseteq> dV G"
-  by (auto simp add: mem_adjacency_iff_edge intro: edgeI(2))
+  by (auto simp add: mem_adjacency_iff_edge intro: edgeD(2))
 
 lemma (in adjacency) finite_dV:
   assumes "invar G"
   shows "finite (dV G)"
   using assms
   by (auto simp add: finite_vertices_iff intro: finite_dE)
+
+section \<open>Binary operations\<close>
 
 subsection \<open>Union\<close>
 

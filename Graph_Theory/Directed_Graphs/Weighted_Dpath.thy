@@ -1,6 +1,9 @@
 theory Weighted_Dpath
-  imports Dpath
+  imports
+    Dpath
 begin
+
+text \<open>This theory formalizes weighted directed paths.\<close>
 
 type_synonym 'a weight_fun = "'a \<times> 'a \<Rightarrow> nat"
 
@@ -12,7 +15,7 @@ definition dpath_weight :: "'a weight_fun \<Rightarrow> 'a dpath \<Rightarrow> n
 
 section \<open>@{term dpath}, @{term dpath_bet}\<close>
 
-subsection \<open>Basic Lemmas\<close>
+subsection \<open>\<close>
 
 lemma edges_weight_Nil [simp]:
   shows "edges_weight f [] = 0"
@@ -89,7 +92,7 @@ qed
 
 section \<open>@{term distinct_dpath_bet}\<close>
 
-lemma dpath_weight_ge_dpath_bet_to_distinct_weight:
+lemma dpath_weight_ge_dpath_weight_dpath_bet_to_distinct:
   assumes "dpath_bet G p u v"
   shows "dpath_weight f (dpath_bet_to_distinct G p) \<le> dpath_weight f p"
   using assms

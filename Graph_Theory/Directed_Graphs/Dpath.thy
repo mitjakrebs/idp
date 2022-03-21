@@ -14,7 +14,7 @@ type_synonym 'a dpath = "'a list"
 
 lemmas dpath_induct = edges_of_dpath.induct
 
-subsection \<open>Convenience lemmas\<close>
+subsection \<open>\<close>
 
 lemma dpath_betD:
   assumes "dpath_bet G p u v"

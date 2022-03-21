@@ -10,7 +10,7 @@ This theory formalizes the representation of a graph as a map from vertices to t
 adjacencies represented as sets.
 \<close>
 
-section \<open>Definitions\<close>
+section \<open>\<close>
 
 locale adjacency =
   M: Map_by_Ordered where
@@ -45,8 +45,6 @@ definition (in adjacency) invar :: "'m \<Rightarrow> bool" where
 
 definition (in adjacency) adjacency :: "'m \<Rightarrow> 'a \<Rightarrow> 'a list" where
   "adjacency G u \<equiv> case Map_lookup G u of None \<Rightarrow> [] | Some s \<Rightarrow> Set_inorder s"
-
-section \<open>Basic lemmas\<close>
 
 subsection \<open>@{term adjacency.invar}\<close>
 
@@ -166,7 +164,7 @@ proof -
     by blast
 qed
 
-section \<open>Basic operations\<close>
+section \<open>Binary operations\<close>
 
 subsection \<open>Union\<close>
 
@@ -489,7 +487,6 @@ next
     by simp+
   thus ?case
     using Cons.prems(1)
-    thm invar_g Cons.hyps
     by (fastforce intro: invar_g Cons.hyps)
 qed
 

@@ -61,11 +61,6 @@ abbreviation (in bfs) shortest_path_Map :: "'n \<Rightarrow> 'a \<Rightarrow> 'm
    \<forall>v. (discovered src m v \<longrightarrow> shortest_path (G.E G) (rev_follow m v) src v) \<and>
        (\<not> discovered src m v \<longrightarrow> \<not> reachable (G.E G) src v)"
 
-lemma (in undirected_bfs_invar_tbd) undirected_bfs_correct:
-  shows "shortest_dpath_Map G src (bfs G src)"
-  using bfs_correct
-  .
-
 lemma (in undirected_bfs_invar_tbd) dist_eq_dist:
   shows "Shortest_Path.dist (G.E G) u v = dist G u v"
   using dist_eq_dist
@@ -80,16 +75,20 @@ lemma (in undirected_bfs_invar_tbd) reachable_iff_reachable:
   using reachable_iff_reachable
   by (simp add: dE_eq_dEs)
 
-lemma (in bfs) undirected_bfs_correct:
-  assumes "undirected_bfs_invar_tbd' G src"
+lemma (in undirected_bfs_invar_tbd) undirected_bfs_correct:
   shows "shortest_path_Map G src (bfs G src)"
 proof -
   have "shortest_dpath_Map G src (bfs G src)"
-    using assms
-    by (intro undirected_bfs_invar_tbd.undirected_bfs_correct)
+    using bfs_correct
+    .
   thus ?thesis
-    using assms
-    by (simp add: undirected_bfs_invar_tbd.shortest_path_iff_shortest_dpath undirected_bfs_invar_tbd.reachable_iff_reachable)
+    by (simp add: shortest_path_iff_shortest_dpath reachable_iff_reachable)
 qed
+
+lemma (in bfs) undirected_bfs_correct:
+  assumes "undirected_bfs_invar_tbd' G src"
+  shows "shortest_path_Map G src (bfs G src)"
+  using assms
+  by (intro undirected_bfs_invar_tbd.undirected_bfs_correct)
 
 end

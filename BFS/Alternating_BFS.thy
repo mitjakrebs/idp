@@ -65,7 +65,7 @@ lemma P_iff_mem_adjacency:
   shows "P G u v \<longleftrightarrow> v \<in> set (G.adjacency G u)"
 proof -
   have "v \<in> set (G.adjacency G u) \<longleftrightarrow> (\<exists>s. Map_lookup G u = Some s \<and> v \<in> G.S.set s)"
-    using G.mem_adjacency_iff
+    using G.mem_adjacency_iff_lookup_eq_Some
     .
   also have "... \<longleftrightarrow> (\<exists>s. Map_lookup G u = Some s \<and> Set_isin s v)"
     using assms
@@ -2123,7 +2123,7 @@ lemma (in alt_bfs_invar_DONE) alt_loop_psimps:
 
 lemma (in alt_bfs) alt_bfs_induct:
   assumes "alt_bfs_invar' G1 G2 src s"
-  assumes "\<And>G1 G2 src s. alt_loop_dom (G1, G2, src, s) \<Longrightarrow> (\<not> DONE s \<Longrightarrow> Q G1 G2 src (alt_fold G1 G2 src s)) \<Longrightarrow> Q G1 G2 src s"
+  assumes "\<And>G1 G2 src s. (\<not> DONE s \<Longrightarrow> Q G1 G2 src (alt_fold G1 G2 src s)) \<Longrightarrow> Q G1 G2 src s"
   shows "Q G1 G2 src s"
   using assms
   by (blast intro: alt_bfs_invar.alt_loop_dom alt_loop.pinduct)
@@ -2151,7 +2151,7 @@ proof (induct rule: alt_bfs_induct[OF alt_bfs_invar_axioms])
       by
         (auto
          simp add: alt_bfs_invar_not_DONE.alt_loop_psimps
-         intro: alt_bfs_invar_not_DONE.alt_bfs_invar_alt_fold "1.hyps"(2))
+         intro: alt_bfs_invar_not_DONE.alt_bfs_invar_alt_fold "1.hyps")
   qed
 qed
 
@@ -2255,7 +2255,7 @@ proof (induct rule: alt_bfs_induct[OF assms(1)])
     thus ?thesis
       using False "1.prems"(2)
       by
-        (intro alt_bfs_invar_not_DONE.alt_bfs_invar_alt_fold "1.hyps"(2))
+        (intro alt_bfs_invar_not_DONE.alt_bfs_invar_alt_fold "1.hyps")
         (simp_all add: alt_bfs_invar_not_DONE.alt_loop_psimps)
   qed
 qed
@@ -2372,7 +2372,7 @@ proof (induct rule: alt_bfs_induct[OF assms(1)])
       by (intro alt_bfs_invar_not_DONE'I)
     thus ?thesis
       using False "1.prems"(2)
-      by (auto simp add: alt_bfs_invar_not_DONE.alt_loop_psimps dest: "1.hyps"(2) intro: alt_bfs_invar_not_DONE.alt_bfs_invar_alt_fold)
+      by (auto simp add: alt_bfs_invar_not_DONE.alt_loop_psimps dest: "1.hyps" intro: alt_bfs_invar_not_DONE.alt_bfs_invar_alt_fold)
   qed
 qed
 

@@ -1,10 +1,7 @@
 theory BFS
   imports
-    "../Graph_Theory/Directed_Graphs/Directed_Adjacency"
+    "../Graph_Theory/Directed_Graphs/Directed_Graphs"
     "../Map_Specs_Tbd"
-    "../Misc_Tbd"
-    "../Queue_Specs"
-    "../Graph_Theory/Directed_Graphs/Shortest_Dpath"
     "../Tbd"
 begin
 
@@ -1806,7 +1803,7 @@ proof
   hence "(u, v) \<in> G.dE G"
     by (intro parent_imp_edge)
   thus "v \<in> G.dV G"
-    by (intro G.edgeI(2))
+    by (intro G.edgeD(2))
 qed
 
 subsection \<open>Convenience Lemmas\<close>
@@ -1834,7 +1831,7 @@ lemma (in bfs_invar_DONE) loop_psimps:
 
 lemma (in bfs) bfs_induct:
   assumes "bfs_invar' G src s"
-  assumes "\<And>G src s. loop_dom (G, src, s) \<Longrightarrow> (\<not> DONE s \<Longrightarrow> P G src (fold G src s)) \<Longrightarrow> P G src s"
+  assumes "\<And>G src s. (\<not> DONE s \<Longrightarrow> P G src (fold G src s)) \<Longrightarrow> P G src s"
   shows "P G src s"
   using assms
   by (blast intro: bfs_invar.loop_dom loop.pinduct)
@@ -1912,7 +1909,7 @@ proof (induct rule: bfs_induct[OF assms(1)])
       by (intro bfs_invar_not_DONE'I)
     thus ?thesis
       using False "1.prems"(2)
-      by (intro bfs_invar_not_DONE.bfs_invar_fold "1.hyps"(2)) (simp_all add: bfs_invar_not_DONE.loop_psimps)
+      by (intro bfs_invar_not_DONE.bfs_invar_fold "1.hyps") (simp_all add: bfs_invar_not_DONE.loop_psimps)
   qed
 qed
 
@@ -1927,7 +1924,7 @@ proof -
     by (auto simp add: reachable_iff_dpath_bet intro: not_white_imp_dpath_rev_follow)
   then obtain p where
     "shortest_dpath G p src v"
-    by (elim dist_dpath_betE) simp+
+    by (elim shortest_dpath_if_reachable_2) simp+
   thus ?thesis
     using assms
   proof (induct p arbitrary: v rule: dpath_rev_induct)
@@ -1956,7 +1953,7 @@ proof -
         by
           (auto
            simp add: dpath_length_eq_dpath_weight dist_eq_\<delta> shortest_dpath_def[symmetric]
-           intro: shortest_dpath_prefix_shortest_dpath)
+           intro: shortest_dpath_prefI)
       have "(u, v) \<in> G.dE G"
         using "3.prems"(1) last_of_dpath_bet
         by (fastforce simp add: edge_iff_dpath_bet intro: split_dpath)
@@ -2011,7 +2008,7 @@ proof (induct rule: bfs_induct[OF assms(1)])
       by (intro bfs_invar_not_DONE'I)
     thus ?thesis
       using False "1.prems"(2)
-      by (auto simp add: bfs_invar_not_DONE.loop_psimps dest: "1.hyps"(2) intro: bfs_invar_not_DONE.bfs_invar_fold)
+      by (auto simp add: bfs_invar_not_DONE.loop_psimps dest: "1.hyps" intro: bfs_invar_not_DONE.bfs_invar_fold)
   qed
 qed
 
