@@ -2,23 +2,23 @@ theory BFS_Impl
   imports
     BFS_Partial
     "HOL-Data_Structures.RBT_Set2"
-    "../Queue"
-    "../Graph_Theory/Adjacency_Impl"
+    "../Queue/Queue"
+    "../Graph/Adjacency/Adjacency_Impl"
 begin
 
 global_interpretation B: bfs where
   Map_empty = empty and
+  Map_update = update and
   Map_delete = RBT_Map.delete and
   Map_lookup = lookup and
   Map_inorder = inorder and
   Map_inv = rbt and
   Set_empty = empty and
-  Set_insert = insert and
+  Set_insert = RBT_Set.insert and
   Set_delete = delete and
   Set_isin = isin and
   Set_inorder = inorder and
   Set_inv = rbt and
-  Map_update = update and
   P_empty = empty and
   P_update = update and
   P_delete = RBT_Map.delete and
@@ -29,10 +29,19 @@ global_interpretation B: bfs where
   Q_snoc = snoc and
   Q_head = head and
   Q_tail = tail and
-  Q_invar = invar and
+  Q_invar = Queue.invar and
   Q_list = list
+  defines init = B.init
+  and DONE = B.DONE
+  and is_discovered = B.is_discovered
+  and discover = B.discover
+  and traverse_edge = B.traverse_edge
+  and loop_partial = B.loop_partial
+  and bfs_partial = B.bfs_partial
   ..
 
-(* value "B.bfs_partial (update (1::nat) (insert (2::nat) empty) empty) 1" *)
+declare B.loop_partial.simps [code]
+thm B.loop_partial.simps
+value "bfs_partial (update (1::nat) (RBT_Set.insert (2::nat) empty) empty) 1"
 
 end

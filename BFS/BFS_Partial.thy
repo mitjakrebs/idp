@@ -9,13 +9,13 @@ partial_function (in bfs) (tailrec) loop_partial where
     then let
           u = Q_head (queue s);
           q = Q_tail (queue s)
-         in loop_partial G src (List.fold (traverse_edge src u) (G.adjacency G u) (s\<lparr>queue := q\<rparr>))
+         in loop_partial G src (List.fold (traverse_edge src u) (G.adjacency_list G u) (s\<lparr>queue := q\<rparr>))
     else s)"
 
-abbreviation (in bfs) bfs_partial :: "'n \<Rightarrow> 'a \<Rightarrow> 'm" where
+definition (in bfs) bfs_partial :: "'n \<Rightarrow> 'a \<Rightarrow> 'm" where
   "bfs_partial G src \<equiv> parent (loop_partial G src (init src))"
 
-lemma (in bfs_invar_tbd) loop_partial_eq_loop:
+lemma (in bfs_valid_input) loop_partial_eq_loop:
   assumes "bfs_invar'' s"
   shows "loop_partial G src s = loop G src s"
   using assms
@@ -42,20 +42,20 @@ proof (induct rule: bfs_induct[OF assms])
   qed
 qed
 
-lemma (in bfs_invar_tbd) bfs_partial_eq_bfs:
+lemma (in bfs_valid_input) bfs_partial_eq_bfs:
   shows "bfs_partial G src = bfs G src"
   using bfs_invar_init
-  by (simp add: loop_partial_eq_loop)
+  by (simp add: bfs_partial_def loop_partial_eq_loop)
 
-theorem (in bfs_invar_tbd) bfs_partial_correct:
-  shows "shortest_dpath_Map G src (bfs_partial G src)"
+theorem (in bfs_valid_input) bfs_partial_correct:
+  shows "is_shortest_dpath_Map G src (bfs_partial G src)"
   using bfs_correct
   by (simp add: bfs_partial_eq_bfs)
 
 corollary (in bfs) bfs_partial_correct:
-  assumes "bfs_invar_tbd' G src"
-  shows "shortest_dpath_Map G src (bfs_partial G src)"
+  assumes "bfs_valid_input' G src"
+  shows "is_shortest_dpath_Map G src (bfs_partial G src)"
   using assms
-  by (intro bfs_invar_tbd.bfs_partial_correct)
+  by (intro bfs_valid_input.bfs_partial_correct)
 
 end

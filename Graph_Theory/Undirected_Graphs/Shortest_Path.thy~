@@ -1,9 +1,0 @@
-theory Shortest_Path
-  imports
-    Path
-begin
-
-definition dist :: "'a graph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> enat" where
-  "dist G u v \<equiv> INF p\<in>{p. walk_betw G u p v}. enat (path_length p)"
-
-end
