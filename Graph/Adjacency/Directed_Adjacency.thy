@@ -1,0 +1,132 @@
+subsubsection \<open>Directed adjacency structure\<close>
+
+theory Directed_Adjacency
+  imports
+    Adjacency
+    "../Directed_Graph/Dgraph"
+    "../Directed_Graph/Dpath"
+begin
+
+text \<open>
+An adjacency structure specified via the locale @{locale adjacency} naturally induces a directed
+graph, where we have an edge from vertex $u$ to vertex $v$ if and only if $v$ is contained in the
+adjacency of $u$.
+\<close>
+
+definition (in adjacency) dE :: "'m \<Rightarrow> ('a \<times> 'a) set" where
+  "dE G \<equiv> {(u, v). v \<in> set (adjacency_list G u)}"
+
+definition (in adjacency) dV :: "'m \<Rightarrow> 'a set" where
+  "dV G \<equiv> dVs (dE G)"
+
+lemma (in adjacency) mem_adjacency_iff_edge:
+  shows "v \<in> set (adjacency_list G u) \<longleftrightarrow> (u, v) \<in> dE G"
+  by (simp add: dE_def)
+
+lemma \<^marker>\<open>tag invisible\<close> (in adjacency) edgeD:
+  assumes "(u, v) \<in> dE G"
+  shows
+    "u \<in> dV G"
+    "v \<in> dV G"
+  using assms
+  by (auto simp add: dV_def intro: dVsI)
+
+lemma (in adjacency) finite_dE:
+  assumes "invar G"
+  shows "finite (dE G)"
+proof (rule finite_subset)
+  { fix u v
+    assume "(u, v) \<in> dE G"
+    then obtain s where
+      "Map_lookup G u = Some s"
+      "v \<in> S.set s"
+      by (auto simp add: mem_adjacency_iff_edge[symmetric] elim: mem_adjacencyE)
+    hence
+      "u \<in> M.dom G"
+      "v \<in> \<Union> (S.set ` M.ran G)"
+      by (auto simp add: M.mem_dom_iff M.ran_def)
+    hence "(u, v) \<in> M.dom G \<times> \<Union> (S.set ` M.ran G)"
+      by blast }
+  thus "dE G \<subseteq> M.dom G \<times> \<Union> (S.set ` M.ran G)"
+    by auto
+  show "finite ..."
+    using assms
+    by (auto simp add: S.set_def dest: invarD(1) intro: M.finite_dom M.finite_ran)
+qed
+
+lemma (in adjacency) adjacency_subset_dV:
+  shows "set (adjacency_list G v) \<subseteq> dV G"
+  by (auto simp add: mem_adjacency_iff_edge intro: edgeD(2))
+
+lemma (in adjacency) finite_dV:
+  assumes "invar G"
+  shows "finite (dV G)"
+  using assms
+  by (auto simp add: dV_def finite_vertices_iff intro: finite_dE)
+
+text \<open>
+We show that graph operations union and difference correspond to the respective set operations in
+terms of @{term adjacency.dE}.
+\<close>
+
+lemma (in adjacency) dE_union_cong:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "dE (union G1 G2) = dE G1 \<union> dE G2"
+  using assms
+  by (auto simp add: dE_def adjacency_union_cong)
+
+lemma (in adjacency) dV_union_cong:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "dV (union G1 G2) = dV G1 \<union> dV G2"
+proof -
+  have "dV (union G1 G2) = fst ` dE (union G1 G2) \<union> snd ` dE (union G1 G2)"
+    by (simp add: dV_def dVs_eq)
+  also have "... = fst ` (dE G1 \<union> dE G2) \<union> snd ` (dE G1 \<union> dE G2)"
+    using assms
+    by (simp add: dE_union_cong)
+  also have "... = (fst ` dE G1 \<union> snd ` dE G1) \<union> (fst ` dE G2 \<union> snd ` dE G2)"
+    by blast
+  also have "... = dV G1 \<union> dV G2"
+    by (simp add: dVs_eq dV_def)
+  finally show ?thesis
+    .
+qed
+
+lemma (in adjacency) finite_dE_union:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "finite (dE (union G1 G2))"
+  using assms
+  by (auto simp add: dE_union_cong intro: finite_dE)
+
+lemma (in adjacency) finite_dV_union:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "finite (dV (union G1 G2))"
+  using assms
+  by (intro invar_union finite_dV)
+
+lemma (in adjacency) dE_difference_cong:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "dE (difference G1 G2) = dE G1 - dE G2"
+  using assms
+  by (auto simp add: dE_def adjacency_difference_cong)
+
+lemma (in adjacency) finite_dE_difference:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "finite (dE (difference G1 G2))"
+  using assms
+  by (auto simp add: dE_difference_cong intro: finite_dE)
+
+lemma (in adjacency) finite_dV_difference:
+  assumes "invar G1"
+  assumes "invar G2"
+  shows "finite (dV (difference G1 G2))"
+  using assms
+  by (intro invar_difference finite_dV)
+
+end

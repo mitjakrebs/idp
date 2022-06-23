@@ -1,0 +1,154 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{BFS{\isacharunderscore}{\kern0pt}Impl}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ BFS{\isacharunderscore}{\kern0pt}Impl\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ BFS{\isacharunderscore}{\kern0pt}Partial\isanewline
+\ \ \ \ {\isachardoublequoteopen}HOL{\isacharminus}{\kern0pt}Data{\isacharunderscore}{\kern0pt}Structures{\isachardot}{\kern0pt}RBT{\isacharunderscore}{\kern0pt}Set{\isadigit{2}}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Queue{\isacharslash}{\kern0pt}Queue{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Graph{\isacharslash}{\kern0pt}Adjacency{\isacharslash}{\kern0pt}Adjacency{\isacharunderscore}{\kern0pt}Impl{\isachardoublequoteclose}\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{global{\isacharunderscore}{\kern0pt}interpretation}\isamarkupfalse%
+\ B{\isacharcolon}{\kern0pt}\ bfs\ \isakeyword{where}\isanewline
+\ \ Map{\isacharunderscore}{\kern0pt}empty\ {\isacharequal}{\kern0pt}\ empty\ \isakeyword{and}\isanewline
+\ \ Map{\isacharunderscore}{\kern0pt}update\ {\isacharequal}{\kern0pt}\ update\ \isakeyword{and}\isanewline
+\ \ Map{\isacharunderscore}{\kern0pt}delete\ {\isacharequal}{\kern0pt}\ RBT{\isacharunderscore}{\kern0pt}Map{\isachardot}{\kern0pt}delete\ \isakeyword{and}\isanewline
+\ \ Map{\isacharunderscore}{\kern0pt}lookup\ {\isacharequal}{\kern0pt}\ lookup\ \isakeyword{and}\isanewline
+\ \ Map{\isacharunderscore}{\kern0pt}inorder\ {\isacharequal}{\kern0pt}\ inorder\ \isakeyword{and}\isanewline
+\ \ Map{\isacharunderscore}{\kern0pt}inv\ {\isacharequal}{\kern0pt}\ rbt\ \isakeyword{and}\isanewline
+\ \ Set{\isacharunderscore}{\kern0pt}empty\ {\isacharequal}{\kern0pt}\ empty\ \isakeyword{and}\isanewline
+\ \ Set{\isacharunderscore}{\kern0pt}insert\ {\isacharequal}{\kern0pt}\ RBT{\isacharunderscore}{\kern0pt}Set{\isachardot}{\kern0pt}insert\ \isakeyword{and}\isanewline
+\ \ Set{\isacharunderscore}{\kern0pt}delete\ {\isacharequal}{\kern0pt}\ delete\ \isakeyword{and}\isanewline
+\ \ Set{\isacharunderscore}{\kern0pt}isin\ {\isacharequal}{\kern0pt}\ isin\ \isakeyword{and}\isanewline
+\ \ Set{\isacharunderscore}{\kern0pt}inorder\ {\isacharequal}{\kern0pt}\ inorder\ \isakeyword{and}\isanewline
+\ \ Set{\isacharunderscore}{\kern0pt}inv\ {\isacharequal}{\kern0pt}\ rbt\ \isakeyword{and}\isanewline
+\ \ P{\isacharunderscore}{\kern0pt}empty\ {\isacharequal}{\kern0pt}\ empty\ \isakeyword{and}\isanewline
+\ \ P{\isacharunderscore}{\kern0pt}update\ {\isacharequal}{\kern0pt}\ update\ \isakeyword{and}\isanewline
+\ \ P{\isacharunderscore}{\kern0pt}delete\ {\isacharequal}{\kern0pt}\ RBT{\isacharunderscore}{\kern0pt}Map{\isachardot}{\kern0pt}delete\ \isakeyword{and}\isanewline
+\ \ P{\isacharunderscore}{\kern0pt}lookup\ {\isacharequal}{\kern0pt}\ lookup\ \isakeyword{and}\isanewline
+\ \ P{\isacharunderscore}{\kern0pt}invar\ {\isacharequal}{\kern0pt}\ M{\isachardot}{\kern0pt}invar\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}empty\ {\isacharequal}{\kern0pt}\ Queue{\isachardot}{\kern0pt}empty\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}empty\ {\isacharequal}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}empty\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}snoc\ {\isacharequal}{\kern0pt}\ snoc\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}head\ {\isacharequal}{\kern0pt}\ head\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}tail\ {\isacharequal}{\kern0pt}\ tail\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}invar\ {\isacharequal}{\kern0pt}\ Queue{\isachardot}{\kern0pt}invar\ \isakeyword{and}\isanewline
+\ \ Q{\isacharunderscore}{\kern0pt}list\ {\isacharequal}{\kern0pt}\ list\isanewline
+\ \ \isakeyword{defines}\ init\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}init\isanewline
+\ \ \isakeyword{and}\ DONE\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}DONE\isanewline
+\ \ \isakeyword{and}\ is{\isacharunderscore}{\kern0pt}discovered\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}is{\isacharunderscore}{\kern0pt}discovered\isanewline
+\ \ \isakeyword{and}\ discover\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}discover\isanewline
+\ \ \isakeyword{and}\ traverse{\isacharunderscore}{\kern0pt}edge\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}traverse{\isacharunderscore}{\kern0pt}edge\isanewline
+\ \ \isakeyword{and}\ loop{\isacharunderscore}{\kern0pt}partial\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}loop{\isacharunderscore}{\kern0pt}partial\isanewline
+\ \ \isakeyword{and}\ bfs{\isacharunderscore}{\kern0pt}partial\ {\isacharequal}{\kern0pt}\ B{\isachardot}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}partial\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{declare}\isamarkupfalse%
+\ B{\isachardot}{\kern0pt}loop{\isacharunderscore}{\kern0pt}partial{\isachardot}{\kern0pt}simps\ {\isacharbrackleft}{\kern0pt}code{\isacharbrackright}{\kern0pt}\isanewline
+\isacommand{thm}\isamarkupfalse%
+\ B{\isachardot}{\kern0pt}loop{\isacharunderscore}{\kern0pt}partial{\isachardot}{\kern0pt}simps\isanewline
+\isacommand{value}\isamarkupfalse%
+\ {\isachardoublequoteopen}bfs{\isacharunderscore}{\kern0pt}partial\ {\isacharparenleft}{\kern0pt}update\ {\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}nat{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}RBT{\isacharunderscore}{\kern0pt}Set{\isachardot}{\kern0pt}insert\ {\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}nat{\isacharparenright}{\kern0pt}\ empty{\isacharparenright}{\kern0pt}\ empty{\isacharparenright}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/BFS/BFS_Impl.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%15=5%:%
+%:%16=6%:%
+%:%17=7%:%
+%:%22=7%:%
+%:%25=8%:%
+%:%26=9%:%
+%:%27=9%:%
+%:%28=10%:%
+%:%29=11%:%
+%:%30=12%:%
+%:%31=13%:%
+%:%32=14%:%
+%:%33=15%:%
+%:%34=16%:%
+%:%35=17%:%
+%:%36=18%:%
+%:%37=19%:%
+%:%38=20%:%
+%:%39=21%:%
+%:%40=22%:%
+%:%41=23%:%
+%:%42=24%:%
+%:%43=25%:%
+%:%44=26%:%
+%:%45=27%:%
+%:%46=28%:%
+%:%47=29%:%
+%:%48=30%:%
+%:%49=31%:%
+%:%50=32%:%
+%:%51=33%:%
+%:%52=34%:%
+%:%53=35%:%
+%:%54=36%:%
+%:%55=37%:%
+%:%56=38%:%
+%:%57=39%:%
+%:%58=40%:%
+%:%61=41%:%
+%:%65=41%:%
+%:%71=41%:%
+%:%74=42%:%
+%:%75=43%:%
+%:%76=43%:%
+%:%77=44%:%
+%:%78=44%:%
+%:%79=45%:%
+%:%80=45%:%
+%:%83=46%:%
+%:%88=47%:%

@@ -1,0 +1,216 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Odd{\isacharunderscore}{\kern0pt}Cycle}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Odd{\isacharunderscore}{\kern0pt}Cycle\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ Path\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\begin{isamarkuptext}%
+We redefine odd cycles--compared to the definition in session \isatt{A{\kern0pt}G{\kern0pt}F{\kern0pt}}--to also include loops
+for the following reason. We show that to find a shortest alternating path it suffices to consider a
+finite number of alternating paths. For this, we show that if there are no odd cycles, we can
+transform any alternating path into a simple alternating path by repeatedly removing cycles. If we
+do not consider loops as odd cycles, however, and hence do not exclude them, removing a single loop
+may destroy the alternation of the path.%
+\end{isamarkuptext}\isamarkuptrue%
+\isacommand{definition}\isamarkupfalse%
+\ odd{\isacharunderscore}{\kern0pt}cycle\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}odd{\isacharunderscore}{\kern0pt}cycle\ p\ {\isasymequiv}\ odd\ {\isacharparenleft}{\kern0pt}path{\isacharunderscore}{\kern0pt}length\ p{\isacharparenright}{\kern0pt}\ {\isasymand}\ hd\ p\ {\isacharequal}{\kern0pt}\ last\ p{\isachardoublequoteclose}\isanewline
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ odd{\isacharunderscore}{\kern0pt}cycleD{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}odd{\isacharunderscore}{\kern0pt}cycle\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\isanewline
+\ \ \ \ {\isachardoublequoteopen}odd\ {\isacharparenleft}{\kern0pt}path{\isacharunderscore}{\kern0pt}length\ p{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}hd\ p\ {\isacharequal}{\kern0pt}\ last\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp{\isacharunderscore}{\kern0pt}all\ add{\isacharcolon}{\kern0pt}\ odd{\isacharunderscore}{\kern0pt}cycle{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ odd{\isacharunderscore}{\kern0pt}cycleI{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}odd\ {\isacharparenleft}{\kern0pt}path{\isacharunderscore}{\kern0pt}length\ p{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}hd\ p\ {\isacharequal}{\kern0pt}\ last\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}odd{\isacharunderscore}{\kern0pt}cycle\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ odd{\isacharunderscore}{\kern0pt}cycle{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ even{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}cycleI{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymnot}\ {\isacharparenleft}{\kern0pt}{\isasymexists}c{\isachardot}{\kern0pt}\ path\ G\ c\ {\isasymand}\ odd{\isacharunderscore}{\kern0pt}cycle\ c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path\ G\ c\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}even\ {\isacharparenleft}{\kern0pt}path{\isacharunderscore}{\kern0pt}length\ c{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ odd{\isacharunderscore}{\kern0pt}cycle{\isacharunderscore}{\kern0pt}def\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Graph/Undirected_Graph/Odd_Cycle.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%23=7%:%
+%:%24=8%:%
+%:%25=9%:%
+%:%26=10%:%
+%:%27=11%:%
+%:%28=12%:%
+%:%30=15%:%
+%:%31=15%:%
+%:%32=16%:%
+%:%35=17%:%
+%:%40=18%:%
+%:%41=18%:%
+%:%42=19%:%
+%:%43=20%:%
+%:%44=21%:%
+%:%45=22%:%
+%:%50=22%:%
+%:%55=23%:%
+%:%59=23%:%
+%:%60=23%:%
+%:%61=24%:%
+%:%62=24%:%
+%:%67=24%:%
+%:%72=25%:%
+%:%77=26%:%
+%:%78=26%:%
+%:%79=27%:%
+%:%80=28%:%
+%:%81=29%:%
+%:%86=29%:%
+%:%91=30%:%
+%:%95=30%:%
+%:%96=30%:%
+%:%97=31%:%
+%:%98=31%:%
+%:%103=31%:%
+%:%108=32%:%
+%:%113=33%:%
+%:%114=33%:%
+%:%115=34%:%
+%:%116=35%:%
+%:%117=36%:%
+%:%122=36%:%
+%:%127=37%:%
+%:%131=37%:%
+%:%132=37%:%
+%:%133=38%:%
+%:%134=38%:%
+%:%139=38%:%
+%:%144=39%:%
+%:%149=40%:%

@@ -1,0 +1,272 @@
+theory Bipartite_Graph
+  imports
+    Odd_Cycle
+    "../Adaptors/Path_Adaptor"
+begin
+
+text \<open>
+A bipartite graph is an undirected graph @{term G} whose set of vertices @{term "Vs G"} can be
+partitioned into two sets @{term L}, @{term R} such that every edge in @{term G} has an endpoint in
+@{term L} and an endpoint in @{term R}.
+\<close>
+
+locale bipartite_graph = graph G for G +
+  fixes L R :: "'a set"
+  assumes L_union_R_eq_Vs: "L \<union> R = Vs G"
+  assumes L_R_disjoint: "L \<inter> R = {}"
+  assumes endpoints: "{u, v} \<in> G \<Longrightarrow> u \<in> L \<longleftrightarrow> v \<in> R"
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) L_subset_Vs:
+  shows "L \<subseteq> Vs G"
+  unfolding L_union_R_eq_Vs[symmetric]
+  by (intro Un_upper1)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) R_subset_Vs:
+  shows "R \<subseteq> Vs G"
+  unfolding L_union_R_eq_Vs[symmetric]
+  by (intro Un_upper2)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) mem_L_imp_not_mem_R:
+  assumes "u \<in> L"
+  shows "u \<notin> R"
+  using assms L_R_disjoint
+  by fast
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) mem_R_imp_not_mem_L:
+  assumes "v \<in> R"
+  shows "v \<notin> L"
+  using assms L_R_disjoint
+  by fast
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) not_mem_L_imp_mem_R:
+  assumes "v \<in> Vs G"
+  assumes "v \<notin> L"
+  shows "v \<in> R"
+  using assms L_union_R_eq_Vs L_R_disjoint
+  by fast
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) not_mem_R_imp_mem_L:
+  assumes "u \<in> Vs G"
+  assumes "u \<notin> R"
+  shows "u \<in> L"
+  using assms L_union_R_eq_Vs L_R_disjoint
+  by fast
+
+text \<open>
+Equivalently, a bipartite graph is an undirected graph whose set of vertices can be partitioned into
+two independent sets. We only show one implication.
+\<close>
+
+lemma (in bipartite_graph) L_independent:
+  shows "\<forall>u\<in>L. \<forall>v\<in>L. {u, v} \<notin> G"
+proof (standard, standard, standard)
+  fix u v
+  assume
+    "u \<in> L"
+    "v \<in> L"
+    "{u, v} \<in> G"
+  thus False
+    by (auto simp add: endpoints dest: mem_L_imp_not_mem_R)
+qed
+
+lemma (in bipartite_graph) R_independent:
+  shows "\<forall>u\<in>R. \<forall>v\<in>R. {u, v} \<notin> G"
+proof (standard, standard, standard)
+  fix u v
+  assume
+    "u \<in> R"
+    "v \<in> R"
+    "{u, v} \<in> G"
+  thus False
+    by (auto simp add: endpoints dest: mem_R_imp_not_mem_L)
+qed
+
+lemma (in bipartite_graph) no_loop:
+  shows "{v, v} \<notin> G"
+proof (standard, goal_cases)
+  case 1
+  show ?case
+  proof (cases "v \<in> L")
+    case True
+    thus ?thesis
+      using 1 L_independent
+      by blast
+  next
+    case False
+    hence "v \<in> R"
+      using 1
+      by (auto intro: not_mem_L_imp_mem_R)
+    thus ?thesis
+      using 1 R_independent
+      by blast
+  qed
+qed
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) nth_mem_L_iff:
+  assumes "path G p"
+  assumes "Suc i < length p"
+  shows "p ! i \<in> L \<longleftrightarrow> p ! (Suc i) \<in> R"
+  using assms
+  by (auto simp add: endpoints dest: pathD_2)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bipartite_graph) nth_mem_L_iff_2:
+  assumes "path G p"
+  assumes "Suc i < length p"
+  shows "p ! i \<in> L \<longleftrightarrow> p ! (Suc i) \<notin> L"
+proof -
+  have "p ! i \<in> L \<longleftrightarrow> p ! (Suc i) \<in> R"
+    using assms
+    by (intro nth_mem_L_iff)
+  also have "... \<longleftrightarrow> p ! (Suc i) \<notin> L"
+  proof (standard, goal_cases)
+    case 1
+    thus ?case
+      by (intro mem_R_imp_not_mem_L)
+  next
+    case 2
+    thus ?case
+      using assms
+      by (fastforce intro: mem_path_Vs intro: not_mem_L_imp_mem_R)
+  qed
+  finally show ?thesis
+    .
+qed
+
+text \<open>
+Equivalently, a bipartite graph is an undirected graph that does not contain any odd-length cycles.
+Again, we only show one implication.
+\<close>
+
+lemma (in bipartite_graph) nth_mem_L_iff_even:
+  assumes "path G p"
+  assumes "hd p \<in> L"
+  assumes "i < length p"
+  shows "p ! i \<in> L \<longleftrightarrow> even i"
+  using assms
+proof (induct i)
+  case 0
+  thus ?case
+    by (simp add: hd_conv_nth)
+next
+  case (Suc i)
+  hence "p ! Suc i \<in> L \<longleftrightarrow> p ! i \<notin> L"
+    by (auto simp add: nth_mem_L_iff_2)
+  also have "... \<longleftrightarrow> odd i"
+    using Suc.prems
+    by (simp add: Suc.hyps)
+  also have "... \<longleftrightarrow> even (Suc i)"
+    by simp
+  finally show ?case
+    .
+qed
+
+lemma (in bipartite_graph) nth_mem_R_iff_even:
+  assumes "path G p"
+  assumes "hd p \<in> R"
+  assumes "i < length p"
+  shows "p ! i \<in> R \<longleftrightarrow> even i"
+  using assms
+proof (induct i)
+  case 0
+  thus ?case
+    by (simp add: hd_conv_nth)
+next
+  case (Suc i)
+  hence "p ! Suc i \<in> R \<longleftrightarrow> p ! i \<in> L"
+    by (simp add: nth_mem_L_iff)
+  also have "... \<longleftrightarrow> p ! i \<notin> R"
+  proof (standard, goal_cases)
+    case 1
+    thus ?case
+      using R_subset_Vs
+      by (auto dest: mem_L_imp_not_mem_R)
+  next
+    case 2
+    have "p ! i \<in> Vs G"
+      using Suc.prems(1, 3)
+      by (fastforce intro: mem_path_Vs)
+    thus ?case
+      using 2
+      by (intro not_mem_R_imp_mem_L)
+  qed
+  also have "... \<longleftrightarrow> odd i"
+    using Suc.prems
+    by (simp add: Suc.hyps)
+  also have "... \<longleftrightarrow> even (Suc i)"
+    by simp
+  finally show ?case
+    .
+qed
+
+theorem (in bipartite_graph) no_odd_cycle:
+  shows "\<not> (\<exists>c. path G c \<and> odd_cycle c)"
+proof (standard, elim exE)
+  fix c
+  assume assm: "path G c \<and> odd_cycle c"
+  hence c_non_empty: "c \<noteq> []"
+    by (auto simp add: odd_cycle_def)
+  show False
+  proof (cases "hd c \<in> L")
+    case True
+    { fix i
+      assume "i < length c"
+      hence "c ! i \<in> L \<longleftrightarrow> even i"
+        using assm True
+        by (intro nth_mem_L_iff_even) simp }
+    moreover have "c ! (length c - 1) \<in> L"
+    proof -
+      have "last c \<in> L"
+        using assm True
+        by (simp add: odd_cycleD(2))
+      thus ?thesis
+        using c_non_empty
+        by (simp add: last_conv_nth)
+    qed
+    ultimately have "even (path_length c)"
+      using c_non_empty
+      by (simp add: edges_of_path_length)
+    thus False
+      using assm
+      by (auto dest: odd_cycleD(1))
+  next
+    case False
+    { fix i
+      assume "i < length c"
+      hence "c ! i \<in> L \<longleftrightarrow> odd i"
+      proof (induct i)
+        case 0
+        thus ?case
+          using False
+          by (simp add: hd_conv_nth)
+      next
+        case (Suc i)
+        hence "c ! Suc i \<in> L \<longleftrightarrow> c ! i \<notin> L"
+          using assm
+          by (auto simp add: nth_mem_L_iff_2)
+        also have "... \<longleftrightarrow> even i"
+          using Suc.prems
+          by (simp add: Suc.hyps)
+        also have "... \<longleftrightarrow> odd (Suc i)"
+          by simp
+        finally show ?case
+          .
+      qed }
+    moreover have "c ! (length c - 1) \<notin> L"
+    proof -
+      have "last c \<notin> L"
+        using assm False
+        by (simp add: odd_cycleD(2))
+      thus ?thesis
+        using c_non_empty
+        by (simp add: last_conv_nth)
+    qed
+    ultimately have "even (path_length c)"
+      using c_non_empty
+      by (simp add: edges_of_path_length)
+    thus False
+      using assm
+      by (auto dest: odd_cycleD(1))
+  qed
+qed
+
+end

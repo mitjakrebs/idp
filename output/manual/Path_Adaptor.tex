@@ -1,0 +1,1239 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Path{\isacharunderscore}{\kern0pt}Adaptor}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Path{\isacharunderscore}{\kern0pt}Adaptor\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Directed{\isacharunderscore}{\kern0pt}Graph{\isacharslash}{\kern0pt}Dpath{\isachardoublequoteclose}\isanewline
+\ \ \ \ Graph{\isacharunderscore}{\kern0pt}Adaptor\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Undirected{\isacharunderscore}{\kern0pt}Graph{\isacharslash}{\kern0pt}Path{\isachardoublequoteclose}\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\begin{isamarkuptext}%
+Since undirected and directed paths are defined in a very similar way, it is no surprise that the
+transition between them is very smooth.%
+\end{isamarkuptext}\isamarkuptrue%
+\isacommand{lemmas}\isamarkupfalse%
+\ path{\isacharunderscore}{\kern0pt}induct\ {\isacharequal}{\kern0pt}\ dpath{\isacharunderscore}{\kern0pt}induct\isanewline
+\isacommand{lemmas}\isamarkupfalse%
+\ path{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}induct\ {\isacharequal}{\kern0pt}\ dpath{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}induct\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}length\ p\ {\isacharequal}{\kern0pt}\ dpath{\isacharunderscore}{\kern0pt}length\ p{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}length\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path\ G\ p\ {\isasymlongleftrightarrow}\ dpath\ dEs\ p{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{sorry}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v\ {\isasymlongleftrightarrow}\ dpath{\isacharunderscore}{\kern0pt}bet\ dEs\ p\ u\ v{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}def\ dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}def\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}geq{\isacharunderscore}{\kern0pt}{\isadigit{1}}I{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}u\ {\isasymnoteq}\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isadigit{1}}\ {\isasymle}\ path{\isacharunderscore}{\kern0pt}length\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ dpath{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}geq{\isacharunderscore}{\kern0pt}{\isadigit{1}}I{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}Cons{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}vs\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}length\ {\isacharparenleft}{\kern0pt}v\ {\isacharhash}{\kern0pt}\ vs{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length\ vs\ {\isacharplus}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ dpath{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}Cons{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}snoc{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}vs\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}length\ {\isacharparenleft}{\kern0pt}vs\ {\isacharat}{\kern0pt}\ {\isacharbrackleft}{\kern0pt}v{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length\ vs\ {\isacharplus}{\kern0pt}\ {\isadigit{1}}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ dpath{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}snoc{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}append{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}p\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}length\ {\isacharparenleft}{\kern0pt}p\ {\isacharat}{\kern0pt}\ q{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length\ p\ {\isacharplus}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length\ {\isacharparenleft}{\kern0pt}last\ p\ {\isacharhash}{\kern0pt}\ q{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ dpath{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}append{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}append{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}p\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}q\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}last\ p\ {\isacharequal}{\kern0pt}\ hd\ q{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}length\ {\isacharparenleft}{\kern0pt}p\ {\isacharat}{\kern0pt}\ tl\ q{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length\ p\ {\isacharplus}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}length\ q{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ dpath{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}append{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}vertex{\isacharunderscore}{\kern0pt}decompE{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}p\ {\isacharequal}{\kern0pt}\ xs\ {\isacharat}{\kern0pt}\ y\ {\isacharhash}{\kern0pt}\ ys{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{obtains}\ q\ r\ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}p\ {\isacharequal}{\kern0pt}\ q\ {\isacharat}{\kern0pt}\ tl\ r{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}q\ {\isacharequal}{\kern0pt}\ xs\ {\isacharat}{\kern0pt}\ {\isacharbrackleft}{\kern0pt}y{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}r\ {\isacharequal}{\kern0pt}\ y\ {\isacharhash}{\kern0pt}\ ys{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ q\ y{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ y\ r\ v{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}erule\ dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}vertex{\isacharunderscore}{\kern0pt}decompE{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ distinct{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}distinct{\isacharunderscore}{\kern0pt}path\ G\ p\ u\ v\ {\isasymlongleftrightarrow}\ distinct{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ dEs\ p\ u\ v{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ distinct{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}def\ distinct{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}def\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ finite{\isacharunderscore}{\kern0pt}graph{\isacharparenright}{\kern0pt}\ distinct{\isacharunderscore}{\kern0pt}paths{\isacharunderscore}{\kern0pt}finite{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}finite\ {\isacharbraceleft}{\kern0pt}p{\isachardot}{\kern0pt}\ distinct{\isacharunderscore}{\kern0pt}path\ G\ p\ u\ v{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ F{\isachardot}{\kern0pt}finite{\isacharunderscore}{\kern0pt}edges\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ distinct{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ intro{\isacharcolon}{\kern0pt}\ distinct{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bets{\isacharunderscore}{\kern0pt}finite{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path\ G\ c\ v\ {\isasymlongleftrightarrow}\ closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ dEs\ c\ v{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}decomp{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}\ {\isasymlongleftrightarrow}\ is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}decomp\ dEs\ p\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isacharequal}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp\ dEs\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}def\ closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}def\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}metis\ is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}decomp\ prod{\isacharunderscore}{\kern0pt}cases{\isadigit{3}}{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decompE{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymnot}\ distinct\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{obtains}\isanewline
+\ \ \ \ {\isachardoublequoteopen}p\ {\isacharequal}{\kern0pt}\ q\ {\isacharat}{\kern0pt}\ tl\ r\ {\isacharat}{\kern0pt}\ tl\ s{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isasymexists}w{\isachardot}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ q\ w\ {\isasymand}\ closed{\isacharunderscore}{\kern0pt}path\ G\ r\ w\ {\isasymand}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ w\ s\ v{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}distinct\ q{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}erule\ closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decompE{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decompE{\isacharunderscore}{\kern0pt}{\isadigit{3}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymnot}\ distinct\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{obtains}\isanewline
+\ \ \ \ {\isachardoublequoteopen}q\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}s\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}last\ q\ {\isacharequal}{\kern0pt}\ hd\ s{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}erule\ closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decompE{\isacharunderscore}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymnot}\ distinct\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path\ p\ {\isacharequal}{\kern0pt}\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path\ q\ {\isacharat}{\kern0pt}\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path\ r\ {\isacharat}{\kern0pt}\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path\ s{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharminus}{\kern0pt}\isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\isanewline
+\ \ \ \ p{\isacharunderscore}{\kern0pt}def{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}p\ {\isacharequal}{\kern0pt}\ q\ {\isacharat}{\kern0pt}\ tl\ r\ {\isacharat}{\kern0pt}\ tl\ s{\isachardoublequoteclose}\ \isakeyword{and}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isasymexists}w{\isachardot}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ q\ w\ {\isasymand}\ closed{\isacharunderscore}{\kern0pt}path\ G\ r\ w\ {\isasymand}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ w\ s\ v{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}blast\ elim{\isacharcolon}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decompE{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}{\isacharplus}{\kern0pt}\isanewline
+\ \ \isacommand{hence}\isamarkupfalse%
+\isanewline
+\ \ \ \ {\isachardoublequoteopen}q\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}r\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}s\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}last\ q\ {\isacharequal}{\kern0pt}\ hd\ r{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}last\ r\ {\isacharequal}{\kern0pt}\ hd\ s{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ dest{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}between{\isacharunderscore}{\kern0pt}nonempty{\isacharunderscore}{\kern0pt}path{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharminus}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{thus}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ p{\isacharunderscore}{\kern0pt}def\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}append{\isacharunderscore}{\kern0pt}{\isadigit{3}}\ append{\isacharunderscore}{\kern0pt}Cons{\isacharbrackleft}{\kern0pt}symmetric{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{function}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct\ p\ {\isacharequal}{\kern0pt}\isanewline
+\ \ \ \ {\isacharparenleft}{\kern0pt}if\ {\isacharparenleft}{\kern0pt}{\isasymexists}u\ v{\isachardot}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isasymnot}\ distinct\ p\isanewline
+\ \ \ \ \ then\ let\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ in\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct\ {\isacharparenleft}{\kern0pt}q\ {\isacharat}{\kern0pt}\ tl\ s{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \ else\ p{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{termination}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}relation\ {\isachardoublequoteopen}measure\ length{\isachardoublequoteclose}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{fix}\isamarkupfalse%
+\ p\ qrs\ rs\ q\ r\ s\isanewline
+\ \ \isacommand{assume}\isamarkupfalse%
+\isanewline
+\ \ \ \ p{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}distinct{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isasymexists}u\ v{\isachardot}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isasymnot}\ distinct\ p{\isachardoublequoteclose}\ \isakeyword{and}\isanewline
+\ \ \ \ assms{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}qrs\ {\isacharequal}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ rs{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ qrs{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ rs{\isachardoublequoteclose}\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{obtain}\isamarkupfalse%
+\ u\ v\ \isakeyword{where}\isanewline
+\ \ \ \ p{\isacharunderscore}{\kern0pt}path{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
+\ \ \isacommand{hence}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{obtain}\isamarkupfalse%
+\isanewline
+\ \ \ \ {\isachardoublequoteopen}p\ {\isacharequal}{\kern0pt}\ q\ {\isacharat}{\kern0pt}\ tl\ r\ {\isacharat}{\kern0pt}\ tl\ s{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}Suc\ {\isadigit{0}}\ {\isacharless}{\kern0pt}\ length\ r{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ p{\isacharunderscore}{\kern0pt}path\ p{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}distinct\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}elim\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decompE{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ auto\isanewline
+\ \ \isacommand{thus}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}q\ {\isacharat}{\kern0pt}\ tl\ s{\isacharcomma}{\kern0pt}\ p{\isacharparenright}{\kern0pt}\ {\isasymin}\ measure\ length{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\isacommand{qed}\isamarkupfalse%
+\ simp%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}induct\ {\isacharbrackleft}{\kern0pt}consumes\ {\isadigit{1}}{\isacharcomma}{\kern0pt}\ case{\isacharunderscore}{\kern0pt}names\ path\ decomp{\isacharbrackright}{\kern0pt}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymAnd}p{\isachardot}{\kern0pt}\ {\isasymlbrakk}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isacharsemicolon}{\kern0pt}\ distinct\ p\ {\isasymrbrakk}\ {\isasymLongrightarrow}\ P\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isasymAnd}p\ q\ r\ s{\isachardot}{\kern0pt}\ {\isasymlbrakk}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isacharsemicolon}{\kern0pt}\ {\isasymnot}\ distinct\ p{\isacharsemicolon}{\kern0pt}\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}q{\isacharcomma}{\kern0pt}\ r{\isacharcomma}{\kern0pt}\ s{\isacharparenright}{\kern0pt}{\isacharsemicolon}{\kern0pt}\ P\ {\isacharparenleft}{\kern0pt}q\ {\isacharat}{\kern0pt}\ tl\ s{\isacharparenright}{\kern0pt}\ {\isasymrbrakk}\ {\isasymLongrightarrow}\ P\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}P\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}rule\ dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}induct{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct\ p\ {\isacharequal}{\kern0pt}\ dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct\ dEs\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}induct\ p\ rule{\isacharcolon}{\kern0pt}\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}induct{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}decomp{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ distinct{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}le{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}length{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}path{\isacharunderscore}{\kern0pt}length\ {\isacharparenleft}{\kern0pt}path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct\ p{\isacharparenright}{\kern0pt}\ {\isasymle}\ path{\isacharunderscore}{\kern0pt}length\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{unfolding}\isamarkupfalse%
+\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\ path{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}distinct{\isacharbrackleft}{\kern0pt}OF\ assms{\isacharbrackright}{\kern0pt}\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ distinct{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}le{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ reachable{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}reachable{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}reachable\ G\ u\ v\ {\isasymlongleftrightarrow}\ Noschinski{\isacharunderscore}{\kern0pt}to{\isacharunderscore}{\kern0pt}DDFS{\isachardot}{\kern0pt}reachable\ dEs\ u\ v{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ reachable{\isacharunderscore}{\kern0pt}def\ reachable{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Graph/Adaptors/Path_Adaptor.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%15=5%:%
+%:%16=6%:%
+%:%25=9%:%
+%:%26=10%:%
+%:%28=13%:%
+%:%29=13%:%
+%:%30=14%:%
+%:%31=14%:%
+%:%32=15%:%
+%:%33=16%:%
+%:%34=16%:%
+%:%35=17%:%
+%:%38=18%:%
+%:%42=18%:%
+%:%43=18%:%
+%:%48=18%:%
+%:%51=19%:%
+%:%52=20%:%
+%:%53=20%:%
+%:%54=21%:%
+%:%57=22%:%
+%:%61=22%:%
+%:%67=22%:%
+%:%70=23%:%
+%:%71=24%:%
+%:%72=24%:%
+%:%73=25%:%
+%:%76=26%:%
+%:%80=26%:%
+%:%81=26%:%
+%:%82=27%:%
+%:%83=27%:%
+%:%88=27%:%
+%:%93=28%:%
+%:%98=29%:%
+%:%99=29%:%
+%:%100=30%:%
+%:%101=31%:%
+%:%102=32%:%
+%:%107=32%:%
+%:%112=33%:%
+%:%116=33%:%
+%:%117=33%:%
+%:%118=34%:%
+%:%119=34%:%
+%:%120=35%:%
+%:%121=35%:%
+%:%126=35%:%
+%:%131=36%:%
+%:%136=37%:%
+%:%137=37%:%
+%:%138=38%:%
+%:%139=39%:%
+%:%144=39%:%
+%:%149=40%:%
+%:%153=40%:%
+%:%154=40%:%
+%:%155=41%:%
+%:%156=41%:%
+%:%157=42%:%
+%:%158=42%:%
+%:%163=42%:%
+%:%168=43%:%
+%:%173=44%:%
+%:%174=44%:%
+%:%175=45%:%
+%:%176=46%:%
+%:%181=46%:%
+%:%186=47%:%
+%:%190=47%:%
+%:%191=47%:%
+%:%192=48%:%
+%:%193=48%:%
+%:%194=49%:%
+%:%195=49%:%
+%:%200=49%:%
+%:%205=50%:%
+%:%210=51%:%
+%:%211=51%:%
+%:%212=52%:%
+%:%213=53%:%
+%:%218=53%:%
+%:%223=54%:%
+%:%227=54%:%
+%:%228=54%:%
+%:%229=55%:%
+%:%230=55%:%
+%:%231=56%:%
+%:%232=56%:%
+%:%237=56%:%
+%:%242=57%:%
+%:%247=58%:%
+%:%248=58%:%
+%:%249=59%:%
+%:%250=60%:%
+%:%251=61%:%
+%:%252=62%:%
+%:%257=62%:%
+%:%262=63%:%
+%:%266=63%:%
+%:%267=63%:%
+%:%268=64%:%
+%:%269=64%:%
+%:%270=65%:%
+%:%271=65%:%
+%:%276=65%:%
+%:%281=66%:%
+%:%286=67%:%
+%:%287=67%:%
+%:%288=68%:%
+%:%289=69%:%
+%:%290=70%:%
+%:%291=71%:%
+%:%292=72%:%
+%:%293=73%:%
+%:%294=74%:%
+%:%295=75%:%
+%:%300=75%:%
+%:%305=76%:%
+%:%309=76%:%
+%:%310=76%:%
+%:%311=77%:%
+%:%312=77%:%
+%:%313=78%:%
+%:%314=78%:%
+%:%319=78%:%
+%:%324=79%:%
+%:%329=80%:%
+%:%330=80%:%
+%:%331=81%:%
+%:%336=81%:%
+%:%341=82%:%
+%:%345=82%:%
+%:%346=82%:%
+%:%347=83%:%
+%:%348=83%:%
+%:%353=83%:%
+%:%358=84%:%
+%:%363=85%:%
+%:%364=85%:%
+%:%365=86%:%
+%:%370=86%:%
+%:%375=87%:%
+%:%379=87%:%
+%:%380=87%:%
+%:%381=88%:%
+%:%382=88%:%
+%:%387=88%:%
+%:%392=89%:%
+%:%397=90%:%
+%:%398=90%:%
+%:%399=91%:%
+%:%404=91%:%
+%:%409=92%:%
+%:%413=92%:%
+%:%414=92%:%
+%:%419=92%:%
+%:%424=93%:%
+%:%429=94%:%
+%:%430=94%:%
+%:%431=95%:%
+%:%436=95%:%
+%:%441=96%:%
+%:%445=96%:%
+%:%446=96%:%
+%:%451=96%:%
+%:%456=97%:%
+%:%461=98%:%
+%:%462=98%:%
+%:%463=99%:%
+%:%468=99%:%
+%:%473=100%:%
+%:%477=100%:%
+%:%478=100%:%
+%:%479=101%:%
+%:%480=101%:%
+%:%485=101%:%
+%:%490=102%:%
+%:%495=103%:%
+%:%496=103%:%
+%:%497=104%:%
+%:%498=105%:%
+%:%499=106%:%
+%:%500=107%:%
+%:%501=108%:%
+%:%502=109%:%
+%:%503=110%:%
+%:%508=110%:%
+%:%513=111%:%
+%:%517=111%:%
+%:%518=111%:%
+%:%519=112%:%
+%:%520=112%:%
+%:%521=113%:%
+%:%522=113%:%
+%:%527=113%:%
+%:%532=114%:%
+%:%537=115%:%
+%:%538=115%:%
+%:%539=116%:%
+%:%540=117%:%
+%:%541=118%:%
+%:%542=119%:%
+%:%543=120%:%
+%:%544=121%:%
+%:%545=122%:%
+%:%550=122%:%
+%:%555=123%:%
+%:%559=123%:%
+%:%560=123%:%
+%:%561=124%:%
+%:%562=124%:%
+%:%563=125%:%
+%:%564=125%:%
+%:%569=125%:%
+%:%574=126%:%
+%:%579=127%:%
+%:%580=127%:%
+%:%581=128%:%
+%:%582=129%:%
+%:%583=130%:%
+%:%584=131%:%
+%:%589=131%:%
+%:%598=132%:%
+%:%599=132%:%
+%:%600=133%:%
+%:%601=133%:%
+%:%602=134%:%
+%:%603=135%:%
+%:%604=136%:%
+%:%605=136%:%
+%:%606=137%:%
+%:%607=137%:%
+%:%608=138%:%
+%:%609=138%:%
+%:%610=139%:%
+%:%611=140%:%
+%:%612=141%:%
+%:%613=142%:%
+%:%614=143%:%
+%:%615=144%:%
+%:%616=144%:%
+%:%617=145%:%
+%:%618=145%:%
+%:%619=146%:%
+%:%620=146%:%
+%:%621=147%:%
+%:%627=147%:%
+%:%632=148%:%
+%:%637=149%:%
+%:%638=149%:%
+%:%639=150%:%
+%:%647=153%:%
+%:%652=154%:%
+%:%656=154%:%
+%:%657=154%:%
+%:%662=154%:%
+%:%667=155%:%
+%:%672=156%:%
+%:%673=156%:%
+%:%678=156%:%
+%:%687=157%:%
+%:%688=157%:%
+%:%689=158%:%
+%:%690=158%:%
+%:%691=159%:%
+%:%692=159%:%
+%:%693=160%:%
+%:%694=161%:%
+%:%695=162%:%
+%:%696=163%:%
+%:%697=164%:%
+%:%698=164%:%
+%:%699=164%:%
+%:%700=165%:%
+%:%701=166%:%
+%:%702=166%:%
+%:%703=167%:%
+%:%704=167%:%
+%:%705=168%:%
+%:%706=168%:%
+%:%707=169%:%
+%:%708=169%:%
+%:%709=170%:%
+%:%710=170%:%
+%:%711=170%:%
+%:%712=171%:%
+%:%713=172%:%
+%:%714=173%:%
+%:%715=173%:%
+%:%716=174%:%
+%:%717=174%:%
+%:%718=175%:%
+%:%719=175%:%
+%:%720=176%:%
+%:%721=176%:%
+%:%722=177%:%
+%:%723=177%:%
+%:%728=177%:%
+%:%733=178%:%
+%:%738=179%:%
+%:%739=179%:%
+%:%740=180%:%
+%:%741=181%:%
+%:%742=182%:%
+%:%743=183%:%
+%:%748=183%:%
+%:%753=184%:%
+%:%757=184%:%
+%:%758=184%:%
+%:%759=185%:%
+%:%760=185%:%
+%:%761=186%:%
+%:%762=186%:%
+%:%767=186%:%
+%:%772=187%:%
+%:%777=188%:%
+%:%778=188%:%
+%:%779=189%:%
+%:%780=190%:%
+%:%785=190%:%
+%:%790=191%:%
+%:%794=191%:%
+%:%795=191%:%
+%:%796=192%:%
+%:%797=192%:%
+%:%802=192%:%
+%:%807=193%:%
+%:%812=194%:%
+%:%813=194%:%
+%:%814=195%:%
+%:%815=196%:%
+%:%820=196%:%
+%:%825=197%:%
+%:%829=197%:%
+%:%830=197%:%
+%:%831=198%:%
+%:%832=198%:%
+%:%833=199%:%
+%:%834=199%:%
+%:%839=199%:%
+%:%842=200%:%
+%:%843=201%:%
+%:%844=201%:%
+%:%845=202%:%
+%:%848=203%:%
+%:%852=203%:%
+%:%853=203%:%
+%:%854=204%:%
+%:%855=204%:%
+%:%860=204%:%
+%:%865=205%:%
+%:%870=206%:%

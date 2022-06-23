@@ -1,0 +1,106 @@
+theory Augmenting_Path
+  imports
+    Alternating_Path
+begin
+
+text \<open>
+In graph theory, a free vertex w.r.t.\ a matching $M$ is a vertex not incident to any edge in $M$,
+and an augmenting path w.r.t.\ $M$ is an alternating path w.r.t.\ $M$ whose endpoints are distinct
+free vertices. Session @{session AGF} introduces the following two definitions:
+@{thm augmenting_path_def}, and @{term augpath}. We show that we can reverse augmenting paths.
+\<close>
+
+thm \<^marker>\<open>tag invisible\<close> augmenting_path_def
+lemma \<^marker>\<open>tag invisible\<close> augmenting_pathD:
+  assumes "augmenting_path M p"
+  shows
+    "2 \<le> length p"
+    "Berge.alt_path M p"
+    "hd p \<notin> Vs M"
+    "last p \<notin> Vs M"
+  using assms
+  by (simp_all add: augmenting_path_def)
+
+lemma \<^marker>\<open>tag invisible\<close> augmenting_pathI:
+  assumes "2 \<le> length p"
+  assumes "Berge.alt_path M p"
+  assumes "hd p \<notin> Vs M"
+  assumes "last p \<notin> Vs M"
+  shows "augmenting_path M p"
+  using assms
+  by (simp add: augmenting_path_def)
+
+lemma augmenting_path_revI:
+  assumes "augmenting_path M p"
+  shows "augmenting_path M (rev p)"
+proof (rule augmenting_pathI, goal_cases)
+  case 1
+  show ?case
+    using assms
+    by (auto dest: augmenting_pathD(1))
+next
+  case 2
+  show ?case
+    using assms
+    by
+      (auto
+       simp add: edges_of_path_rev[symmetric]
+       dest: augmenting_pathD(2) augmenting_path_odd_length
+       intro: alt_list_rev)
+next
+  case 3
+  have "p \<noteq> []"
+    using assms
+    by (auto dest: augmenting_pathD(1))
+  thus ?case
+    using assms
+    by (auto simp add: hd_rev dest: augmenting_pathD(4))
+next
+  case 4
+  have "p \<noteq> []"
+    using assms
+    by (auto dest: augmenting_pathD(1))
+  thus ?case
+    using assms
+    by (auto simp add: last_rev dest: augmenting_pathD(3))
+qed
+
+term \<^marker>\<open>tag invisible\<close> augpath
+lemma \<^marker>\<open>tag invisible\<close> augpathD:
+  assumes "augpath G M p"
+  shows
+    "path G p"
+    "distinct p"
+    "augmenting_path M p"
+  using assms
+  by simp_all
+
+lemma \<^marker>\<open>tag invisible\<close> augpathI:
+  assumes "path G p"
+  assumes "distinct p"
+  assumes "augmenting_path M p"
+  shows "augpath G M p"
+  using assms
+  by simp
+
+lemma augpath_revI:
+  assumes "augpath G M p"
+  shows "augpath G M (rev p)"
+proof (rule augpathI, goal_cases)
+  case 1
+  show ?case
+    using assms
+    by (intro rev_path_is_path) simp
+next
+  case 2
+  show ?case
+    using assms
+    by force
+next
+  case 3
+  show ?case
+    using assms
+    by (intro augmenting_path_revI) simp
+qed
+
+end

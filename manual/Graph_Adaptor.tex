@@ -1,0 +1,316 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Graph{\isacharunderscore}{\kern0pt}Adaptor}%
+%
+\isadelimdocument
+%
+\endisadelimdocument
+%
+\isatagdocument
+%
+\isamarkupsubsubsection{Adaptors%
+}
+\isamarkuptrue%
+%
+\endisatagdocument
+{\isafolddocument}%
+%
+\isadelimdocument
+%
+\endisadelimdocument
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Graph{\isacharunderscore}{\kern0pt}Adaptor\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Directed{\isacharunderscore}{\kern0pt}Graph{\isacharslash}{\kern0pt}Dgraph{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Undirected{\isacharunderscore}{\kern0pt}Graph{\isacharslash}{\kern0pt}Graph{\isacharunderscore}{\kern0pt}Ext{\isachardoublequoteclose}\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\begin{isamarkuptext}%
+An undirected graph can be viewed as a symmetric directed graph. Session \isatt{A{\kern0pt}G{\kern0pt}F{\kern0pt}} shows how to
+transform a \isa{graph} into a symmetric \isa{dgraph}. We extend, or rather, redo (parts of)
+their theory. Our issue with their theory is that the lemmas are inside a locale that assumes that
+the graph does not have loops. Most--if not all--of the lemmas hold even if the graph contains
+loops, though.%
+\end{isamarkuptext}\isamarkuptrue%
+\isacommand{definition}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ dEs\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ dgraph{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}dEs\ {\isasymequiv}\ {\isacharbraceleft}{\kern0pt}{\isacharparenleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharparenright}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharbraceleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharbraceright}{\kern0pt}\ {\isasymin}\ G{\isacharbraceright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ dEs{\isacharunderscore}{\kern0pt}symmetric{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharparenright}{\kern0pt}\ {\isasymin}\ dEs\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}v{\isacharcomma}{\kern0pt}\ u{\isacharparenright}{\kern0pt}\ {\isasymin}\ dEs{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ dEs{\isacharunderscore}{\kern0pt}def\ insert{\isacharunderscore}{\kern0pt}commute{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edge{\isacharunderscore}{\kern0pt}{\isadigit{1}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharbraceright}{\kern0pt}\ {\isasymin}\ G\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharparenright}{\kern0pt}\ {\isasymin}\ dEs{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ dEs{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edge{\isacharunderscore}{\kern0pt}{\isadigit{2}}{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharbraceright}{\kern0pt}\ {\isasymin}\ G\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}v{\isacharcomma}{\kern0pt}\ u{\isacharparenright}{\kern0pt}\ {\isasymin}\ dEs{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edge{\isacharunderscore}{\kern0pt}{\isadigit{1}}\ dEs{\isacharunderscore}{\kern0pt}symmetric{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edges{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}{\isacharbraceleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharbraceright}{\kern0pt}\ {\isasymin}\ G\ {\isasymlongleftrightarrow}\ {\isacharparenleft}{\kern0pt}u{\isacharcomma}{\kern0pt}\ v{\isacharparenright}{\kern0pt}\ {\isasymin}\ dEs\ {\isasymand}\ {\isacharparenleft}{\kern0pt}v{\isacharcomma}{\kern0pt}\ u{\isacharparenright}{\kern0pt}\ {\isasymin}\ dEs{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edge{\isacharunderscore}{\kern0pt}{\isadigit{1}}\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edge{\isacharunderscore}{\kern0pt}{\isadigit{2}}\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ simp%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{context}\isamarkupfalse%
+\ finite{\isacharunderscore}{\kern0pt}graph\isanewline
+\isakeyword{begin}\isanewline
+\isacommand{sublocale}\isamarkupfalse%
+\ F{\isacharcolon}{\kern0pt}\ finite{\isacharunderscore}{\kern0pt}dgraph\ dEs\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}standard{\isacharcomma}{\kern0pt}\ goal{\isacharunderscore}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{1}}\isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}dEs\ {\isasymsubseteq}\ Vs\ G\ {\isasymtimes}\ Vs\ G{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ edge{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}edge{\isacharunderscore}{\kern0pt}{\isadigit{1}}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\ \ \isacommand{moreover}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}finite\ {\isacharparenleft}{\kern0pt}Vs\ G\ {\isasymtimes}\ Vs\ G{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ finite{\isacharunderscore}{\kern0pt}vertices\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ fast\isanewline
+\ \ \isacommand{ultimately}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}rule\ finite{\isacharunderscore}{\kern0pt}subset{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isacommand{end}\isamarkupfalse%
+\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Graph/Adaptors/Graph_Adaptor.thy%:%
+%:%11=1%:%
+%:%27=3%:%
+%:%28=3%:%
+%:%29=4%:%
+%:%30=5%:%
+%:%31=6%:%
+%:%32=7%:%
+%:%41=10%:%
+%:%42=11%:%
+%:%43=12%:%
+%:%44=13%:%
+%:%45=14%:%
+%:%47=17%:%
+%:%48=17%:%
+%:%49=18%:%
+%:%50=19%:%
+%:%51=20%:%
+%:%52=20%:%
+%:%53=21%:%
+%:%56=22%:%
+%:%60=22%:%
+%:%61=22%:%
+%:%66=22%:%
+%:%71=23%:%
+%:%76=24%:%
+%:%77=24%:%
+%:%78=25%:%
+%:%83=25%:%
+%:%88=26%:%
+%:%92=26%:%
+%:%93=26%:%
+%:%98=26%:%
+%:%103=27%:%
+%:%108=28%:%
+%:%109=28%:%
+%:%110=29%:%
+%:%115=29%:%
+%:%120=30%:%
+%:%124=30%:%
+%:%125=30%:%
+%:%130=30%:%
+%:%135=31%:%
+%:%140=32%:%
+%:%141=32%:%
+%:%142=33%:%
+%:%147=33%:%
+%:%152=34%:%
+%:%156=34%:%
+%:%157=34%:%
+%:%158=35%:%
+%:%159=35%:%
+%:%164=35%:%
+%:%167=36%:%
+%:%168=37%:%
+%:%169=37%:%
+%:%170=38%:%
+%:%171=39%:%
+%:%172=39%:%
+%:%179=40%:%
+%:%180=40%:%
+%:%181=41%:%
+%:%182=41%:%
+%:%183=42%:%
+%:%184=42%:%
+%:%185=43%:%
+%:%186=43%:%
+%:%187=44%:%
+%:%188=44%:%
+%:%189=45%:%
+%:%190=45%:%
+%:%191=45%:%
+%:%192=46%:%
+%:%193=46%:%
+%:%194=47%:%
+%:%195=47%:%
+%:%196=48%:%
+%:%197=48%:%
+%:%198=48%:%
+%:%199=49%:%
+%:%200=49%:%
+%:%201=50%:%
+%:%207=50%:%
+%:%210=51%:%
+%:%211=51%:%
+%:%214=52%:%
+%:%219=53%:%

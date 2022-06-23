@@ -1,0 +1,166 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Orderings{\isacharunderscore}{\kern0pt}Ext}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Orderings{\isacharunderscore}{\kern0pt}Ext\isanewline
+\ \ \isakeyword{imports}\ Main\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{instantiation}\isamarkupfalse%
+\ prod\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isacharparenleft}{\kern0pt}linorder{\isacharcomma}{\kern0pt}\ linorder{\isacharparenright}{\kern0pt}\ linorder\isanewline
+\isakeyword{begin}\isanewline
+\isanewline
+\isacommand{abbreviation}\isamarkupfalse%
+\ less{\isacharunderscore}{\kern0pt}prod{\isacharprime}{\kern0pt}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}less{\isacharunderscore}{\kern0pt}prod{\isacharprime}{\kern0pt}\ p{\isadigit{1}}\ p{\isadigit{2}}\ {\isasymequiv}\isanewline
+\ \ \ case\ p{\isadigit{1}}\ of\ {\isacharparenleft}{\kern0pt}a{\isadigit{1}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}\ b{\isadigit{1}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\isanewline
+\ \ \ \ \ case\ p{\isadigit{2}}\ of\ {\isacharparenleft}{\kern0pt}a{\isadigit{2}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}\ b{\isadigit{2}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\isanewline
+\ \ \ \ \ \ \ if\ {\isacharparenleft}{\kern0pt}a{\isadigit{1}}\ {\isacharless}{\kern0pt}\ a{\isadigit{2}}{\isacharparenright}{\kern0pt}\ {\isasymor}\ {\isacharparenleft}{\kern0pt}a{\isadigit{1}}\ {\isacharequal}{\kern0pt}\ a{\isadigit{2}}\ {\isasymand}\ b{\isadigit{1}}\ {\isacharless}{\kern0pt}\ b{\isadigit{2}}{\isacharparenright}{\kern0pt}\ then\ True\ else\ False{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ less{\isacharunderscore}{\kern0pt}prod\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}less{\isacharunderscore}{\kern0pt}prod\ {\isasymequiv}\ less{\isacharunderscore}{\kern0pt}prod{\isacharprime}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ eq{\isacharunderscore}{\kern0pt}prod\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}eq{\isacharunderscore}{\kern0pt}prod\ p{\isadigit{1}}\ p{\isadigit{2}}\ {\isasymequiv}\isanewline
+\ \ \ case\ p{\isadigit{1}}\ of\ {\isacharparenleft}{\kern0pt}a{\isadigit{1}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}\ b{\isadigit{1}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\isanewline
+\ \ \ \ \ case\ p{\isadigit{2}}\ of\ {\isacharparenleft}{\kern0pt}a{\isadigit{2}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}a{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharcomma}{\kern0pt}\ b{\isadigit{2}}{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}{\isacharprime}{\kern0pt}b{\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}linorder{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\isanewline
+\ \ \ \ \ \ \ if\ {\isacharparenleft}{\kern0pt}a{\isadigit{1}}\ {\isacharequal}{\kern0pt}\ a{\isadigit{2}}{\isacharparenright}{\kern0pt}\ {\isasymand}\ {\isacharparenleft}{\kern0pt}b{\isadigit{1}}\ {\isacharequal}{\kern0pt}\ b{\isadigit{2}}{\isacharparenright}{\kern0pt}\ then\ True\ else\ False{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod\ p{\isadigit{1}}\ p{\isadigit{2}}\ {\isasymequiv}\ less{\isacharunderscore}{\kern0pt}prod{\isacharprime}{\kern0pt}\ p{\isadigit{1}}\ p{\isadigit{2}}\ {\isasymor}\ eq{\isacharunderscore}{\kern0pt}prod\ p{\isadigit{1}}\ p{\isadigit{2}}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{instance}\isamarkupfalse%
+%
+\isadelimproof
+\ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}x\ {\isasymle}\ x{\isachardoublequoteclose}\ \isakeyword{for}\ x\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ {\isasymtimes}\ {\isacharprime}{\kern0pt}b{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}x\ {\isacharless}{\kern0pt}\ y{\isacharparenright}{\kern0pt}\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}x\ {\isasymle}\ y\ {\isasymand}\ {\isasymnot}\ y\ {\isasymle}\ x{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\ \isakeyword{for}\ x\ y\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ {\isasymtimes}\ {\isacharprime}{\kern0pt}b{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ less{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}\ x\ {\isasymle}\ y\ {\isasymLongrightarrow}\ y\ {\isasymle}\ z\ {\isasymLongrightarrow}\ x\ {\isasymle}\ z{\isachardoublequoteclose}\ \isakeyword{for}\ x\ y\ z\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ {\isasymtimes}\ {\isacharprime}{\kern0pt}b{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ split{\isacharcolon}{\kern0pt}\ if{\isacharunderscore}{\kern0pt}splits{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}x\ {\isasymle}\ y\ {\isasymLongrightarrow}\ y\ {\isasymle}\ x\ {\isasymLongrightarrow}\ x\ {\isacharequal}{\kern0pt}\ y{\isachardoublequoteclose}\ \isakeyword{for}\ x\ y\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ {\isasymtimes}\ {\isacharprime}{\kern0pt}b{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ split{\isacharcolon}{\kern0pt}\ if{\isacharunderscore}{\kern0pt}splits{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}x\ {\isasymle}\ y\ {\isasymor}\ y\ {\isasymle}\ x{\isachardoublequoteclose}\ \isakeyword{for}\ x\ y\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ {\isasymtimes}\ {\isacharprime}{\kern0pt}b{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ less{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def\ eq{\isacharunderscore}{\kern0pt}prod{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{end}\isamarkupfalse%
+\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Orderings_Ext.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%18=3%:%
+%:%21=4%:%
+%:%22=5%:%
+%:%23=5%:%
+%:%24=6%:%
+%:%25=7%:%
+%:%26=8%:%
+%:%27=8%:%
+%:%28=9%:%
+%:%31=12%:%
+%:%32=13%:%
+%:%33=14%:%
+%:%34=14%:%
+%:%35=15%:%
+%:%36=16%:%
+%:%37=17%:%
+%:%38=17%:%
+%:%39=18%:%
+%:%42=21%:%
+%:%43=22%:%
+%:%44=23%:%
+%:%45=23%:%
+%:%46=24%:%
+%:%47=25%:%
+%:%48=26%:%
+%:%51=26%:%
+%:%55=26%:%
+%:%56=26%:%
+%:%57=27%:%
+%:%58=27%:%
+%:%59=28%:%
+%:%60=28%:%
+%:%61=29%:%
+%:%62=29%:%
+%:%63=30%:%
+%:%64=30%:%
+%:%65=31%:%
+%:%66=31%:%
+%:%67=32%:%
+%:%68=32%:%
+%:%69=33%:%
+%:%70=33%:%
+%:%71=34%:%
+%:%72=34%:%
+%:%73=35%:%
+%:%74=35%:%
+%:%75=36%:%
+%:%76=36%:%
+%:%77=37%:%
+%:%85=37%:%
+%:%86=38%:%
+%:%87=39%:%
+%:%88=39%:%
+%:%91=40%:%
+%:%96=41%:%

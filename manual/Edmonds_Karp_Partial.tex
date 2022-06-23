@@ -1,0 +1,80 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Edmonds{\isacharunderscore}{\kern0pt}Karp{\isacharunderscore}{\kern0pt}Partial}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Edmonds{\isacharunderscore}{\kern0pt}Karp{\isacharunderscore}{\kern0pt}Partial\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Alternating{\isacharunderscore}{\kern0pt}BFS{\isacharslash}{\kern0pt}Alternating{\isacharunderscore}{\kern0pt}BFS{\isacharunderscore}{\kern0pt}Partial{\isachardoublequoteclose}\isanewline
+\ \ \ \ Edmonds{\isacharunderscore}{\kern0pt}Karp\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Map{\isacharslash}{\kern0pt}Parent{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Partial{\isachardoublequoteclose}\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{partial{\isacharunderscore}{\kern0pt}function}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}tailrec{\isacharparenright}{\kern0pt}\ loop{\isacharprime}{\kern0pt}{\isacharunderscore}{\kern0pt}partial\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}loop{\isacharprime}{\kern0pt}{\isacharunderscore}{\kern0pt}partial\ G\ U\ V\ s\ t\ M\ {\isacharequal}{\kern0pt}\isanewline
+\ \ \ {\isacharparenleft}{\kern0pt}if\ done{\isacharunderscore}{\kern0pt}{\isadigit{1}}\ U\ V\ M\ then\ M\isanewline
+\ \ \ \ else\ if\ done{\isacharunderscore}{\kern0pt}{\isadigit{2}}\ t\ {\isacharparenleft}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}partial\ {\isacharparenleft}{\kern0pt}G{\isadigit{1}}\ G\ {\isacharparenleft}{\kern0pt}G{\isadigit{2}}\ U\ V\ s\ t\ M{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}G{\isadigit{2}}\ U\ V\ s\ t\ M{\isacharparenright}{\kern0pt}\ s{\isacharparenright}{\kern0pt}\ then\ M\isanewline
+\ \ \ \ \ \ \ \ \ else\ loop{\isacharprime}{\kern0pt}{\isacharunderscore}{\kern0pt}partial\ G\ U\ V\ s\ t\ {\isacharparenleft}{\kern0pt}augment\ M\ {\isacharparenleft}{\kern0pt}butlast\ {\isacharparenleft}{\kern0pt}tl\ {\isacharparenleft}{\kern0pt}Parent{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Partial{\isachardot}{\kern0pt}rev{\isacharunderscore}{\kern0pt}follow\ {\isacharparenleft}{\kern0pt}P{\isacharunderscore}{\kern0pt}lookup\ {\isacharparenleft}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}partial\ {\isacharparenleft}{\kern0pt}G{\isadigit{1}}\ G\ {\isacharparenleft}{\kern0pt}G{\isadigit{2}}\ U\ V\ s\ t\ M{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ {\isacharparenleft}{\kern0pt}G{\isadigit{2}}\ U\ V\ s\ t\ M{\isacharparenright}{\kern0pt}\ s{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\ t{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharparenright}{\kern0pt}\ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharunderscore}{\kern0pt}partial\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}edmonds{\isacharunderscore}{\kern0pt}karp{\isacharunderscore}{\kern0pt}partial\ G\ L\ R\ s\ t\ {\isasymequiv}\ loop{\isacharprime}{\kern0pt}{\isacharunderscore}{\kern0pt}partial\ G\ L\ R\ s\ t\ M{\isacharunderscore}{\kern0pt}empty{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Hopcroft_Karp/Edmonds_Karp_Partial.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%15=5%:%
+%:%16=6%:%
+%:%21=6%:%
+%:%24=7%:%
+%:%25=8%:%
+%:%26=8%:%
+%:%27=9%:%
+%:%30=12%:%
+%:%31=13%:%
+%:%32=14%:%
+%:%33=14%:%
+%:%34=15%:%
+%:%35=16%:%
+%:%36=99%:%
+%:%37=100%:%
+%:%38=176%:%
+%:%41=177%:%
+%:%46=178%:%

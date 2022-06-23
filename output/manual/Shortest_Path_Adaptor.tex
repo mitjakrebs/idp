@@ -1,0 +1,118 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Shortest{\isacharunderscore}{\kern0pt}Path{\isacharunderscore}{\kern0pt}Adaptor}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Shortest{\isacharunderscore}{\kern0pt}Path{\isacharunderscore}{\kern0pt}Adaptor\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ Path{\isacharunderscore}{\kern0pt}Adaptor\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Directed{\isacharunderscore}{\kern0pt}Graph{\isacharslash}{\kern0pt}Shortest{\isacharunderscore}{\kern0pt}Dpath{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isacharslash}{\kern0pt}Undirected{\isacharunderscore}{\kern0pt}Graph{\isacharslash}{\kern0pt}Shortest{\isacharunderscore}{\kern0pt}Path{\isachardoublequoteclose}\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{abbreviation}\isamarkupfalse%
+\ is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}dpath\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ dgraph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ dpath\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}dpath\ G\ p\ u\ v\ {\isasymequiv}\ dpath{\isacharunderscore}{\kern0pt}bet\ G\ p\ u\ v\ {\isasymand}\ dpath{\isacharunderscore}{\kern0pt}length\ p\ {\isacharequal}{\kern0pt}\ Shortest{\isacharunderscore}{\kern0pt}Dpath{\isachardot}{\kern0pt}dist\ G\ u\ v{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ dist{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dist{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}dist\ G\ u\ v\ {\isacharequal}{\kern0pt}\ Shortest{\isacharunderscore}{\kern0pt}Dpath{\isachardot}{\kern0pt}dist\ dEs\ u\ v{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ dist{\isacharunderscore}{\kern0pt}def\ Shortest{\isacharunderscore}{\kern0pt}Dpath{\isachardot}{\kern0pt}dist{\isacharunderscore}{\kern0pt}def\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ graph{\isacharparenright}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}dpath{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}path\ G\ p\ u\ v\ {\isacharequal}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}dpath\ dEs\ p\ u\ v{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw{\isacharunderscore}{\kern0pt}iff{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}bet\ path{\isacharunderscore}{\kern0pt}length{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dpath{\isacharunderscore}{\kern0pt}length\ dist{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}dist{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Graph/Adaptors/Shortest_Path_Adaptor.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%15=5%:%
+%:%16=6%:%
+%:%21=6%:%
+%:%24=7%:%
+%:%25=8%:%
+%:%26=8%:%
+%:%27=9%:%
+%:%28=10%:%
+%:%29=11%:%
+%:%30=11%:%
+%:%31=12%:%
+%:%34=13%:%
+%:%38=13%:%
+%:%39=13%:%
+%:%40=14%:%
+%:%41=14%:%
+%:%46=14%:%
+%:%49=15%:%
+%:%50=16%:%
+%:%51=16%:%
+%:%52=17%:%
+%:%55=18%:%
+%:%59=18%:%
+%:%60=18%:%
+%:%65=18%:%
+%:%70=19%:%
+%:%75=20%:%

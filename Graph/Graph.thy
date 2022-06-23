@@ -1,0 +1,28 @@
+section \<open>Graph\<close>
+
+theory Graph
+  imports
+    "Adjacency/Adjacency"
+    "Adjacency/Adjacency_Impl"
+    "Directed_Graph/Directed_Graph"
+    "Undirected_Graph/Undirected_Graph"
+begin
+
+text \<open>
+This section considers graphs from three levels of abstraction. On the high level, a graph is a set
+of edges (@{type graph} for undirected graphs, and @{type dgraph} for directed graphs). On the
+medium level, a graph is specified via the interface @{locale adjacency}. On the low level, this
+interface is then implemented via red-black trees.
+\<close>
+
+subsection \<open>High level\<close>
+
+text \<open>
+For the high level of abstraction, we extend the archive of graph formalizations @{session AGF},
+which formalizes both directed (@{type dgraph}) and undirected (@{type graph}) graphs as sets of
+edges. The set of vertices of a graph is then defined as the union of all endpoints of all edges in
+the graph (@{thm dVs_def} for directed graphs, and @{thm Vs_def} for undirected graphs). Let us
+first look at directed graphs.
+\<close>
+
+end

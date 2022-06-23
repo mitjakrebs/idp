@@ -1,0 +1,501 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Augmenting{\isacharunderscore}{\kern0pt}Path}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Augmenting{\isacharunderscore}{\kern0pt}Path\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ Alternating{\isacharunderscore}{\kern0pt}Path\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\begin{isamarkuptext}%
+In graph theory, a free vertex w.r.t.\ a matching $M$ is a vertex not incident to any edge in $M$,
+and an augmenting path w.r.t.\ $M$ is an alternating path w.r.t.\ $M$ whose endpoints are distinct
+free vertices. Session \isatt{A{\kern0pt}G{\kern0pt}F{\kern0pt}} introduces the following two definitions:
+\isa{augmenting{\isacharunderscore}{\kern0pt}path\ {\isacharquery}{\kern0pt}M\ {\isacharquery}{\kern0pt}p\ {\isasymequiv}\ {\isadigit{2}}\ {\isasymle}\ length\ {\isacharquery}{\kern0pt}p\ {\isasymand}\ Berge{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}path\ {\isacharquery}{\kern0pt}M\ {\isacharquery}{\kern0pt}p\ {\isasymand}\ hd\ {\isacharquery}{\kern0pt}p\ {\isasymnotin}\ Vs\ {\isacharquery}{\kern0pt}M\ {\isasymand}\ last\ {\isacharquery}{\kern0pt}p\ {\isasymnotin}\ Vs\ {\isacharquery}{\kern0pt}M}, and \isa{augpath}. We show that we can reverse augmenting paths.%
+\end{isamarkuptext}\isamarkuptrue%
+%
+\isadeliminvisible
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{thm}\isamarkupfalse%
+\ augmenting{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}def\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}augmenting{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isadigit{2}}\ {\isasymle}\ length\ p{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}Berge{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}hd\ p\ {\isasymnotin}\ Vs\ M{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}last\ p\ {\isasymnotin}\ Vs\ M{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+%
+\endisadeliminvisible
+\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp{\isacharunderscore}{\kern0pt}all\ add{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+\isanewline
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ augmenting{\isacharunderscore}{\kern0pt}pathI{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}{\isadigit{2}}\ {\isasymle}\ length\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}Berge{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}hd\ p\ {\isasymnotin}\ Vs\ M{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}last\ p\ {\isasymnotin}\ Vs\ M{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}augmenting{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+%
+\endisadeliminvisible
+\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}def{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ augmenting{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}revI{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}augmenting{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}augmenting{\isacharunderscore}{\kern0pt}path\ M\ {\isacharparenleft}{\kern0pt}rev\ p{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}rule\ augmenting{\isacharunderscore}{\kern0pt}pathI{\isacharcomma}{\kern0pt}\ goal{\isacharunderscore}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{1}}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ dest{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{2}}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\isanewline
+\ \ \ \ \ \ {\isacharparenleft}{\kern0pt}auto\isanewline
+\ \ \ \ \ \ \ simp\ add{\isacharcolon}{\kern0pt}\ edges{\isacharunderscore}{\kern0pt}of{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}rev{\isacharbrackleft}{\kern0pt}symmetric{\isacharbrackright}{\kern0pt}\isanewline
+\ \ \ \ \ \ \ dest{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharparenleft}{\kern0pt}{\isadigit{2}}{\isacharparenright}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}odd{\isacharunderscore}{\kern0pt}length\isanewline
+\ \ \ \ \ \ \ intro{\isacharcolon}{\kern0pt}\ alt{\isacharunderscore}{\kern0pt}list{\isacharunderscore}{\kern0pt}rev{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{3}}\isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}p\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ dest{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{thus}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ hd{\isacharunderscore}{\kern0pt}rev\ dest{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharparenleft}{\kern0pt}{\isadigit{4}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{4}}\isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}p\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ dest{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharparenleft}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{thus}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}auto\ simp\ add{\isacharcolon}{\kern0pt}\ last{\isacharunderscore}{\kern0pt}rev\ dest{\isacharcolon}{\kern0pt}\ augmenting{\isacharunderscore}{\kern0pt}pathD{\isacharparenleft}{\kern0pt}{\isadigit{3}}{\isacharparenright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{term}\isamarkupfalse%
+\ augpath\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ augpathD{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}augpath\ G\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\isanewline
+\ \ \ \ {\isachardoublequoteopen}path\ G\ p{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}distinct\ p{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}augmenting{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ simp{\isacharunderscore}{\kern0pt}all%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
+\isacommand{lemma}\isamarkupfalse%
+\ augpathI{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}path\ G\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}distinct\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}augmenting{\isacharunderscore}{\kern0pt}path\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}augpath\ G\ M\ p{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ simp%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ augpath{\isacharunderscore}{\kern0pt}revI{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}augpath\ G\ M\ p{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}augpath\ G\ M\ {\isacharparenleft}{\kern0pt}rev\ p{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}rule\ augpathI{\isacharcomma}{\kern0pt}\ goal{\isacharunderscore}{\kern0pt}cases{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{1}}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ rev{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}is{\isacharunderscore}{\kern0pt}path{\isacharparenright}{\kern0pt}\ simp\isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{2}}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ force\isanewline
+\isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isadigit{3}}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ augmenting{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}revI{\isacharparenright}{\kern0pt}\ simp\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Graph/Undirected_Graph/Augmenting_Path.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%23=7%:%
+%:%24=8%:%
+%:%25=9%:%
+%:%26=10%:%
+%:%34=13%:%
+%:%35=13%:%
+%:%36=14%:%
+%:%37=14%:%
+%:%38=15%:%
+%:%39=16%:%
+%:%40=17%:%
+%:%41=18%:%
+%:%42=19%:%
+%:%43=20%:%
+%:%50=20%:%
+%:%53=21%:%
+%:%57=21%:%
+%:%58=21%:%
+%:%59=22%:%
+%:%60=22%:%
+%:%67=22%:%
+%:%70=23%:%
+%:%75=24%:%
+%:%76=24%:%
+%:%77=25%:%
+%:%78=26%:%
+%:%79=27%:%
+%:%80=28%:%
+%:%81=29%:%
+%:%88=29%:%
+%:%91=30%:%
+%:%95=30%:%
+%:%96=30%:%
+%:%97=31%:%
+%:%98=31%:%
+%:%105=31%:%
+%:%106=32%:%
+%:%107=33%:%
+%:%108=33%:%
+%:%109=34%:%
+%:%110=35%:%
+%:%117=36%:%
+%:%118=36%:%
+%:%119=37%:%
+%:%120=37%:%
+%:%121=38%:%
+%:%122=38%:%
+%:%123=39%:%
+%:%124=39%:%
+%:%125=40%:%
+%:%126=40%:%
+%:%127=41%:%
+%:%128=41%:%
+%:%129=42%:%
+%:%130=42%:%
+%:%131=43%:%
+%:%132=43%:%
+%:%133=44%:%
+%:%134=44%:%
+%:%135=45%:%
+%:%136=45%:%
+%:%137=46%:%
+%:%138=47%:%
+%:%139=48%:%
+%:%140=49%:%
+%:%141=50%:%
+%:%142=50%:%
+%:%143=51%:%
+%:%144=51%:%
+%:%145=52%:%
+%:%146=52%:%
+%:%147=53%:%
+%:%148=53%:%
+%:%149=54%:%
+%:%150=54%:%
+%:%151=55%:%
+%:%152=55%:%
+%:%153=56%:%
+%:%154=56%:%
+%:%155=57%:%
+%:%156=57%:%
+%:%157=58%:%
+%:%158=58%:%
+%:%159=59%:%
+%:%160=59%:%
+%:%161=60%:%
+%:%162=60%:%
+%:%163=61%:%
+%:%164=61%:%
+%:%165=62%:%
+%:%166=62%:%
+%:%167=63%:%
+%:%168=63%:%
+%:%169=64%:%
+%:%170=64%:%
+%:%171=65%:%
+%:%172=65%:%
+%:%173=66%:%
+%:%179=66%:%
+%:%184=67%:%
+%:%189=68%:%
+%:%190=68%:%
+%:%191=69%:%
+%:%192=69%:%
+%:%193=70%:%
+%:%194=71%:%
+%:%195=72%:%
+%:%196=73%:%
+%:%197=74%:%
+%:%202=74%:%
+%:%207=75%:%
+%:%211=75%:%
+%:%212=75%:%
+%:%213=76%:%
+%:%214=76%:%
+%:%219=76%:%
+%:%224=77%:%
+%:%229=78%:%
+%:%230=78%:%
+%:%231=79%:%
+%:%232=80%:%
+%:%233=81%:%
+%:%234=82%:%
+%:%239=82%:%
+%:%244=83%:%
+%:%248=83%:%
+%:%249=83%:%
+%:%250=84%:%
+%:%251=84%:%
+%:%256=84%:%
+%:%259=85%:%
+%:%260=86%:%
+%:%261=86%:%
+%:%262=87%:%
+%:%263=88%:%
+%:%270=89%:%
+%:%271=89%:%
+%:%272=90%:%
+%:%273=90%:%
+%:%274=91%:%
+%:%275=91%:%
+%:%276=92%:%
+%:%277=92%:%
+%:%278=93%:%
+%:%279=93%:%
+%:%280=94%:%
+%:%281=94%:%
+%:%282=95%:%
+%:%283=95%:%
+%:%284=96%:%
+%:%285=96%:%
+%:%286=97%:%
+%:%287=97%:%
+%:%288=98%:%
+%:%289=98%:%
+%:%290=99%:%
+%:%291=99%:%
+%:%292=100%:%
+%:%293=100%:%
+%:%294=101%:%
+%:%295=101%:%
+%:%296=102%:%
+%:%297=102%:%
+%:%298=103%:%
+%:%299=103%:%
+%:%300=104%:%
+%:%306=104%:%
+%:%311=105%:%
+%:%316=106%:%

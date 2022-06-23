@@ -1,0 +1,64 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Shortest{\isacharunderscore}{\kern0pt}Path}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Shortest{\isacharunderscore}{\kern0pt}Path\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ Path\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ dist\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ graph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ enat{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}dist\ G\ u\ v\ {\isasymequiv}\ INF\ p{\isasymin}{\isacharbraceleft}{\kern0pt}p{\isachardot}{\kern0pt}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v{\isacharbraceright}{\kern0pt}{\isachardot}{\kern0pt}\ enat\ {\isacharparenleft}{\kern0pt}path{\isacharunderscore}{\kern0pt}length\ p{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{abbreviation}\isamarkupfalse%
+\ is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}path\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ graph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ path\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}is{\isacharunderscore}{\kern0pt}shortest{\isacharunderscore}{\kern0pt}path\ G\ p\ u\ v\ {\isasymequiv}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v\ {\isasymand}\ path{\isacharunderscore}{\kern0pt}length\ p\ {\isacharequal}{\kern0pt}\ dist\ G\ u\ v{\isachardoublequoteclose}\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Graph/Undirected_Graph/Shortest_Path.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%19=4%:%
+%:%22=5%:%
+%:%23=6%:%
+%:%24=6%:%
+%:%25=7%:%
+%:%26=8%:%
+%:%27=9%:%
+%:%28=9%:%
+%:%29=10%:%
+%:%32=11%:%
+%:%37=12%:%

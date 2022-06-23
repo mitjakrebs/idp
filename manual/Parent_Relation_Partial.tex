@@ -1,0 +1,218 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Parent{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Partial}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Parent{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Partial\isanewline
+\ \ \isakeyword{imports}\isanewline
+\ \ \ \ Parent{\isacharunderscore}{\kern0pt}Relation\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{partial{\isacharunderscore}{\kern0pt}function}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}tailrec{\isacharparenright}{\kern0pt}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ a\ m\ v\ {\isacharequal}{\kern0pt}\ {\isacharparenleft}{\kern0pt}case\ m\ v\ of\ None\ {\isasymRightarrow}\ v\ {\isacharhash}{\kern0pt}\ a\ {\isacharbar}{\kern0pt}\ Some\ u\ {\isasymRightarrow}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ {\isacharparenleft}{\kern0pt}v\ {\isacharhash}{\kern0pt}\ a{\isacharparenright}{\kern0pt}\ m\ u{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ rev{\isacharunderscore}{\kern0pt}follow\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharparenleft}{\kern0pt}{\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ option{\isacharparenright}{\kern0pt}\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ list{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
+\ \ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow\ {\isasymequiv}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}follow{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}parent\ m{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ a\ m\ v\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}\ {\isacharat}{\kern0pt}\ a{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}induct\ arbitrary{\isacharcolon}{\kern0pt}\ a\ rule{\isacharcolon}{\kern0pt}\ parent{\isachardot}{\kern0pt}follow{\isacharunderscore}{\kern0pt}pinduct{\isacharbrackleft}{\kern0pt}OF\ assms{\isacharbrackright}{\kern0pt}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{case}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}{\isadigit{1}}\ v{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}case\isanewline
+\ \ \isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}cases\ {\isachardoublequoteopen}m\ v{\isachardoublequoteclose}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \isacommand{case}\isamarkupfalse%
+\ None\isanewline
+\ \ \ \ \isacommand{thus}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial{\isachardot}{\kern0pt}simps\ parent{\isachardot}{\kern0pt}follow{\isacharunderscore}{\kern0pt}psimps{\isacharparenright}{\kern0pt}\isanewline
+\ \ \isacommand{next}\isamarkupfalse%
+\isanewline
+\ \ \ \ \isacommand{case}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}Some\ u{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \isacommand{hence}\isamarkupfalse%
+\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ a\ m\ v\ {\isacharequal}{\kern0pt}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ {\isacharparenleft}{\kern0pt}v\ {\isacharhash}{\kern0pt}\ a{\isacharparenright}{\kern0pt}\ m\ u{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial{\isachardot}{\kern0pt}simps{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \isacommand{also}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ u{\isacharparenright}{\kern0pt}\ {\isacharat}{\kern0pt}\ {\isacharparenleft}{\kern0pt}v\ {\isacharhash}{\kern0pt}\ a{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ Some\isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}intro\ {\isachardoublequoteopen}{\isadigit{1}}{\isachardot}{\kern0pt}hyps{\isachardoublequoteclose}{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \isacommand{also}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}{\isachardot}{\kern0pt}\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}\ {\isacharat}{\kern0pt}\ a{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ assms\ Some\isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ parent{\isachardot}{\kern0pt}follow{\isacharunderscore}{\kern0pt}psimps{\isacharparenright}{\kern0pt}\isanewline
+\ \ \ \ \isacommand{finally}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}{\kern0pt}thesis\isanewline
+\ \ \ \ \ \ \isacommand{{\isachardot}{\kern0pt}}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{qed}\isamarkupfalse%
+\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}follow{\isacharcolon}{\kern0pt}\isanewline
+\ \ \isakeyword{assumes}\ {\isachardoublequoteopen}parent\ m{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow\ m\ v\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ assms\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}simp\ add{\isacharcolon}{\kern0pt}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}def\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}follow{\isacharparenright}{\kern0pt}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/Documents/1_projects/2022_idp/thys/Map/Parent_Relation_Partial.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%19=4%:%
+%:%22=5%:%
+%:%23=6%:%
+%:%24=6%:%
+%:%25=7%:%
+%:%26=8%:%
+%:%27=9%:%
+%:%28=9%:%
+%:%29=10%:%
+%:%30=11%:%
+%:%31=12%:%
+%:%32=12%:%
+%:%33=13%:%
+%:%34=14%:%
+%:%41=15%:%
+%:%42=15%:%
+%:%43=16%:%
+%:%44=16%:%
+%:%45=17%:%
+%:%46=17%:%
+%:%47=18%:%
+%:%48=18%:%
+%:%49=19%:%
+%:%50=19%:%
+%:%51=20%:%
+%:%52=20%:%
+%:%53=21%:%
+%:%54=21%:%
+%:%55=22%:%
+%:%56=22%:%
+%:%57=23%:%
+%:%58=23%:%
+%:%59=24%:%
+%:%60=24%:%
+%:%61=25%:%
+%:%62=25%:%
+%:%63=26%:%
+%:%64=26%:%
+%:%65=27%:%
+%:%66=27%:%
+%:%67=27%:%
+%:%68=28%:%
+%:%69=28%:%
+%:%70=29%:%
+%:%71=29%:%
+%:%72=30%:%
+%:%73=30%:%
+%:%74=30%:%
+%:%75=31%:%
+%:%76=31%:%
+%:%77=32%:%
+%:%78=32%:%
+%:%79=33%:%
+%:%80=33%:%
+%:%81=33%:%
+%:%82=34%:%
+%:%83=34%:%
+%:%84=35%:%
+%:%85=35%:%
+%:%86=36%:%
+%:%92=36%:%
+%:%95=37%:%
+%:%96=38%:%
+%:%97=38%:%
+%:%98=39%:%
+%:%99=40%:%
+%:%102=41%:%
+%:%106=41%:%
+%:%107=41%:%
+%:%108=42%:%
+%:%109=42%:%
+%:%114=42%:%
+%:%117=43%:%
+%:%118=71%:%
+%:%121=72%:%
+%:%126=73%:%

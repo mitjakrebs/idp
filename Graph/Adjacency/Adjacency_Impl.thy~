@@ -1,0 +1,42 @@
+theory Adjacency_Impl
+  imports
+    Adjacency
+    Directed_Adjacency
+    Undirected_Adjacency
+    "HOL-Data_Structures.RBT_Map"
+    "HOL-Data_Structures.RBT_Set2"
+begin
+
+global_interpretation G: adjacency where
+  Map_empty = empty and
+  Map_update = update and
+  Map_delete = RBT_Map.delete and
+  Map_lookup = lookup and
+  Map_inorder = inorder and
+  Map_inv = rbt and
+  Set_empty = empty and
+  Set_insert = insert and
+  Set_delete = delete and
+  Set_isin = isin and
+  Set_inorder = inorder and
+  Set_inv = rbt
+  defines invar = G.invar
+  and adjacency_list = G.adjacency_list
+  and insert = G.insert
+  and insert' = G.insert'
+  and insert_2 = G.insert_2
+  and insert_2' = G.insert_2'
+  and delete_2 = G.delete_2
+  and union = G.union
+  and difference = G.difference
+  and dE = G.dE
+  and dV = G.dV
+  and E = G.E
+  and V = G.V
+  and insert_edge = G.insert_edge
+  ..
+
+value "adjacency_list (update (1::nat) (RBT_Set.insert (2::nat) empty) empty) 1"
+value "difference (update (1::nat) (RBT_Set.insert (2::nat) empty) empty) (update (3::nat) (RBT_Set.insert (2::nat) empty) empty)"
+
+end
