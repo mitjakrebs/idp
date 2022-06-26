@@ -1,0 +1,8 @@
+\part{Introduction}
+\label{ch:1}
+
+Our goal for this project was to formally verify the Hopcroft-Karp algorithm for finding a maximum cardinality matching in a bipartite graph in Isabelle/HOL. The basic idea of the algorithm is based on Berge's theorem, which states that a matching is maximum if and only if there is no augmenting path. The algorithm repeatedly finds a \emph{maximal set} of \emph{vertex-disjoint} \emph{shortest} \emph{augmenting paths} and augments the matching until there is no augmenting path.
+
+Unfortunately, we had to cut the project short and instead formally verified only a shortest augmenting path algorithm, which, in each iteration, finds a single shortest augmenting path instead of a maximal set of such paths. In particular, we formally specified the algorithm and formally verified its correctness. We then refined our specification to obtain a verified implementation of the algorithm.
+
+The rest of this paper is structured as follows. In part \ref{ch:2}, we formalize the types of data used by the shortest augmenting path algorithm. We formalize the algorithm itself in part \ref{ch:3}. Finally, we sketch how we believe our formalization could be extended to a formalization of the Hopcroft-Karp algorithm in part \ref{ch:4}.

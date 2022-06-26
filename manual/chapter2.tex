@@ -1,0 +1,20 @@
+\part{Preliminaries}
+\label{ch:2}
+
+This part formalizes the types of data used by the shortest augmenting path algorithm. To see what these are, let us have a closer look at the algorithm. It takes a bipartite graph $G$ as input and outputs a maximum cardinality matching $M$ in $G$. For this, it first initializes $M$ to be empty. Then it repeatedly finds a shortest augmenting path w.r.t.\ $M$ and augments $M$ until there is no augmenting path. The pseudo code is depicted in figure \ref{fig:1}. To find a shortest augmenting path, the algorithm uses a modified breadth-first search (BFS) as a subroutine. The modified BFS uses a first-in first-out queue to manage the frontier between discovered and undiscovered vertices, as well as a map mapping a vertex $v$ to its \emph{parent}, that is, the vertex from which $v$ has been discovered. We consider the types of data mentioned above, that is, graphs and paths, matchings, queues, and maps, from three levels of abstraction. Let us first look at graphs and paths.
+
+\begin{figure}
+    \centering
+    \begin{algorithm}[H]
+        \DontPrintSemicolon
+        $M\gets\emptyset$\;
+        \Repeat{there is no augmenting path w.r.t.\ $M$}{
+            Let $P$ be a shortest augmenting path w.r.t.\ $M$.\;
+            $M\gets M\oplus P$
+        }
+        \Return{$M$}
+        \caption{}
+    \end{algorithm}
+    \label{fig:1}
+    \caption{Shortest augmenting path algorithm}
+\end{figure}

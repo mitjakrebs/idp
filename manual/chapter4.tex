@@ -1,0 +1,8 @@
+\part{Future Work}
+\label{ch:4}
+
+As mentioned in the introduction, our goal for this project was to formally verify the Hopcroft-Karp algorithm. We briefly sketch how we believe our formalization of the shortest augmenting path algorithm could be extended to a formalization of the Hopcroft-Karp algorithm.
+
+Recall that the shortest augmenting path algorithm uses a modified BFS that returns (a map that induces) a tree. This is completely sufficient if we want to find only a single augmenting path. If we want to find a \emph{maximal} set of vertex-disjoint augmenting paths, as is the case for the Hopcroft-Karp algorithm, however, a tree is not sufficient, since there may be augmenting paths containing edges not in the tree. Therefore, we would need to change the way the modified BFS handles edges to already discovered vertices, and we would need to change the type of the output, possibly from a map to a graph.
+
+Moreover, to find a maximal set of \emph{vertex-disjoint} augmenting paths in the graph output by the modified BFS, we could use a modified depth-first search which whenever it finds a shortest augmenting path, removes this path from the graph.
