@@ -2,6 +2,27 @@
 \begin{isabellebody}%
 \setisabellecontext{Queue{\isacharunderscore}{\kern0pt}Specs}%
 %
+\isadelimdocument
+%
+\endisadelimdocument
+%
+\isatagdocument
+%
+\isamarkupsection{Queue%
+}
+\isamarkuptrue%
+%
+\endisatagdocument
+{\isafolddocument}%
+%
+\isadelimdocument
+%
+\endisadelimdocument
+%
+\begin{isamarkuptext}%
+This section considers first-in first-out queues from three levels of abstraction.%
+\end{isamarkuptext}\isamarkuptrue%
+%
 \isadelimtheory
 %
 \endisadelimtheory
@@ -15,10 +36,13 @@
 {\isafoldtheory}%
 %
 \isadelimtheory
-\isanewline
 %
 \endisadelimtheory
-\isanewline
+%
+\begin{isamarkuptext}%
+On the high level, a queue is a list (\isa{list}). On the medium level, a queue is specified via
+the following interface.%
+\end{isamarkuptext}\isamarkuptrue%
 \isacommand{locale}\isamarkupfalse%
 \ Queue\ {\isacharequal}{\kern0pt}\isanewline
 \ \ \isakeyword{fixes}\ empty\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}q{\isachardoublequoteclose}\isanewline
@@ -36,12 +60,25 @@
 \ \ \isakeyword{assumes}\ invar{\isacharunderscore}{\kern0pt}empty{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}invar\ empty{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{assumes}\ invar{\isacharunderscore}{\kern0pt}snoc{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}invar\ q\ {\isasymLongrightarrow}\ invar\ {\isacharparenleft}{\kern0pt}snoc\ q\ x{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{assumes}\ invar{\isacharunderscore}{\kern0pt}tail{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isasymlbrakk}\ invar\ q{\isacharsemicolon}{\kern0pt}\ list\ q\ {\isasymnoteq}\ Nil\ {\isasymrbrakk}\ {\isasymLongrightarrow}\ invar\ {\isacharparenleft}{\kern0pt}tail\ q{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+%
+\isadeliminvisible
 \isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ Queue{\isacharparenright}{\kern0pt}\ list{\isacharunderscore}{\kern0pt}queue{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}invar\ q{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}list\ q\ {\isasymnoteq}\ {\isacharbrackleft}{\kern0pt}{\isacharbrackright}{\kern0pt}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{shows}\ {\isachardoublequoteopen}list\ q\ {\isacharequal}{\kern0pt}\ head\ q\ {\isacharhash}{\kern0pt}\ list\ {\isacharparenleft}{\kern0pt}tail\ q{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}list\ q\ {\isacharequal}{\kern0pt}\ head\ q\ {\isacharhash}{\kern0pt}\ list\ {\isacharparenleft}{\kern0pt}tail\ q{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
 %
 \isadelimproof
 \ \ %
@@ -78,40 +115,43 @@
 \end{isabellebody}%
 \endinput
 %:%file=~/Documents/1_projects/2022_idp/thys/Queue/Queue_Specs.thy%:%
-%:%10=1%:%
 %:%11=1%:%
-%:%12=2%:%
-%:%13=3%:%
-%:%18=3%:%
-%:%21=4%:%
-%:%22=5%:%
-%:%23=5%:%
-%:%24=6%:%
-%:%25=7%:%
-%:%26=8%:%
-%:%27=9%:%
-%:%28=10%:%
-%:%29=11%:%
-%:%30=12%:%
-%:%31=13%:%
-%:%32=14%:%
-%:%33=15%:%
-%:%34=16%:%
-%:%35=17%:%
-%:%36=18%:%
-%:%37=19%:%
-%:%38=20%:%
-%:%39=21%:%
-%:%40=22%:%
-%:%41=22%:%
-%:%42=23%:%
-%:%43=24%:%
-%:%44=25%:%
-%:%47=26%:%
-%:%51=26%:%
-%:%52=26%:%
-%:%53=27%:%
-%:%54=27%:%
-%:%59=27%:%
-%:%64=28%:%
-%:%69=29%:%
+%:%23=3%:%
+%:%31=5%:%
+%:%32=5%:%
+%:%33=6%:%
+%:%34=7%:%
+%:%43=10%:%
+%:%44=11%:%
+%:%46=14%:%
+%:%47=14%:%
+%:%48=15%:%
+%:%49=16%:%
+%:%50=17%:%
+%:%51=18%:%
+%:%52=19%:%
+%:%53=20%:%
+%:%54=21%:%
+%:%55=22%:%
+%:%56=23%:%
+%:%57=24%:%
+%:%58=25%:%
+%:%59=26%:%
+%:%60=27%:%
+%:%61=28%:%
+%:%62=29%:%
+%:%65=30%:%
+%:%70=31%:%
+%:%71=31%:%
+%:%72=32%:%
+%:%73=33%:%
+%:%74=34%:%
+%:%79=34%:%
+%:%84=35%:%
+%:%88=35%:%
+%:%89=35%:%
+%:%90=36%:%
+%:%91=36%:%
+%:%96=36%:%
+%:%101=37%:%
+%:%106=38%:%

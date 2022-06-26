@@ -4,7 +4,7 @@ theory Undirected_Adjacency
   imports
     Adjacency
     AGF.Berge
-    "../Undirected_Graphs/Graph_Ext"
+    "../Undirected_Graph/Graph_Ext"
 begin
 
 text \<open>If the adjacency structure is symmetric, then it induces an undirected graph.\<close>

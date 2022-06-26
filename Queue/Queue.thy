@@ -2,11 +2,9 @@ theory Queue
   imports Queue_Specs
 begin
 
-section \<open>\<close>
-
 text \<open>
-This implementation is based on
-Okasaki, C. (1999). Purely functional data structures. Cambridge University Press.
+On the low level, this interface is implemented using a pair of @{type list}s. Our implementation is
+based on Okasaki, C. (1999). Purely functional data structures. Cambridge University Press.
 \<close>
 
 type_synonym 'a queue = "'a list \<times> 'a list"
@@ -37,13 +35,11 @@ fun invar :: "'a queue \<Rightarrow> bool" where
 fun list :: "'a queue \<Rightarrow> 'a list" where
   "list (f, r) = f @ (rev r)"
 
-subsection \<open>Functional correctness\<close>
-
-lemma list_empty:
+lemma \<^marker>\<open>tag invisible\<close> list_empty:
   shows "list empty = []"
   by (simp add: empty_def)
 
-lemma is_empty:
+lemma \<^marker>\<open>tag invisible\<close> is_empty:
   assumes "invar q"
   shows "is_empty q \<longleftrightarrow> list q = []"
 proof -
@@ -55,7 +51,7 @@ proof -
     by fastforce
 qed
 
-lemma list_snoc:
+lemma \<^marker>\<open>tag invisible\<close> list_snoc:
   assumes "invar q"
   shows "list (snoc q x) = list q @ [x]"
 proof -
@@ -67,7 +63,7 @@ proof -
     by (cases f) auto
 qed
 
-lemma list_non_emptyE:
+lemma \<^marker>\<open>tag invisible\<close> list_non_emptyE:
   assumes "invar q"
   assumes "list q \<noteq> []"
   obtains x f r where
@@ -88,14 +84,14 @@ proof -
     by (intro that) (simp add: q)
 qed
 
-lemma list_head:
+lemma \<^marker>\<open>tag invisible\<close> list_head:
   assumes "invar q"
   assumes "list q \<noteq> []"
   shows "head q = hd (list q)"
   using assms
   by (auto elim: list_non_emptyE)
 
-lemma list_tail:
+lemma \<^marker>\<open>tag invisible\<close> list_tail:
   assumes "invar q"
   assumes "list q \<noteq> []"
   shows "list (tail q) = tl (list q)"
@@ -108,11 +104,11 @@ proof -
     by (cases f) simp+
 qed
 
-lemma invar_empty:
+lemma \<^marker>\<open>tag invisible\<close> invar_empty:
   shows "invar empty"
   by (simp add: empty_def)
 
-lemma invar_snoc:
+lemma \<^marker>\<open>tag invisible\<close> invar_snoc:
   assumes "invar q"
   shows "invar (snoc q x)"
 proof -
@@ -124,13 +120,13 @@ proof -
     by (cases f) auto
 qed
 
-lemma invar_if_r_empty:
+lemma \<^marker>\<open>tag invisible\<close> invar_if_r_empty:
   assumes "r = []"
   shows "invar (f, r)"
   using assms
   by (cases f) simp+
 
-lemma invar_tail:
+lemma \<^marker>\<open>tag invisible\<close> invar_tail:
   assumes "invar q"
   assumes "list q \<noteq> []"
   shows "invar (tail q)"

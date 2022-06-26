@@ -12,7 +12,7 @@ text \<open>
 This section considers graphs from three levels of abstraction. On the high level, a graph is a set
 of edges (@{type graph} for undirected graphs, and @{type dgraph} for directed graphs). On the
 medium level, a graph is specified via the interface @{locale adjacency}. On the low level, this
-interface is then implemented via red-black trees (@{theory "Draft.Adjacency_Impl"}).
+interface is then implemented via red-black trees.
 \<close>
 
 subsection \<open>High level\<close>

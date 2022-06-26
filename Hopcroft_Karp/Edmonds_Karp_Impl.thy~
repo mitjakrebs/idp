@@ -56,4 +56,6 @@ value "alt_bfs_partial (update (4::nat) (RBT_Set.insert (3::nat) empty) (update 
 value "loop'_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) (RBT_Set.insert (1::nat) empty) (RBT_Set.insert (2::nat) empty) 1 2 empty"
 value "edmonds_karp_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty))"
 
+text \<open>@{typeof "edmonds_karp_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty))"}\<close>
+
 end

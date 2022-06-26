@@ -17,7 +17,5 @@ session Hopcroft_Karp = HOL +
   theories
     Edmonds_Karp_Impl
     Graph
-  theories [document = false]
-    Misc_Ext
   document_files
     "root.tex"

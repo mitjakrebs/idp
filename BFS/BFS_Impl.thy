@@ -6,6 +6,11 @@ theory BFS_Impl
     "../Graph/Adjacency/Adjacency_Impl"
 begin
 
+text \<open>
+We now show that our specification of BFS in locale @{locale bfs} can be implemented via red-black
+trees.
+\<close>
+
 global_interpretation B: bfs where
   Map_empty = empty and
   Map_update = update and
@@ -41,7 +46,7 @@ global_interpretation B: bfs where
   ..
 
 declare B.loop_partial.simps [code]
-thm B.loop_partial.simps
-value "bfs_partial (update (1::nat) (RBT_Set.insert (2::nat) empty) empty) 1"
+thm \<^marker>\<open>tag invisible\<close> B.loop_partial.simps
+value \<^marker>\<open>tag invisible\<close> "bfs_partial (update (1::nat) (RBT_Set.insert (2::nat) empty) empty) 1"
 
 end

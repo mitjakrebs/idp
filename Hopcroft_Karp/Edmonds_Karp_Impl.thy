@@ -4,6 +4,11 @@ theory Edmonds_Karp_Impl
     Edmonds_Karp_Partial
 begin
 
+text \<open>
+We now show that our specification of the Edmonds-Karp algorithm in locale @{locale edmonds_karp}
+can be implemented via red-black trees.
+\<close>
+
 global_interpretation E: edmonds_karp where
   Map_empty = empty and
   Map_update = update and
@@ -51,11 +56,9 @@ global_interpretation E: edmonds_karp where
 
 declare rev_follow_partial.simps [code]
 declare E.loop'_partial.simps [code]
-thm E.loop'_partial.simps
-value "alt_bfs_partial (update (4::nat) (RBT_Set.insert (3::nat) empty) (update (3::nat) (RBT_Set.insert (4::nat) empty) empty)) (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) 1"
-value "loop'_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) (RBT_Set.insert (1::nat) empty) (RBT_Set.insert (2::nat) empty) 1 2 empty"
-value "edmonds_karp_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty))"
-
-text \<open>@{typeof "edmonds_karp_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty))"}\<close>
+thm \<^marker>\<open>tag invisible\<close> E.loop'_partial.simps
+value \<^marker>\<open>tag invisible\<close> "alt_bfs_partial (update (4::nat) (RBT_Set.insert (3::nat) empty) (update (3::nat) (RBT_Set.insert (4::nat) empty) empty)) (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) 1"
+value \<^marker>\<open>tag invisible\<close> "loop'_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) (RBT_Set.insert (1::nat) empty) (RBT_Set.insert (2::nat) empty) 1 2 empty"
+value \<^marker>\<open>tag invisible\<close> "edmonds_karp_partial (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty))"
 
 end

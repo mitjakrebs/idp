@@ -1,23 +1,21 @@
 subsection \<open>Medium level\<close>
 
-text \<open>
-As mentioned above, a graph on the high level of abstraction is a set of edges. Hence, we would
-expect a graph to provide basic set operations such as insert, delete, union, intersection, and
-difference. Moreover, many graph algorithms, including breadth-first and depth-first search, involve
-iterating, or, folding, over all vertices adjacent to a given vertex. Thus, we would have liked to
-specify a graph on the medium level of abstraction via the following locales.
-\<close>
-
 subsubsection \<open>Adjacency structure\<close>
 
 theory Adjacency
   imports
     "HOL-Data_Structures.Set_Specs"
     "../../Map/Map_Specs_Ext"
-    "../../Orderings_Tbd"
+    "../../Orderings_Ext"
 begin
 
-text \<open>@{session Ports}\<close>
+text \<open>
+As mentioned above, a graph on the high level of abstraction is a set of edges. Hence, we would
+expect a graph to provide basic set operations such as insert, delete, union, intersection, and
+difference. Moreover, many graph algorithms, including breadth-first and depth-first search, involve
+iterating, or folding, over all vertices adjacent to a given vertex. Thus, we would have liked to
+specify a graph on the medium level of abstraction via the following locales.
+\<close>
 
 locale Adjacency_Structure =
   fixes empty :: "'g"
@@ -252,12 +250,10 @@ This locale specifies a graph as a @{term Map_by_Ordered} mapping a vertex to it
 is specified as a @{term Set_by_Ordered}.
 \<close>
 
-(* TODO Transition. *)
-(* TODO Edit. *)
 text \<open>
 We define graph operations insert, delete, union, as well as difference, and show that they
 correspond to the respective set operations in terms of @{term adjacency.adjacency_list}. Let us
-first look at how to insert an edge.
+first look at inserting an edge into a graph.
 \<close>
 
 definition (in adjacency) insert :: "'a \<times> 'a \<Rightarrow> 'm \<Rightarrow> 'm" where
@@ -530,7 +526,7 @@ next
     .
 qed
 
-text \<open>Let us now look at how to delete an edge.\<close>
+text \<open>Next, let us look at deleting an edge from a graph.\<close>
 
 definition (in adjacency) delete :: "'a \<times> 'a \<Rightarrow> 'm \<Rightarrow> 'm" where
   "delete p G \<equiv>
@@ -629,7 +625,7 @@ lemma (in adjacency) adjacency_list_delete'_cong:
   using assms
   by (simp add: delete'_def adjacency_list_delete_cong)
 
-text \<open>Let us now look at how to union two graphs.\<close>
+text \<open>Let us now look at computing the union two graphs.\<close>
 
 definition (in adjacency) insert_2 :: "'a \<times> 's \<Rightarrow> 'm \<Rightarrow> 'm" where
   "insert_2 p G \<equiv>
@@ -843,7 +839,7 @@ proof -
     .
 qed
 
-text \<open>Finally, let us look at how to compute the difference of two graphs.\<close>
+text \<open>Finally, let us look at computing the difference of two graphs.\<close>
 
 definition (in adjacency) delete_2 :: "'a \<times> 's \<Rightarrow> 'm \<Rightarrow> 'm" where
   "delete_2 p G \<equiv>
@@ -1116,42 +1112,42 @@ locale \<^marker>\<open>tag invisible\<close> fukakyo =
   E_isin and
   E_inorder and
   E_inv
-begin \<^marker>\<open>tag invisible\<close> 
+begin
 
-abbreviation f :: "'a \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> 's" where
+abbreviation \<^marker>\<open>tag invisible\<close> f :: "'a \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> 's" where
   "f u v \<equiv> E_insert (u, v)"
 
-abbreviation g :: "'a \<times> 't \<Rightarrow> 's \<Rightarrow> 's"  where
+abbreviation \<^marker>\<open>tag invisible\<close> g :: "'a \<times> 't \<Rightarrow> 's \<Rightarrow> 's"  where
   "g p \<equiv> fold (f (fst p)) (Set_inorder (snd p))"
 
-abbreviation E :: "'m \<Rightarrow> 's" where
+abbreviation \<^marker>\<open>tag invisible\<close> E :: "'m \<Rightarrow> 's" where
   "E G \<equiv> fold g (Map_inorder G) E_empty"
 
-lemma invar_f:
+lemma \<^marker>\<open>tag invisible\<close> invar_f:
   assumes "E.invar s"
   shows "E.invar (f u v s)"
   using assms
   by (intro E.invar_insert)
 
-lemma set_f_cong:
+lemma \<^marker>\<open>tag invisible\<close> set_f_cong:
   assumes "E.invar s"
   shows "E.set (f u v s) = E.set s \<union> {(u, v)}"
   using assms
   by (intro E.set_insert)
 
-lemma invar_fold_f:
+lemma \<^marker>\<open>tag invisible\<close> invar_fold_f:
   assumes "E.invar s"
   shows "E.invar (fold (f u) l s)"
   using assms
   by (induct l arbitrary: s) (auto intro: invar_f)
 
-lemma invar_g:
+lemma \<^marker>\<open>tag invisible\<close> invar_g:
   assumes "E.invar s"
   shows "E.invar (g p s)"
   using assms
   by (intro invar_fold_f)
 
-lemma set_fold_f_cong:
+lemma \<^marker>\<open>tag invisible\<close> set_fold_f_cong:
   assumes "E.invar s"
   shows "E.set (fold (f u) l s) = E.set s \<union> {u} \<times> set l"
   using assms
@@ -1175,24 +1171,24 @@ next
     .
 qed
 
-lemma set_g_cong:
+lemma \<^marker>\<open>tag invisible\<close> set_g_cong:
   assumes "E.invar s"
   shows "E.set (g p s) = E.set s \<union> {fst p} \<times> G.S.set (snd p)"
   using assms
   by (simp add: set_fold_f_cong G.S.set_def)
 
-lemma invar_fold_g:
+lemma \<^marker>\<open>tag invisible\<close> invar_fold_g:
   assumes "E.invar s"
   shows "E.invar (fold g l s)"
   using assms
   by (induct l arbitrary: s) (auto intro: invar_g)
 
-lemma invar_E:
+lemma \<^marker>\<open>tag invisible\<close> invar_E:
   shows "E.invar (E G)"
   using E.invar_empty
   by (intro invar_fold_g)
 
-lemma set_fold_g_cong:
+lemma \<^marker>\<open>tag invisible\<close> set_fold_g_cong:
   assumes "E.invar s"
   shows "E.set (fold g l s) = E.set s \<union> (\<Union>p\<in>set l. {fst p} \<times> G.S.set (snd p))"
   using assms
@@ -1216,12 +1212,12 @@ next
     .
 qed
 
-lemma set_E_cong:
+lemma \<^marker>\<open>tag invisible\<close> set_E_cong:
   assumes "G.invar G"
   shows "E.set (E G) = {(u, v). v \<in> set (G.adjacency_list G u)}"
   using assms E.invar_empty
   by (auto simp add: G.mem_adjacency_iff_mem_inorder set_fold_g_cong E.set_empty)
 
-end \<^marker>\<open>tag invisible\<close>
+end
 
 end

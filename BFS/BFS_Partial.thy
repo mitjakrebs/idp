@@ -1,7 +1,16 @@
+subsection \<open>Implementation of the algorithm\<close>
+
 theory BFS_Partial
   imports
     BFS
 begin
+
+text \<open>
+One point to note is that we verified only partial termination and correctness of loop
+@{term bfs.loop}, since we assumed an appropriate input as specified via locale
+@{locale bfs_valid_input}. To obtain executable code, we make this explicit and use a partial
+function.
+\<close>
 
 partial_function (in bfs) (tailrec) loop_partial where
   "loop_partial G src s =
@@ -44,6 +53,7 @@ qed
 
 lemma (in bfs_valid_input) bfs_partial_eq_bfs:
   shows "bfs_partial G src = bfs G src"
+  unfolding bfs_def
   using bfs_invar_init
   by (simp add: bfs_partial_def loop_partial_eq_loop)
 

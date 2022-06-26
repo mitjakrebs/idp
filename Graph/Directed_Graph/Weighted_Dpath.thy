@@ -1,39 +1,39 @@
-theory Weighted_Dpath
+theory \<^marker>\<open>tag invisible\<close> Weighted_Dpath
   imports
     Dpath
 begin
 
-type_synonym 'a weight_fun = "'a \<times> 'a \<Rightarrow> nat"
+type_synonym \<^marker>\<open>tag invisible\<close> 'a weight_fun = "'a \<times> 'a \<Rightarrow> nat"
 
-definition edges_weight :: "'a weight_fun \<Rightarrow> ('a \<times> 'a) list \<Rightarrow> nat" where
+definition \<^marker>\<open>tag invisible\<close> edges_weight :: "'a weight_fun \<Rightarrow> ('a \<times> 'a) list \<Rightarrow> nat" where
   "edges_weight f l = sum_list (map f l)"
 
-definition dpath_weight :: "'a weight_fun \<Rightarrow> 'a dpath \<Rightarrow> nat" where
+definition \<^marker>\<open>tag invisible\<close> dpath_weight :: "'a weight_fun \<Rightarrow> 'a dpath \<Rightarrow> nat" where
   "dpath_weight f p = edges_weight f (edges_of_dpath p)"
 
-lemma edges_weight_Nil [simp]:
+lemma \<^marker>\<open>tag invisible\<close> edges_weight_Nil [simp]:
   shows "edges_weight f [] = 0"
   by (simp add: edges_weight_def)
 
-lemma dpath_weight_Nil [simp]:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_Nil [simp]:
   shows "dpath_weight f [] = 0"
   by (simp add: dpath_weight_def)
 
-lemma edges_weight_Cons [simp]:
+lemma \<^marker>\<open>tag invisible\<close> edges_weight_Cons [simp]:
   shows "edges_weight f (x # xs) = f x + edges_weight f xs"
   by (simp add: edges_weight_def)
 
-lemma edges_weight_append [simp]:
+lemma \<^marker>\<open>tag invisible\<close> edges_weight_append [simp]:
   shows "edges_weight f (xs @ ys) = edges_weight f xs + edges_weight f ys"
   by (simp add: edges_weight_def)
 
-lemma dpath_weight_append:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_append:
   assumes "p \<noteq> []"
   shows "dpath_weight f (p @ q) = dpath_weight f p + dpath_weight f (last p # q)"
   using assms
   by (simp add: dpath_weight_def edges_of_dpath_append_3)
 
-lemma dpath_weight_append_2:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_append_2:
   assumes "p \<noteq> []"
   assumes "q \<noteq> []"
   assumes "last p = hd q"
@@ -41,13 +41,13 @@ lemma dpath_weight_append_2:
   using assms
   by (simp add: dpath_weight_append)
 
-lemma dpath_weight_append_3:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_append_3:
   assumes "q \<noteq> []"
   shows "dpath_weight f (p @ q) = dpath_weight f (p @ [hd q]) + dpath_weight f q"
   using assms dpath_weight_append[of "p @ [hd q]" _ "tl q"]
   by simp
 
-lemma dpath_weight_append_append:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_append_append:
   assumes "p \<noteq> []"
   assumes "Suc 0 < length q"
   assumes "r \<noteq> []"
@@ -65,7 +65,7 @@ proof -
     .
 qed
 
-lemma dpath_weight_closed_dpath_bet_decomp:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_closed_dpath_bet_decomp:
   assumes "dpath_bet G p u v"
   assumes "\<not> distinct p"
   assumes "closed_dpath_bet_decomp G p = (q, r, s)"
@@ -80,7 +80,7 @@ proof -
     by (auto simp add: dpath_bet_nonempty_dpath(3, 4) intro: dpath_weight_append_append)
 qed
 
-lemma dpath_weight_ge_dpath_weight_dpath_bet_to_distinct:
+lemma \<^marker>\<open>tag invisible\<close> dpath_weight_ge_dpath_weight_dpath_bet_to_distinct:
   assumes "dpath_bet G p u v"
   shows "dpath_weight f (dpath_bet_to_distinct G p) \<le> dpath_weight f p"
   using assms
@@ -112,7 +112,7 @@ next
     .
 qed
 
-lemma dpath_length_eq_dpath_weight:
+lemma \<^marker>\<open>tag invisible\<close> dpath_length_eq_dpath_weight:
   shows "dpath_length p = dpath_weight (\<lambda>_. 1) p"
 proof (induction p rule: dpath_induct)
 case 1
@@ -137,4 +137,4 @@ next
     .
 qed
 
-end
+end \<^marker>\<open>tag invisible\<close> 

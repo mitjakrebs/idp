@@ -238,7 +238,7 @@ proof -
 qed
 
 text \<open>
-We show that graph operations union and difference correspond to the respective set operations in
+Next, we show that graph operations union and difference correspond to the respective set operations in
 terms of @{term adjacency.E}, and that they maintain symmetry.
 \<close>
 

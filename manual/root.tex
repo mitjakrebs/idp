@@ -22,6 +22,11 @@
   %for \<onequarter>, \<onehalf>, \<threequarters>, \<degree>, \<cent>,
   %\<currency>
 
+\usepackage[english,boxruled,noalgohanging,noend,noline,linesnumbered]{algorithm2e}
+
+\usepackage{tikz}
+\usetikzlibrary{calc,decorations.pathreplacing,fit,through}
+
 % this should be the last package used
 \usepackage{pdfsetup}
 
@@ -35,9 +40,11 @@
 
 \begin{document}
 
-\title{thys}
-\author{mitjakrebs}
+\title{Formal Verification of the Hopcroft-Karp Algorithm}
+\author{Mitja Krebs}
 \maketitle
+
+\input{abstract.tex}
 
 \tableofcontents
 

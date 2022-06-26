@@ -3,8 +3,8 @@ theory Augmenting_Path
     Alternating_Path
 begin
 
-thm augmenting_path_def
-lemma augmenting_pathD:
+thm \<^marker>\<open>tag invisible\<close> augmenting_path_def
+lemma \<^marker>\<open>tag invisible\<close> augmenting_pathD:
   assumes "augmenting_path M p"
   shows
     "2 \<le> length p"
@@ -14,7 +14,7 @@ lemma augmenting_pathD:
   using assms
   by (simp_all add: augmenting_path_def)
 
-lemma augmenting_pathI:
+lemma \<^marker>\<open>tag invisible\<close> augmenting_pathI:
   assumes "2 \<le> length p"
   assumes "Berge.alt_path M p"
   assumes "hd p \<notin> Vs M"
@@ -23,7 +23,15 @@ lemma augmenting_pathI:
   using assms
   by (simp add: augmenting_path_def)
 
-lemma augmenting_path_rev_if_augmenting_path:
+text \<open>
+A free vertex w.r.t.\ a matching @{term M} is a vertex not incident to any edge in @{term M}, and an
+augmenting path w.r.t.\ @{term M} is an alternating path w.r.t.\ @{term M} whose endpoints are
+distinct free vertices. Session @{session AGF} introduces the following two definitions:
+@{thm augmenting_path_def}, and @{term augpath}. We extend their formalization and show that
+augmenting paths can be reversed.
+\<close>
+
+lemma augmenting_path_revI:
   assumes "augmenting_path M p"
   shows "augmenting_path M (rev p)"
 proof (rule augmenting_pathI, goal_cases)
@@ -58,8 +66,8 @@ next
     by (auto simp add: last_rev dest: augmenting_pathD(3))
 qed
 
-term augpath
-lemma augpathD:
+term \<^marker>\<open>tag invisible\<close> augpath
+lemma \<^marker>\<open>tag invisible\<close> augpathD:
   assumes "augpath G M p"
   shows
     "path G p"
@@ -68,7 +76,7 @@ lemma augpathD:
   using assms
   by simp_all
 
-lemma augpathI:
+lemma \<^marker>\<open>tag invisible\<close> augpathI:
   assumes "path G p"
   assumes "distinct p"
   assumes "augmenting_path M p"
@@ -76,7 +84,7 @@ lemma augpathI:
   using assms
   by simp
 
-lemma augpath_rev_if_augpath:
+lemma augpath_revI:
   assumes "augpath G M p"
   shows "augpath G M (rev p)"
 proof (rule augpathI, goal_cases)
@@ -93,7 +101,7 @@ next
   case 3
   show ?case
     using assms
-    by (intro augmenting_path_rev_if_augmenting_path) simp
+    by (intro augmenting_path_revI) simp
 qed
 
 end

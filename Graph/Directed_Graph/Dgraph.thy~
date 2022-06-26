@@ -3,11 +3,9 @@ theory Dgraph
     AGF.DDFS
 begin
 
-text \<open>This theory extends the @{session AGF} formalization of directed graphs.\<close>
-
-section \<open>Directed graphs\<close>
-
 type_synonym 'a vertex = 'a
+
+text \<open>An edge in a directed graph is a pair of vertices.\<close>
 
 type_synonym 'a edge = "('a vertex \<times> 'a vertex)"
 
@@ -16,16 +14,10 @@ type_synonym 'a dgraph = "'a edge set"
 locale dgraph =
   fixes G :: "'a dgraph"
 
+text \<open>Let us identify a few special types of graphs.\<close>
+
 locale finite_dgraph = dgraph G for G +
   assumes finite_edges: "finite G"
-
-locale simple_dgraph = dgraph G for G +
-  assumes no_loop: "(u, v) \<in> G \<Longrightarrow> u \<noteq> v"
-
-locale symmetric_dgraph = dgraph G for G +
-  assumes symmetric: "(u, v) \<in> G \<longleftrightarrow> (v, u) \<in> G"
-
-subsection \<open>Vertices\<close>
 
 lemma (in finite_dgraph) finite_vertices:
   shows "finite (dVs G)"
@@ -46,21 +38,25 @@ proof -
     by blast
 qed
 
-subsection \<open>Neighborhood\<close>
+locale simple_dgraph = dgraph G for G +
+  assumes no_loop: "(u, v) \<in> G \<Longrightarrow> u \<noteq> v"
 
-definition out_neighborhood :: "'a dgraph \<Rightarrow> 'a \<Rightarrow> 'a set" where
+locale symmetric_dgraph = dgraph G for G +
+  assumes symmetric: "(u, v) \<in> G \<longleftrightarrow> (v, u) \<in> G"
+
+definition \<^marker>\<open>tag invisible\<close> out_neighborhood :: "'a dgraph \<Rightarrow> 'a \<Rightarrow> 'a set" where
   "out_neighborhood G u \<equiv> {v \<in> dVs G. (u, v) \<in> G}"
 
-lemma mem_out_neighborhood_iff_edge:
+lemma \<^marker>\<open>tag invisible\<close> mem_out_neighborhood_iff_edge:
   shows "v \<in> out_neighborhood G u \<longleftrightarrow> (u, v) \<in> G"
   using dVsI(2)
   by (auto simp add: out_neighborhood_def)
 
-lemma out_neighborhood_subset_vertices:
+lemma \<^marker>\<open>tag invisible\<close> out_neighborhood_subset_vertices:
   shows "out_neighborhood G u \<subseteq> dVs G"
   by (simp add: out_neighborhood_def)
 
-lemma (in finite_dgraph) finite_out_neighborhood:
+lemma \<^marker>\<open>tag invisible\<close> (in finite_dgraph) finite_out_neighborhood:
   shows "finite (out_neighborhood G u)"
   using out_neighborhood_subset_vertices finite_edges finite_subset
   by (fastforce intro: finite_vertices)

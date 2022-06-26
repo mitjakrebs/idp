@@ -1,7 +1,7 @@
-theory Ford_Fulkerson_Tbd
+theory Edmonds_Karp_Tbd
   imports
     "../../matching/Blossom_Algo"
-    Ford_Fulkerson
+    Edmonds_Karp
 begin
 
 text \<open>This theory connects @{term ford_fulkerson.loop'} to @{term find_max_match.find_max_matching}\<close>

@@ -3,13 +3,6 @@ theory Augmenting_Path
     Alternating_Path
 begin
 
-text \<open>
-In graph theory, a free vertex w.r.t.\ a matching $M$ is a vertex not incident to any edge in $M$,
-and an augmenting path w.r.t.\ $M$ is an alternating path w.r.t.\ $M$ whose endpoints are distinct
-free vertices. Session @{session AGF} introduces the following two definitions:
-@{thm augmenting_path_def}, and @{term augpath}. We show that we can reverse augmenting paths.
-\<close>
-
 thm \<^marker>\<open>tag invisible\<close> augmenting_path_def
 lemma \<^marker>\<open>tag invisible\<close> augmenting_pathD:
   assumes "augmenting_path M p"
@@ -29,6 +22,14 @@ lemma \<^marker>\<open>tag invisible\<close> augmenting_pathI:
   shows "augmenting_path M p"
   using assms
   by (simp add: augmenting_path_def)
+
+text \<open>
+A free vertex w.r.t.\ a matching @{term M} is a vertex not incident to any edge in @{term M}, and an
+augmenting path w.r.t.\ @{term M} is an alternating path w.r.t.\ @{term M} whose endpoints are
+distinct free vertices. Session @{session AGF} introduces the following two definitions:
+@{thm augmenting_path_def}, and @{abbrev augpath}. We extend their formalization and show that
+augmenting paths can be reversed.
+\<close>
 
 lemma augmenting_path_revI:
   assumes "augmenting_path M p"

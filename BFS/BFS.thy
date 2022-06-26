@@ -1,21 +1,21 @@
+section \<open>BFS\<close>
+
+text \<open>
+This section specifies and verifies breadth-first search (BFS). More specifically, we verify that
+given a directed graph $G$ and a source vertex $s$, the output of the algorithm induces a
+breadth-first tree $T$ of $G$ w.r.t.\ $s$, that is, $T$ consists of the vertices reachable from $s$
+in $G$, and for every vertex $v$ in $T$, $T$ contains a unique simple path from $s$ to $v$ that is
+also a shortest path from $s$ to $v$ in $G$.
+\<close>
+
 theory BFS
   imports
     "../Graph/Adjacency/Directed_Adjacency"
     "../Graph/Directed_Graph/Directed_Graph"
     "../Map/Map_Specs_Ext"
-    "../Map/Parent_Relation"
+    Parent_Relation
     "../Queue/Queue_Specs"
 begin
-
-text \<open>
-This theory specifies and verifies breadth-first search (BFS). More specifically, we verify that
-given a directed graph G and a source vertex src, the output of the algorithm induces a
-breadth-first tree T, that is, T consists of the vertices reachable from src in G, and for every
-vertex v in T, T contains a unique simple path from src to v that is also a shortest path from src
-to v in G.
-\<close>
-
-section \<open>BFS\<close>
 
 subsection \<open>Specification of the algorithm\<close>
 
@@ -55,11 +55,11 @@ locale bfs =
 begin
 
 text \<open>
-Our implementation of BFS keeps two data structures, a first-in, first-out queue, initialized to
-contain the source vertex src, and a parent map, initialized to the empty map. As long as the queue
-is not empty, the algorithm pops the head u of the queue, and for every adjacent vertex v, discovers
-v if it hasn't been discovered yet, where discovering v entails enqueuing v as well as setting v's
-parent to u.
+Our specification of BFS maintains a first-in first-out queue, initialized to contain the source
+vertex @{term src}, and a parent map, initialized to the empty map. As long as the queue is not
+empty, the algorithm pops the head @{term u} of the queue, and for every adjacent vertex @{term v},
+discovers @{term v} if it hasn't been discovered yet, where discovering @{term v} entails adding
+@{term v} to the queue as well as setting @{term v}'s parent to @{term u}.
 \<close>
 
 definition init :: "'a \<Rightarrow> ('q, 'm) state" where
@@ -93,7 +93,7 @@ function (domintros) loop :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \
     else s)"
   by pat_completeness simp
 
-abbreviation bfs :: "'n \<Rightarrow> 'a \<Rightarrow> 'm" where
+definition bfs :: "'n \<Rightarrow> 'a \<Rightarrow> 'm" where
   "bfs G src \<equiv> parent (loop G src (init src))"
 
 abbreviation fold :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> ('q, 'm) state" where
@@ -110,12 +110,13 @@ end
 
 subsection \<open>Verification of the correctness of the algorithm\<close>
 
-subsubsection \<open>Input\<close>
+subsubsection \<open>Assumptions on the input\<close>
 
 text \<open>
-Algorithm @{term bfs.bfs} expects a directed graph G and a source vertex src in G as input, and the
-correctness theorem will assume such an input. We remark that the assumption that src is indeed a
-vertex in G is for the purpose of convenience. Let us formally specify these assumptions.
+Algorithm @{term bfs.bfs} expects a directed graph @{term G} and a source vertex @{term src} in
+@{term G} as input, and the correctness theorem will assume such an input. We remark that the
+assumption that @{term src} is indeed a vertex in @{term G} is for the purpose of convenience. Let
+us formally specify these assumptions.
 \<close>
 
 locale bfs_valid_input = bfs where
@@ -130,7 +131,7 @@ locale bfs_valid_input = bfs where
   assumes invar_G: "G.invar G"
   assumes src_mem_dV: "src \<in> G.dV G"
 
-abbreviation (in bfs) bfs_valid_input' :: "'n \<Rightarrow> 'a \<Rightarrow> bool" where
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs) bfs_valid_input' :: "'n \<Rightarrow> 'a \<Rightarrow> bool" where
   "bfs_valid_input' G src \<equiv>
    bfs_valid_input
     Map_empty Map_delete Map_lookup Map_inorder Map_inv
@@ -139,19 +140,23 @@ abbreviation (in bfs) bfs_valid_input' :: "'n \<Rightarrow> 'a \<Rightarrow> boo
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     Map_update P_update Q_snoc G src"
 
+text \<open>
+Graph @{term G} is represented as an @{locale adjacency}, that is, as a @{locale Map_by_Ordered}
+mapping a vertex to its adjacency, which is represented as a @{locale Set_by_Ordered}.
+\<close>
+
 subsubsection \<open>Loop invariants\<close>
 
 text \<open>
-Unfolding the definition of @{term bfs.bfs}, we see that function @{term bfs.loop} lies at the heart
-of the algorithm. It expects the undirected graph G, the source vertex src in G, as well as the
-current state s, which comprises the queue and parent map, as input. Let us look at the assumptions
-on the queue and parent map. As these are the only two data structures that may change from one
-iteration to the next, these assumptions constitute the loop invariants of @{term bfs.loop}.
-\<close>
+Unfolding the definition of algorithm @{term bfs.bfs}, we see that recursive function
+@{term bfs.loop} lies at the heart of the algorithm. It expects an input
+$\langle @{term G},@{term src},@{term s}\rangle$, which constitutes the program state, such that
+  \<^item> @{term G}, @{term src} satisfy the assumptions specified above, and
+  \<^item> @{term s} comprises a queue and a parent map satisfying the assumptions stated below.
 
-text \<open>
-To keep track of progress, the algorithm colors every vertex in G either white, gray, or black. All
-vertices start out white and may later become gray and then black.
+
+As @{term s} is the only state variable that is subject to change from one iteration to the next,
+the following assumptions constitute the (non-trivial) loop invariants of @{term bfs.loop}.
 \<close>
 
 abbreviation (in bfs_valid_input) white :: "('q, 'm) state \<Rightarrow> 'a \<Rightarrow> bool" where
@@ -190,31 +195,7 @@ locale bfs_invar =
     "\<lbrakk> dpath_bet (G.dE G) p u v; \<not> white s u; \<not> white s v \<rbrakk> \<Longrightarrow>
      d (parent s) v \<le> d (parent s) u + dpath_length p"
 
-text \<open>
-Invariant @{thm bfs_invar.black_imp_adjacency_not_white} says that all vertices adjacent to black
-vertices have been discovered.
-\<close>
-
-text \<open>
-For a vertex $v$ in G, let d v denote the distance from the source src to v induced by the current
-parent map. 
-\<close>
-
-text \<open>
-Let $v_1,\dots,v_k$ be the content of the current queue, where $v_1$ is the head. Then invariant
-@{thm bfs_invar.queue_sorted_wrt_d} says that $d v_i\leq d v_{i+1}$ for all $i<k$. And invariant
-@{thm bfs_invar.d_last_queue_le} says that $d v_k\leq d v_1 + 1$. That is, the current queue holds at
-most two distinct $d$ values.
-\<close>
-
-text \<open>
-Finally, invariant @{thm bfs_invar.d_triangle_inequality} says that d satisfies a variant of the
-triangle inequality. More specifically, if there is a path in G between two vertices u, v that
-have been discovered by the algorithm, then their d values differ by at most the length of that
-path.
-\<close>
-
-abbreviation (in bfs) bfs_invar' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> bool" where
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs) bfs_invar' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> bool" where
   "bfs_invar' G src s \<equiv>
    bfs_invar
     Map_empty Map_delete Map_lookup Map_inorder Map_inv
@@ -223,52 +204,47 @@ abbreviation (in bfs) bfs_invar' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) 
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     Map_update G src P_update Q_snoc s"
 
-abbreviation (in bfs_valid_input) bfs_invar'' :: "('q, 'm) state \<Rightarrow> bool" where
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) bfs_invar'' :: "('q, 'm) state \<Rightarrow> bool" where
   "bfs_invar'' \<equiv> bfs_invar' G src"
 
-text \<open>
-Let us quickly show that the initial configuration of the queue--containing only the source vertex
-src--and parent map--the empty map--satisfies the loop invariants.
-\<close>
-
-lemma (in bfs_valid_input) follow_invar_parent_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) follow_invar_parent_init:
   shows "follow_invar (P_lookup (parent (init src)))"
   using wf_empty
   by (simp add: init_def P.map_empty follow_invar_def)
 
-lemma (in bfs_valid_input) invar_queue_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) invar_queue_init:
   shows "Q_invar (queue (init src))"
   using Q.invar_empty
   by (auto simp add: init_def intro: Q.invar_snoc)
 
-lemma (in bfs_valid_input) invar_parent_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) invar_parent_init:
   shows "P_invar (parent (init src))"
   using P.invar_empty
   by (simp add: init_def)
 
-lemma (in bfs_valid_input) parent_src_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) parent_src_init:
   shows "P_lookup (parent (init src)) src = None"
   by (simp add: init_def P.map_empty)
 
-lemma (in bfs_valid_input) parent_imp_edge_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) parent_imp_edge_init:
   assumes "P_lookup (parent (init src)) v = Some u"
   shows "(u, v) \<in> G.dE G"
   using assms
   by (simp add: init_def P.map_empty)
 
-lemma (in bfs_valid_input) not_white_if_mem_queue_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) not_white_if_mem_queue_init:
   assumes "v \<in> set (Q_list (queue (init src)))"
   shows "\<not> white (init src) v"
   using assms Q.invar_empty
   by (simp add: init_def Q.list_snoc Q.list_empty is_discovered_def)
 
-lemma (in bfs_valid_input) not_white_if_parent_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) not_white_if_parent_init:
   assumes "P_lookup (parent (init src)) v = Some u"
   shows "\<not> white (init src) u"
   using assms
   by (simp add: init_def P.map_empty)
 
-lemma (in bfs_valid_input) black_imp_adjacency_not_white_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) black_imp_adjacency_not_white_init:
   assumes "black (init src) u"
   assumes "(u, v) \<in> G.dE G"
   shows "\<not> white s v"
@@ -281,12 +257,12 @@ proof -
     by (simp add: init_def Q.list_snoc)
 qed
 
-lemma (in bfs_valid_input) queue_sorted_wrt_d_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) queue_sorted_wrt_d_init:
   shows "sorted_wrt (\<lambda>u v. d (parent (init src)) u \<le> d (parent (init src)) v) (Q_list (queue (init src)))"
   using Q.invar_empty
   by (simp add: init_def Q.list_snoc Q.list_empty)
 
-lemma (in bfs_valid_input) d_last_queue_le_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) d_last_queue_le_init:
   assumes "\<not> Q_is_empty (queue (init src))"
   shows
     "d (parent (init src)) (last (Q_list (queue (init src)))) \<le>
@@ -294,13 +270,53 @@ lemma (in bfs_valid_input) d_last_queue_le_init:
   using Q.invar_empty invar_queue_init
   by (simp add: init_def Q.list_snoc Q.list_empty Q.list_head)
 
-lemma (in bfs_valid_input) d_triangle_inequality_init:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) d_triangle_inequality_init:
   assumes "dpath_bet (G.dE G) p u v"
   assumes "\<not> white (init src) u"
   assumes "\<not> white (init src) v"
   shows "d (parent (init src)) v \<le> d (parent (init src)) u + dpath_length p"
   using assms
   by (simp add: is_discovered_def init_def P.map_empty)
+
+text \<open>
+As mentioned above, state @{term s} comprises a queue, represented as a @{locale Queue}, and a map,
+represented as a @{locale Map}.
+\<close>
+
+text \<open>
+Invariant @{thm [source] bfs_invar.black_imp_adjacency_not_white} says that all vertices adjacent to a black
+vertex have been discovered.
+\<close>
+
+text \<open>
+For a vertex @{term v}, let $d(@{term v})=@{term "d (parent s) v"}$ denote the distance from the
+source @{term src} to @{term v} induced by the current state @{term s}.
+\<close>
+
+text \<open>
+Let $\langle v_1,\dots,v_k\rangle$ be the contents of the queue, where $v_1$ is the head. Then
+invariant @{thm [source] bfs_invar.queue_sorted_wrt_d} says that $d(v_i)\leq d(v_{i+1})$ for all $i<k$. And
+invariant @{thm [source] bfs_invar.d_last_queue_le} says that $d(v_k)\leq d(v_1)+1$. That is, the current
+queue holds at most two distinct $d$ values.
+\<close>
+
+text \<open>
+Finally, invariant @{thm [source] bfs_invar.d_triangle_inequality} says that @{term d} satisfies a variant of
+the triangle inequality. More specifically, if there is a path in @{term G} between two vertices
+@{term u}, @{term v} that both have been discovered by the algorithm, then their @{term d} values
+differ by at most the length of that path.
+\<close>
+
+text \<open>
+To verify the correctness of loop @{term bfs.loop}, we need to show that
+  \<^enum> the loop invariants are satisfied prior to the first iteration of the loop, and that
+  \<^enum> the loop invariants are maintained.
+
+
+Let us start with the former, that is, let us prove that the initial configurations of the
+queue--containing only the source vertex @{term src}--and parent map--the empty map--satisfy the
+loop invariants.
+\<close>
 
 lemma (in bfs_valid_input) bfs_invar_init:
   shows "bfs_invar'' (init src)"
@@ -340,13 +356,10 @@ next
 qed
 
 text \<open>
-Let us now show that the loop invariants are maintained, that is, if they are satisfied at the start
-of an iteration, then they also will be satisfied at the end.
+Let us now verify that the loop invariants are maintained, that is, if they hold at the start of an
+iteration of loop @{term bfs.loop}, then they will also hold at the end. For this, let us first look
+at how the different subroutines change the queue and parent map.
 \<close>
-
-text \<open>For this, let us first look at how the different subroutines change the queue and parent map.\<close>
-
-text \<open>How does @{term bfs.discover} change the queue and parent map?\<close>
 
 lemma (in bfs) queue_discover_cong [simp]:
   shows "queue (discover u v s) = Q_snoc (queue s) v"
@@ -356,13 +369,11 @@ lemma (in bfs) parent_discover_cong [simp]:
   shows "parent (discover u v s) = P_update v u (parent s)"
   by (simp add: discover_def)
 
-text \<open>How does @{term bfs.traverse_edge} change the queue and parent map?\<close>
-
 lemma (in bfs) queue_traverse_edge_cong:
   shows "queue (traverse_edge src u v s) = (if \<not> is_discovered src (parent s) v then Q_snoc (queue s) v else queue s)"
   by (simp add: traverse_edge_def)
 
-lemma (in bfs) invar_queue_traverse_edge:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_queue_traverse_edge:
   assumes "Q_invar (queue s)"
   shows "Q_invar (queue (traverse_edge src u v s))"
   using assms Q.invar_snoc
@@ -376,7 +387,7 @@ lemma (in bfs) list_queue_traverse_edge_cong:
   using assms
   by (simp add: queue_traverse_edge_cong Q.list_snoc)
 
-lemma (in bfs) invar_parent_traverse_edge:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_parent_traverse_edge:
   assumes "P_invar (parent s)"
   shows "P_invar (parent (traverse_edge src u v s))"
   using assms P.invar_update
@@ -399,9 +410,7 @@ lemma (in bfs) T_traverse_edge_cong:
   using assms
   by (auto simp add: lookup_parent_traverse_edge_cong override_on_def is_discovered_def)
 
-text \<open>How does @{term bfs.fold} change the queue and parent map?\<close>
-
-lemma (in bfs) list_queue_fold_cong_aux:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) list_queue_fold_cong_aux:
   assumes "P_invar (parent s)"
   assumes "distinct (v # vs)"
   shows "filter (Not \<circ> is_discovered src (parent (traverse_edge src u v s))) vs = filter (Not \<circ> is_discovered src (parent s)) vs"
@@ -459,7 +468,7 @@ next
     .
 qed
 
-lemma (in bfs) invar_tail:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_tail:
   assumes "Q_invar (queue s)"
   assumes "\<not> DONE s"
   shows "Q_invar (queue (s\<lparr>queue := Q_tail (queue s)\<rparr>))"
@@ -569,7 +578,7 @@ lemma (in bfs_invar) lookup_parent_fold_cong:
   using invar_G invar_parent
   by (intro lookup_parent_fold_cong_2)
 
-lemma (in bfs) T_fold_cong_aux:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) T_fold_cong_aux:
   assumes "P_invar (parent s)"
   assumes "distinct (v # vs)"
   shows "w \<in> set vs \<and> \<not> is_discovered src (parent (traverse_edge src u v s)) w \<longleftrightarrow> w \<in> set vs \<and> \<not> is_discovered src (parent s) w"
@@ -645,14 +654,14 @@ lemma (in bfs_invar) T_fold_cong:
   using invar_G invar_parent
   by (intro T_fold_cong_2)
 
-text \<open>We are now ready to prove that the variants are maintained.\<close>
+text \<open>Next, we verify the maintenance of the loop invariants one by one.\<close>
 
 locale bfs_invar_not_DONE = bfs_invar where P_update = P_update and Q_snoc = Q_snoc for
   P_update :: "'a::linorder \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" and
   Q_snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" +
 assumes not_DONE: "\<not> DONE s"
 
-abbreviation (in bfs) bfs_invar_not_DONE' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> bool" where
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs) bfs_invar_not_DONE' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> bool" where
   "bfs_invar_not_DONE' G src s \<equiv>
    bfs_invar_not_DONE
     Map_empty Map_delete Map_lookup Map_inorder Map_inv
@@ -661,29 +670,27 @@ abbreviation (in bfs) bfs_invar_not_DONE' :: "'n \<Rightarrow> 'a \<Rightarrow> 
     Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
     Map_update G src s P_update Q_snoc"
 
-abbreviation (in bfs_valid_input) bfs_invar_not_DONE'' :: "('q, 'm) state \<Rightarrow> bool" where
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) bfs_invar_not_DONE'' :: "('q, 'm) state \<Rightarrow> bool" where
   "bfs_invar_not_DONE'' \<equiv> bfs_invar_not_DONE' G src"
 
-text \<open>We start with the first invariant.\<close>
-
-lemma (in bfs) list_queue_non_empty:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) list_queue_non_empty:
   assumes "Q_invar (queue s)"
   assumes "\<not> DONE s"
   shows "Q_list (queue s) \<noteq> []"
   using assms
   by (simp add: DONE_def Q.is_empty)
 
-lemma (in bfs_invar_not_DONE) list_queue_non_empty:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) list_queue_non_empty:
   shows "Q_list (queue s) \<noteq> []"
   using invar_queue not_DONE
   by (intro list_queue_non_empty)
 
-lemma (in bfs_invar_not_DONE) head_queue_mem_queue:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) head_queue_mem_queue:
   shows "Q_head (queue s) \<in> set (Q_list (queue s))"
   using invar_queue list_queue_non_empty
   by (simp add: Q.list_head)
 
-lemma (in bfs_invar_not_DONE) not_white_head_queue:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) not_white_head_queue:
   shows "\<not> white s (Q_head (queue s))"
   using head_queue_mem_queue
   by (intro not_white_if_mem_queue)
@@ -708,16 +715,14 @@ proof (rule wf_Un)
     by auto
 qed
 
-text \<open>Then the second invariant, @{thm bfs_invar.invar_queue}.\<close>
-
-lemma (in bfs) invar_queue_fold:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_queue_fold:
   assumes "Q_invar (queue s)"
   assumes "distinct l"
   shows "Q_invar (queue (List.fold (traverse_edge src u) l s))"
   using assms
   by (induct l arbitrary: s) (simp_all add: invar_queue_traverse_edge)
 
-lemma (in bfs) invar_queue_fold_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_queue_fold_2:
   assumes "G.invar G"
   assumes "Q_invar (queue s)"
   assumes "\<not> DONE s"
@@ -730,16 +735,14 @@ lemma (in bfs_invar_not_DONE) invar_queue_fold:
   using invar_G invar_queue not_DONE
   by (intro invar_queue_fold_2)
 
-text \<open>Then the third invariant, @{thm bfs_invar.invar_parent}.\<close>
-
-lemma (in bfs) invar_parent_fold:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_parent_fold:
   assumes "P_invar (parent s)"
   assumes "distinct l"
   shows "P_invar (parent (List.fold (traverse_edge src u) l s))"
   using assms
   by (induct l arbitrary: s) (simp_all add: invar_parent_traverse_edge)
 
-lemma (in bfs) invar_parent_fold_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) invar_parent_fold_2:
   assumes "G.invar G"
   assumes "P_invar (parent s)"
   shows "P_invar (parent (fold G src s))"
@@ -751,9 +754,7 @@ lemma (in bfs_invar) invar_parent_fold:
   using invar_G invar_parent
   by (intro invar_parent_fold_2)
 
-text \<open>Then the fourth invariant, @{thm bfs_invar.parent_src}.\<close>
-
-lemma (in bfs_valid_input) src_not_white:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) src_not_white:
   shows "\<not> white s src"
   by (simp add: is_discovered_def)
 
@@ -762,9 +763,7 @@ lemma (in bfs_invar) parent_src_fold:
   using invar_G invar_parent src_not_white
   by (simp add: lookup_parent_fold_cong_2 parent_src)
 
-text \<open>Then the fifth invariant, @{thm bfs_invar.parent_imp_edge}.\<close>
-
-lemma (in bfs_invar) head_queueI:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) head_queueI:
   assumes "P_lookup (parent s) v \<noteq> Some u"
   assumes "P_lookup (parent (fold G src s)) v = Some u"
   shows "u = Q_head (queue s)"
@@ -785,9 +784,7 @@ next
     by (fastforce simp add: lookup_parent_fold_cong)
 qed
 
-text \<open>Then the sixth invariant, @{thm bfs_invar.not_white_if_mem_queue}.\<close>
-
-lemma (in bfs_invar) not_white_imp_not_white_fold:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) not_white_imp_not_white_fold:
   assumes "\<not> white s v"
   shows "\<not> white (fold G src s) v"
   using assms
@@ -821,8 +818,6 @@ next
     by (fastforce simp add: is_discovered_def lookup_parent_fold_cong)
 qed
 
-text \<open>Then the seventh invariant, @{thm bfs_invar.not_white_if_parent}.\<close>
-
 lemma (in bfs_invar_not_DONE) not_white_if_parent_fold:
   assumes "P_lookup (parent (fold G src s)) v = Some u"
   shows "\<not> white (fold G src s) u"
@@ -840,8 +835,6 @@ next
     by (intro not_white_imp_not_white_fold) simp
 qed
 
-text \<open>Then the eighth invariant, @{thm bfs_invar.black_imp_adjacency_not_white}.\<close>
-
 lemma (in bfs_valid_input) vertex_color_induct [case_names white gray black]:
   assumes "white s v \<Longrightarrow> P s v"
   assumes "gray s v \<Longrightarrow> P s v"
@@ -850,13 +843,13 @@ lemma (in bfs_valid_input) vertex_color_induct [case_names white gray black]:
   using assms
   by blast
 
-lemma (in bfs_invar_not_DONE) whiteD:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) whiteD:
   assumes "white s v"
   shows "\<not> black (fold G src s) v"
   using assms
   by (auto simp add: is_discovered_def lookup_parent_fold_cong list_queue_fold_cong)
 
-lemma (in bfs_invar_not_DONE) head_queueI_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) head_queueI_2:
   assumes "v \<in> set (Q_list (queue s))"
   assumes "v \<notin> set (Q_list (queue (fold G src s)))"
   shows "v = Q_head (queue s)"
@@ -893,9 +886,7 @@ next
     by (intro black_imp_adjacency_not_white not_white_imp_not_white_fold)
 qed
 
-text \<open>Then the ninth invariant, @{thm bfs_invar.queue_sorted_wrt_d}.\<close>
-
-lemma (in bfs_invar_not_DONE) parent_fold:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) parent_fold:
   shows "Parent_Relation.parent (P_lookup (parent (fold G src s)))"
 proof (standard, goal_cases)
   case 1
@@ -951,7 +942,7 @@ proof (induct v rule: follow_pinduct)
   qed
 qed
 
-lemma (in bfs_invar) mem_queue_imp_d_le:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) mem_queue_imp_d_le:
   assumes "v \<in> set (Q_list (queue s))"
   shows "d (parent s) v \<le> d (parent s) (last (Q_list (queue s)))"
 proof (cases "v = last (Q_list (queue s))")
@@ -968,7 +959,7 @@ next
     by fastforce
 qed
 
-lemma (in bfs_invar_not_DONE) mem_filterD:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) mem_filterD:
   assumes "v \<in> set (filter (Not \<circ> is_discovered src (parent s)) (G.adjacency_list G (Q_head (queue s))))"
   shows
     "d (parent (fold G src s)) v = d (parent (fold G src s)) (Q_head (queue s)) + 1"
@@ -1001,7 +992,7 @@ proof -
     .
 qed
 
-lemma (in bfs_invar_not_DONE) queue_sorted_wrt_d_fold_aux:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) queue_sorted_wrt_d_fold_aux:
   assumes u_mem_tail_queue: "u \<in> set (Q_list (Q_tail (queue s)))"
   assumes v_mem_filter: "v \<in> set (filter (Not \<circ> is_discovered src (parent s)) (G.adjacency_list G (Q_head (queue s))))"
   shows "d (parent (fold G src s)) u \<le> d (parent (fold G src s)) v"
@@ -1045,9 +1036,7 @@ proof -
     by (simp add: list_queue_fold_cong sorted_wrt_append)
 qed
 
-text \<open>Then the tenth invariant, @{thm bfs_invar.d_last_queue_le}.\<close>
-
-lemma (in bfs_invar_not_DONE) d_last_queue_le_fold_aux:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) d_last_queue_le_fold_aux:
   assumes "\<not> Q_is_empty (queue (fold G src s))"
   shows "d (parent (fold G src s)) (last (Q_list (queue (fold G src s)))) \<le> d (parent (fold G src s)) (Q_head (queue s)) + 1"
 proof (cases "filter (Not \<circ> is_discovered src (parent s)) (G.adjacency_list G (Q_head (queue s))) = []")
@@ -1084,7 +1073,7 @@ next
     by (simp add: mem_filterD(1))
 qed
 
-lemma (in bfs_invar) mem_queue_imp_d_ge:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) mem_queue_imp_d_ge:
   assumes "v \<in> set (Q_list (queue s))"
   shows "d (parent s) (Q_head (queue s)) \<le> d (parent s) v"
 proof (cases "v = Q_head (queue s)")
@@ -1104,7 +1093,7 @@ next
     by fastforce
 qed
 
-lemma (in bfs_invar_not_DONE) d_last_queue_le_fold_aux_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) d_last_queue_le_fold_aux_2:
   assumes "\<not> Q_is_empty (queue (fold G src s))"
   shows "d (parent (fold G src s)) (Q_head (queue s)) \<le> d (parent (fold G src s)) (Q_head (queue (fold G src s)))"
 proof (cases "Q_list (Q_tail (queue s)) = []")
@@ -1177,7 +1166,21 @@ proof -
     .
 qed
 
-text \<open>Finally, the eleventh invariant, @{thm bfs_invar.d_triangle_inequality}.\<close>
+text \<open>
+The last invariant, @{thm [source] bfs_invar.d_triangle_inequality}, is, at least in our minds, the most
+interesting one. Our first attempt at this invariant was the following: If a vertex @{term v} has
+been discovered, then the path from @{term src} to @{term v} induced by the parent map
+(@{term "bfs.rev_follow (parent s) v"}) is a shortest path in graph @{term G}. This invariant was so
+strong, however, that it did not require using the induction hypothesis (of the induction rule given
+by @{term bfs.loop}) to prove one of the two implications of the correctness theorem. Indeed, the
+following invariant is sufficient to prove the implication, provided that it can be maintained: If
+there is an edge $(u,v)$ in graph @{term G} such that both $u$ and $v$ have been discovered, then
+$d(v)\leq d(u)+1$. However, we were not able to prove that this invariant can be maintained without
+requiring an additional invariant. Therefore, we generalized the invariant from edges to arbitrary
+paths in graph @{term G}, yielding invariant @{thm [source] bfs_invar.d_triangle_inequality}. We realized
+only recently that this generalization is strong enough to imply our first attempt, that is, we now
+have an invariant that is at least as strong as an invariant we deemed too strong.
+\<close>
 
 lemma (in bfs_invar) white_imp_gray_ancestor:
   assumes "dpath_bet (G.dE G) p u w"
@@ -1187,7 +1190,7 @@ lemma (in bfs_invar) white_imp_gray_ancestor:
     "v \<in> set p"
     "gray s v"
   using assms
-proof (induct p arbitrary: w rule: dpath_rev_induct)
+proof \<^marker>\<open>tag visible\<close> (induct p arbitrary: w rule: dpath_rev_induct)
   case 1
   thus ?case
     by simp
@@ -1223,7 +1226,7 @@ next
   qed
 qed
 
-lemma (in bfs_invar) white_not_white_foldD:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) white_not_white_foldD:
   assumes "white s v"
   assumes "\<not> white (fold G src s) v"
   shows
@@ -1238,7 +1241,7 @@ proof -
     by (auto simp add: lookup_parent_fold_cong)
 qed
 
-lemma (in bfs_valid_input) parent_imp_d:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) parent_imp_d:
   assumes "Parent_Relation.parent (P_lookup (parent s))"
   assumes "P_lookup (parent s) v = Some u"
   shows "d (parent s) v = d (parent s) u + 1"
@@ -1251,14 +1254,14 @@ proof -
     by (simp add: dpath_length_snoc)
 qed
 
-lemma (in bfs_invar_not_DONE) white_not_white_foldD_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) white_not_white_foldD_2:
   assumes "white s v"
   assumes "\<not> white (fold G src s) v"
   shows "d (parent (fold G src s)) v = d (parent (fold G src s)) (Q_head (queue s)) + 1"
   using parent_fold assms
   by (fastforce intro: white_not_white_foldD(2) parent_imp_d)
 
-lemmas (in bfs_invar_not_DONE) white_not_white_foldD =
+lemmas \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) white_not_white_foldD =
   white_not_white_foldD
   white_not_white_foldD_2
 
@@ -1267,7 +1270,7 @@ lemma (in bfs_invar_not_DONE) d_triangle_inequality_fold:
   assumes not_white_fold_u: "\<not> white (fold G src s) u"
   assumes not_white_fold_v: "\<not> white (fold G src s) v"
   shows "d (parent (fold G src s)) v \<le> d (parent (fold G src s)) u + dpath_length p"
-proof -
+proof \<^marker>\<open>tag visible\<close> -
   consider
     (white_white) "white s u \<and> white s v" |
     (white_not_white) "white s u \<and> \<not> white s v" |
@@ -1415,16 +1418,7 @@ next
   thus ?case by (intro d_triangle_inequality_fold)
 qed
 
-(* qq *)
-(* Next: termination. Then: correctness. *)
-
-subsection \<open>@{term "Q_list \<circ> queue"}\<close>
-
-
-
-subsection \<open>@{term "Q_head \<circ> queue"}\<close>
-
-lemma (in bfs) head_queue_mem_dV:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) head_queue_mem_dV:
   assumes "Q_invar (queue s)"
   assumes "set (Q_list (queue s)) \<subseteq> G.dV G"
   assumes "\<not> DONE s"
@@ -1432,54 +1426,7 @@ lemma (in bfs) head_queue_mem_dV:
   using assms list_queue_non_empty
   by (auto simp add: Q.list_head)
 
-section \<open>Basic Lemmas\<close>
-
-subsection \<open>@{term discover}\<close>
-
-subsubsection \<open>@{term queue}\<close>
-
-
-
-subsubsection \<open>@{term parent}\<close>
-
-
-
-subsection \<open>@{term traverse_edge}\<close>
-
-subsubsection \<open>@{term queue}\<close>
-
-
-
-subsubsection \<open>@{term "Q_list \<circ> queue"}\<close>
-
-
-
-subsubsection \<open>@{term "P_lookup \<circ> parent"}\<close>
-
-
-
-subsubsection \<open>@{term "P_invar \<circ> parent"}\<close>
-
-
-
-subsubsection \<open>@{term T}\<close>
-
-
-
-subsection \<open>@{term fold}\<close>
-
-subsubsection \<open>@{term "Q_invar \<circ> queue"}\<close>
-
-
-
-subsubsection \<open>@{term "Q_list \<circ> queue"}\<close>
-
-
-
-
-subsubsection \<open>@{term "set \<circ> Q_list \<circ> queue"}\<close>
-
-lemma (in bfs) queue_fold_subset_dV:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) queue_fold_subset_dV:
   assumes "G.invar G"
   assumes "Q_invar (queue s)"
   assumes "P_invar (parent s)"
@@ -1509,15 +1456,7 @@ proof
   qed
 qed
 
-subsubsection \<open>@{term parent}\<close>
-
-
-
-subsubsection \<open>@{term "P_invar \<circ> parent"}\<close>
-
-
-
-lemma (in bfs) dom_parent_fold_subset_dV:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) dom_parent_fold_subset_dV:
   assumes "P_invar (parent s)"
   assumes "distinct l"
   assumes "P.dom (parent s) \<subseteq> G.dV G"
@@ -1546,7 +1485,7 @@ proof
   qed
 qed
 
-lemma (in bfs) dom_parent_fold_subset_dV_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) dom_parent_fold_subset_dV_2:
   assumes "G.invar G"
   assumes "P_invar (parent s)"
   assumes "P.dom (parent s) \<subseteq> G.dV G"
@@ -1554,7 +1493,7 @@ lemma (in bfs) dom_parent_fold_subset_dV_2:
   using assms G.adjacency_subset_dV
   by (intro G.distinct_adjacency_list dom_parent_fold_subset_dV) simp+
 
-lemma (in bfs) ran_parent_fold_cong:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) ran_parent_fold_cong:
   assumes "G.invar G"
   assumes "P_invar (parent s)"
   shows
@@ -1599,15 +1538,7 @@ proof
   qed
 qed
 
-subsubsection \<open>@{term T}\<close>
-
-
-
-
-
-section \<open>Termination\<close>
-
-lemma (in bfs) loop_dom_aux:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) loop_dom_aux:
   assumes "G.invar G"
   assumes "P_invar (parent s)"
   assumes "P.dom (parent s) \<subseteq> G.dV G"
@@ -1631,7 +1562,7 @@ proof -
     by (simp add: card_Un_disjoint)
 qed
 
-lemma (in bfs) loop_dom_aux_2:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) loop_dom_aux_2:
   assumes invar_G: "G.invar G"
   assumes invar_queue: "Q_invar (queue s)"
   assumes not_DONE: "\<not> DONE s"
@@ -1657,6 +1588,13 @@ proof -
     by simp
 qed
 
+subsubsection \<open>Termination\<close>
+
+text \<open>
+Before we can prove the correctness of loop @{term bfs.loop}, we need to prove that it terminates on
+appropriate inputs.
+\<close>
+
 lemma (in bfs) loop_dom:
   assumes "G.invar G"
   assumes "Q_invar (queue s)"
@@ -1665,7 +1603,7 @@ lemma (in bfs) loop_dom:
   assumes "P.dom (parent s) \<subseteq> G.dV G"
   shows "loop_dom (G, src, s)"
   using assms
-proof (induct "card (G.dV G) + length (Q_list (queue s)) - card (P.dom (parent s))"
+proof \<^marker>\<open>tag visible\<close> (induct "card (G.dV G) + length (Q_list (queue s)) - card (P.dom (parent s))"
        arbitrary: s
        rule: less_induct)
   case less
@@ -1705,116 +1643,6 @@ proof (induct "card (G.dV G) + length (Q_list (queue s)) - card (P.dom (parent s
   qed
 qed
 
-section \<open>Invariants\<close>
-
-subsection \<open>Definitions\<close>
-
-(* TODO Rename. *)
-
-
-
-locale bfs_invar_DONE = bfs_invar where P_update = P_update and Q_snoc = Q_snoc for
-  P_update :: "'a::linorder \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" and
-  Q_snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" +
-  assumes DONE: "DONE s"
-
-
-
-
-
-
-
-abbreviation (in bfs) bfs_invar_DONE' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> bool" where
-  "bfs_invar_DONE' G src s \<equiv>
-   bfs_invar_DONE
-    Map_empty Map_delete Map_lookup Map_inorder Map_inv
-    Set_empty Set_insert Set_delete Set_isin Set_inorder Set_inv
-    P_empty P_delete P_lookup P_invar
-    Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
-    Map_update G src s P_update Q_snoc"
-
-abbreviation (in bfs_valid_input) bfs_invar_DONE'' :: "('q, 'm) state \<Rightarrow> bool" where
-  "bfs_invar_DONE'' \<equiv> bfs_invar_DONE' G src"
-
-subsection \<open>Convenience Lemmas\<close>
-
-subsubsection \<open>@{term bfs}\<close>
-
-lemma (in bfs) bfs_invar_not_DONE'I:
-  assumes "bfs_invar' G src s"
-  assumes "\<not> DONE s"
-  shows "bfs_invar_not_DONE' G src s"
-  using assms
-  by (simp add: bfs_invar_not_DONE_def bfs_invar_not_DONE_axioms_def)
-
-lemma (in bfs) bfs_invar_DONE'I:
-  assumes "bfs_invar' G src s"
-  assumes "DONE s"
-  shows "bfs_invar_DONE' G src s"
-  using assms
-  by (simp add: bfs_invar_DONE_def bfs_invar_DONE_axioms_def)
-
-lemma (in bfs) rev_follow_non_empty:
-  assumes "Parent_Relation.parent (P_lookup m)"
-  shows "rev_follow m v \<noteq> []"
-  using assms
-  by (auto dest: parent.follow_non_empty)
-
-lemma (in bfs) distinct_rev_follow:
-  assumes "Parent_Relation.parent (P_lookup m)"
-  shows "distinct (rev_follow m v)"
-  unfolding distinct_rev
-  using assms
-  by (intro parent.distinct_follow)
-
-lemma (in bfs) last_rev_follow:
-  assumes "Parent_Relation.parent (P_lookup m)"
-  shows "last (rev_follow m v) = v"
-proof -
-  let ?l = "parent.follow (P_lookup m) v"
-  have "?l = hd ?l # tl ?l"
-    using assms
-    by (intro parent.follow_non_empty hd_Cons_tl[symmetric])
-  hence "hd ?l = v"
-    using assms
-    by (auto dest: parent.follow_ConsD)
-  thus ?thesis
-    using assms parent.follow_non_empty
-    by (fastforce simp add: last_rev)
-qed
-
-subsubsection \<open>@{term bfs_valid_input}\<close>
-
-context bfs_valid_input
-begin
-sublocale finite_dgraph "G.dE G"
-proof (standard, goal_cases)
-  case 1
-  show ?case
-    using invar_G
-    by (intro G.finite_dE)
-qed
-end
-
-
-
-
-
-subsubsection \<open>@{term bfs_invar}\<close>
-
-lemma (in bfs_invar) distinct_rev_follow:
-  shows "distinct (rev_follow (parent s) v)"
-  using distinct_follow
-  by simp
-
-subsection \<open>Basic Lemmas\<close>
-
-subsubsection \<open>@{term bfs_valid_input}\<close>
-
-
-
-subsubsection \<open>@{term bfs_invar}\<close>
-
 lemma (in bfs_invar) not_white_imp_dpath_rev_follow:
   assumes "\<not> white s v"
   shows "dpath_bet (G.dE G) (rev_follow (parent s) v) src v"
@@ -1847,148 +1675,12 @@ proof (induct v rule: follow_pinduct)
   qed
 qed
 
-lemma (in bfs_invar) hd_rev_follow_eq_src:
-  assumes "\<not> white s v"
-  shows "hd (rev_follow (parent s) v) = src"
-  using assms
-  by (intro hd_of_dpath_bet'[symmetric]) (rule not_white_imp_dpath_rev_follow)
-
-
-
-
-
-lemma (in bfs_invar) d_triangle_inequality_edge:
-  assumes "(u, v) \<in> G.dE G"
-  assumes "\<not> white s u"
-  assumes "\<not> white s v"
-  shows "d (parent s) v \<le> d (parent s) u + 1"
-proof -
-  have "dpath_bet (G.dE G) [u, v] u v"
-    using assms(1)
-    by (intro edges_are_dpath_bet)
-  thus ?thesis
-    using assms(2, 3)
-    using d_triangle_inequality
-    by fastforce
-qed
-
-subsection \<open>@{term bfs.init}\<close>
-
-subsubsection \<open>\<close>
-
-
-
-subsubsection \<open>\<close>
-
-
-
-subsection \<open>@{term bfs.fold}\<close>
-
-subsubsection \<open>Convenience Lemmas\<close>
-
-
-
-
-
-
-
-
-
-
-
-
-
-subsubsection \<open>\<close>
-
-
-
-
-
-subsubsection \<open>@{thm bfs_invar.invar_queue}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.invar_parent}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.parent_src}\<close>
-
-
-
-subsubsection \<open>Basic Lemmas\<close>
-
-
-
-
-
-
-
-
-
-
-
-
-
-lemmas (in bfs_invar_not_DONE) not_whiteD =
-  not_white_imp_not_white_fold
-  not_white_imp_lookup_parent_fold_eq_lookup_parent
-  not_white_imp_rev_follow_fold_eq_rev_follow
-
-
-
-
-
-subsubsection \<open>@{thm bfs_invar.parent_imp_edge}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.not_white_if_mem_queue}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.not_white_if_parent}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.black_imp_adjacency_not_white}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.queue_sorted_wrt_d}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.d_last_queue_le}\<close>
-
-
-
-subsubsection \<open>@{thm bfs_invar.d_triangle_inequality}\<close>
-
-
-
-subsubsection \<open>\<close>
-
-
-
-section \<open>Correctness\<close>
-
-subsection \<open>Definitions\<close>
-
-abbreviation (in bfs) dist :: "'n \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> enat" where
-  "dist G \<equiv> Shortest_Dpath.dist (G.dE G)"
-
-abbreviation (in bfs) is_shortest_dpath :: "'n \<Rightarrow> 'a list \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
-  "is_shortest_dpath G p u v \<equiv> dpath_bet (G.dE G) p u v \<and> dpath_length p = dist G u v"
-
-subsection \<open>Basic Lemmas\<close>
-
-lemma (in bfs_invar) queue_subset_dV:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) queue_subset_dV:
   shows "set (Q_list (queue s)) \<subseteq> G.dV G"
   using not_white_if_mem_queue not_white_imp_dpath_rev_follow
   by (auto simp add: G.dV_def intro: dpath_bet_endpoints(2))
 
-lemma (in bfs_invar) dom_parent_subset_dV:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) dom_parent_subset_dV:
   shows "P.dom (parent s) \<subseteq> G.dV G"
 proof
   fix v
@@ -2002,37 +1694,140 @@ proof
     by (intro G.edgeD(2))
 qed
 
-subsection \<open>Convenience Lemmas\<close>
-
-lemma (in bfs_invar) loop_dom:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) loop_dom:
   shows "loop_dom (G, src, s)"
   using invar_G invar_queue invar_parent queue_subset_dV dom_parent_subset_dV
   by (intro loop_dom)
 
-lemma (in bfs) loop_psimps:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) loop_psimps:
   assumes "bfs_invar' G src s"
   shows "loop G src s = (if \<not> DONE s then loop G src (fold G src s) else s)"
   using assms
   by (metis bfs_invar.loop_dom loop.psimps)
 
-lemma (in bfs_invar_not_DONE) loop_psimps:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_not_DONE) loop_psimps:
   shows "loop G src s = loop G src (fold G src s)"
   using not_DONE bfs_invar_axioms
   by (simp add: loop_psimps)
 
-lemma (in bfs_invar_DONE) loop_psimps:
-  shows "loop G src s = s"
-  using DONE bfs_invar_axioms
-  by (simp add: loop_psimps)
-
-lemma (in bfs) bfs_induct:
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) bfs_induct:
   assumes "bfs_invar' G src s"
   assumes "\<And>G src s. (\<not> DONE s \<Longrightarrow> P G src (fold G src s)) \<Longrightarrow> P G src s"
   shows "P G src s"
   using assms
   by (blast intro: bfs_invar.loop_dom loop.pinduct)
 
-subsection \<open>Completeness\<close>
+subsubsection \<open>Correctness\<close>
+
+text \<open>We are now finally ready to prove the correctness of algorithm @{term bfs.bfs}.\<close>
+
+abbreviation (in bfs) dist :: "'n \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> enat" where
+  "dist G \<equiv> Shortest_Dpath.dist (G.dE G)"
+
+abbreviation (in bfs) is_shortest_dpath :: "'n \<Rightarrow> 'a list \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
+  "is_shortest_dpath G p u v \<equiv> dpath_bet (G.dE G) p u v \<and> dpath_length p = dist G u v"
+
+locale bfs_invar_DONE = bfs_invar where P_update = P_update and Q_snoc = Q_snoc for
+  P_update :: "'a::linorder \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> 'm" and
+  Q_snoc :: "'q \<Rightarrow> 'a \<Rightarrow> 'q" +
+  assumes DONE: "DONE s"
+
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs) bfs_invar_DONE' :: "'n \<Rightarrow> 'a \<Rightarrow> ('q, 'm) state \<Rightarrow> bool" where
+  "bfs_invar_DONE' G src s \<equiv>
+   bfs_invar_DONE
+    Map_empty Map_delete Map_lookup Map_inorder Map_inv
+    Set_empty Set_insert Set_delete Set_isin Set_inorder Set_inv
+    P_empty P_delete P_lookup P_invar
+    Q_empty Q_is_empty Q_head Q_tail Q_invar Q_list
+    Map_update G src s P_update Q_snoc"
+
+abbreviation \<^marker>\<open>tag invisible\<close> (in bfs_valid_input) bfs_invar_DONE'' :: "('q, 'm) state \<Rightarrow> bool" where
+  "bfs_invar_DONE'' \<equiv> bfs_invar_DONE' G src"
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar_DONE) loop_psimps:
+  shows "loop G src s = s"
+  using DONE bfs_invar_axioms
+  by (simp add: loop_psimps)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) bfs_invar_not_DONE'I:
+  assumes "bfs_invar' G src s"
+  assumes "\<not> DONE s"
+  shows "bfs_invar_not_DONE' G src s"
+  using assms
+  by (simp add: bfs_invar_not_DONE_def bfs_invar_not_DONE_axioms_def)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) bfs_invar_DONE'I:
+  assumes "bfs_invar' G src s"
+  assumes "DONE s"
+  shows "bfs_invar_DONE' G src s"
+  using assms
+  by (simp add: bfs_invar_DONE_def bfs_invar_DONE_axioms_def)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) rev_follow_non_empty:
+  assumes "Parent_Relation.parent (P_lookup m)"
+  shows "rev_follow m v \<noteq> []"
+  using assms
+  by (auto dest: parent.follow_non_empty)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) distinct_rev_follow:
+  assumes "Parent_Relation.parent (P_lookup m)"
+  shows "distinct (rev_follow m v)"
+  unfolding distinct_rev
+  using assms
+  by (intro parent.distinct_follow)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs) last_rev_follow:
+  assumes "Parent_Relation.parent (P_lookup m)"
+  shows "last (rev_follow m v) = v"
+proof -
+  let ?l = "parent.follow (P_lookup m) v"
+  have "?l = hd ?l # tl ?l"
+    using assms
+    by (intro parent.follow_non_empty hd_Cons_tl[symmetric])
+  hence "hd ?l = v"
+    using assms
+    by (auto dest: parent.follow_ConsD)
+  thus ?thesis
+    using assms parent.follow_non_empty
+    by (fastforce simp add: last_rev)
+qed
+
+context bfs_valid_input
+begin
+sublocale finite_dgraph "G.dE G"
+proof (standard, goal_cases)
+  case 1
+  show ?case
+    using invar_G
+    by (intro G.finite_dE)
+qed
+end
+
+lemma (in bfs_invar) distinct_rev_follow:
+  shows "distinct (rev_follow (parent s) v)"
+  using distinct_follow
+  by simp
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) hd_rev_follow_eq_src:
+  assumes "\<not> white s v"
+  shows "hd (rev_follow (parent s) v) = src"
+  using assms
+  by (intro hd_of_dpath_bet'[symmetric]) (rule not_white_imp_dpath_rev_follow)
+
+lemma \<^marker>\<open>tag invisible\<close> (in bfs_invar) d_triangle_inequality_edge:
+  assumes "(u, v) \<in> G.dE G"
+  assumes "\<not> white s u"
+  assumes "\<not> white s v"
+  shows "d (parent s) v \<le> d (parent s) u + 1"
+proof -
+  have "dpath_bet (G.dE G) [u, v] u v"
+    using assms(1)
+    by (intro edges_are_dpath_bet)
+  thus ?thesis
+    using assms(2, 3)
+    using d_triangle_inequality
+    by fastforce
+qed
 
 lemma (in bfs_invar_DONE) white_imp_not_reachable:
   assumes "white s v"
@@ -2082,7 +1877,7 @@ proof
   qed
 qed
 
-lemma (in bfs_valid_input) completeness:
+lemma (in bfs_valid_input) loop_complete:
   assumes "bfs_invar'' s"
   assumes "\<not> is_discovered src (parent (loop G src s)) v"
   shows "\<not> reachable (G.dE G) src v"
@@ -2108,8 +1903,6 @@ proof (induct rule: bfs_induct[OF assms(1)])
       by (intro bfs_invar_not_DONE.bfs_invar_fold "1.hyps") (simp_all add: bfs_invar_not_DONE.loop_psimps)
   qed
 qed
-
-subsection \<open>Soundness\<close>
 
 lemma (in bfs_invar_DONE) not_white_imp_d_le_dist:
   assumes "\<not> white s v"
@@ -2181,7 +1974,7 @@ proof (rule conjI)
     by (intro not_white_imp_d_le_dist dist_le_dpath_length antisym)
 qed
 
-lemma (in bfs_valid_input) soundness:
+lemma (in bfs_valid_input) loop_sound:
   assumes "bfs_invar'' s"
   assumes "is_discovered src (parent (loop G src s)) v"
   shows "is_shortest_dpath G (rev_follow (parent (loop G src s)) v) src v"
@@ -2208,25 +2001,24 @@ proof (induct rule: bfs_induct[OF assms(1)])
   qed
 qed
 
-subsection \<open>Correctness\<close>
-
 abbreviation (in bfs) is_shortest_dpath_Map :: "'n \<Rightarrow> 'a \<Rightarrow> 'm \<Rightarrow> bool" where
   "is_shortest_dpath_Map G src m \<equiv>
    \<forall>v. (is_discovered src m v \<longrightarrow> is_shortest_dpath G (rev_follow m v) src v) \<and>
        (\<not> is_discovered src m v \<longrightarrow> \<not> reachable (G.dE G) src v)"
 
-lemma (in bfs_valid_input) correctness:
+lemma (in bfs_valid_input) loop_correct:
   assumes "bfs_invar'' s"
   shows "is_shortest_dpath_Map G src (parent (loop G src s))"
-  using assms soundness completeness
+  using assms loop_sound loop_complete
   by simp
 
-theorem (in bfs_valid_input) bfs_correct:
+lemma (in bfs_valid_input) bfs_correct:
   shows "is_shortest_dpath_Map G src (bfs G src)"
+  unfolding bfs_def
   using bfs_invar_init
-  by (intro correctness)
+  by (intro loop_correct)
 
-corollary (in bfs) bfs_correct:
+theorem (in bfs) bfs_correct:
   assumes "bfs_valid_input' G src"
   shows "is_shortest_dpath_Map G src (bfs G src)"
   using assms

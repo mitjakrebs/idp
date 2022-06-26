@@ -1,4 +1,4 @@
-section \<open>Edmonds-Karp algorithm\<close>
+section \<open>Shortest augmenting path algorithm\<close>
 
 text \<open>
 This section specifies an algorithm that solves the maximum cardinality matching problem in
@@ -11,9 +11,8 @@ are no augmenting paths. We claim that the algorithm specified below, in each it
 just any augmenting path but a shortest one. We do not verify this claim, however, as the
 distinction is not relevant for the correctness of the algorithm.
 
-The algorithm is an adaptation of the Edmonds-Karp algorithm, which solves the
-maximum flow problem, to the maximum cardinality matching problem in bipartite graphs, which reduces
-to the maximum flow problem.
+Hence, the algorithm takes the same general approach as the Edmonds-Karp algorithm, which solves the
+maximum flow problem, to which the maximum cardinality matching problem reduces.
 \<close>
 
 theory Edmonds_Karp
@@ -59,7 +58,7 @@ relation such that any path from @{term src} induced by the parent relation is a
 alternating path, that is, it alternates between edges in @{term G2} and @{term G1} and is shortest
 among all such paths.
 
-Let $(@{term L},@{term R},@{term G})$ be a bipartite graph and @{term M} be a matching in @{term G}.
+Let $(@{term L}\cup @{term R},@{term G})$ be a bipartite graph and @{term M} be a matching in @{term G}.
 Recall that an augmenting path in @{term G} w.r.t.\ @{term M} is a path between two free vertices
 that alternates between edges not in @{term M} and edges in @{term M}. Since @{term G} is bipartite,
 any such path is between a free vertex in @{term L} and a free vertex in @{term R} (every augmenting
@@ -180,9 +179,9 @@ subsection \<open>Verification of the correctness of the algorithm\<close>
 subsubsection \<open>Assumptions on the input\<close>
 
 text \<open>
-Algorithm @{term edmonds_karp.edmonds_karp} expects an input @{term G}, @{term L}, @{term R},
-@{term s}, @{term t} such that
-  \<^item> $(@{term L},@{term R},@{term G})$ is a bipartite graph, and
+Algorithm @{term edmonds_karp.edmonds_karp} expects an input $\langle @{term G},@{term L},@{term R},
+@{term s},@{term t}\rangle$ such that
+  \<^item> $(@{term L}\cup @{term R},@{term G})$ is a bipartite graph, and
   \<^item> @{term s} and @{term t} are two new vertices, that is, vertices not in @{term G},
 
 
@@ -291,7 +290,7 @@ proof -
 qed
 
 text \<open>
-As was the case for locale @{locale alt_bfs}, graph @{term G} is represented as an
+As is the case for locale @{locale alt_bfs}, graph @{term G} is represented as an
 @{locale adjacency}, that is, as a @{locale Map_by_Ordered} mapping a vertex to its adjacency, which
 is represented as a @{locale Set_by_Ordered}. And sets @{term L} and @{term R} are represented as
 @{locale Set_by_Ordered}s.
@@ -302,14 +301,15 @@ subsubsection \<open>Loop invariants\<close>
 text \<open>
 Unfolding the definition of algorithm @{term edmonds_karp.edmonds_karp}, we see that recursive
 function @{term edmonds_karp.loop'} lies at the heart of the algorithm. It expects an input
-@{term G}, @{term L}, @{term R}, @{term s}, @{term t}, @{term M} such that
+$\langle @{term G},@{term L},@{term R},@{term s},@{term t},@{term M}\rangle$, which constitutes the
+program state, such that
   \<^item> @{term G}, @{term L}, @{term R}, @{term s}, @{term t} satisfy the assumptions specified above, and
   \<^item> @{term M} is a matching in @{term G}.
 
 
-Let us now formally specify the assumptions on @{term M}. As @{term M} is the only data structure
-that is subject to change from one iteration to the next, these assumptions constitute the loop
-invariants of @{term edmonds_karp.loop'}.
+Let us now formally specify the assumptions on @{term M}. As @{term M} is the only state variable
+that is subject to change from one iteration to the next, these assumptions constitute the
+(non-trivial) loop invariants of @{term edmonds_karp.loop'}.
 \<close>
 
 locale edmonds_karp_invar = edmonds_karp_valid_input where
@@ -797,7 +797,7 @@ lemma \<^marker>\<open>tag invisible\<close> (in edmonds_karp) adjacency_G1_cong
   by (intro G.adjacency_difference_cong)
 
 text \<open>
-We now show that graph @{term edmonds_karp.G1} comprises all edges not in the current matching.
+Next, we show that graph @{term edmonds_karp.G1} comprises all edges not in the current matching.
 \<close>
 
 lemma (in edmonds_karp) E1_cong:
@@ -960,8 +960,8 @@ lemma \<^marker>\<open>tag invisible\<close> (in edmonds_karp) symmetric_adjacen
   by (intro symmetric_adjacency_G2 symmetric_adjacency_G1 G.symmetric_adjacency_union)
 
 text \<open>
-We are now able to show that @{term edmonds_karp.G1}, @{term edmonds_karp.G2}, @{term s} constitutes
-a valid input for algorithm @{term alt_bfs.alt_bfs}.
+We are now ready to show that $\langle @{term edmonds_karp.G1},@{term edmonds_karp.G2},@{term s}\rangle$
+constitutes a valid input for algorithm @{term alt_bfs.alt_bfs}.
 \<close>
 
 lemma (in edmonds_karp_invar_not_done_1) alt_bfs_valid_input:
@@ -1120,7 +1120,7 @@ lemma (in edmonds_karp_invar_not_done_1) is_shortest_alt_path_rev_follow:
       (rev_follow (m_tbd G L R s t M) v) s v"
   using alt_bfs_valid_input assms
   unfolding alt_bfs_def
-  by (metis alt_bfs_valid_input.alt_bfs_invar_init is_discovered_def alt_bfs_valid_input.soundness)
+  by (metis alt_bfs_valid_input.alt_bfs_invar_init is_discovered_def alt_bfs_valid_input.alt_loop_sound)
 
 lemma \<^marker>\<open>tag invisible\<close> (in edmonds_karp_invar) lookup_s_eq_None:
   shows "M_lookup M s = None"
@@ -2920,7 +2920,7 @@ proof -
       using alt_bfs_valid_input s_neq_t done_2
       unfolding done_2_def
       unfolding alt_bfs_def
-      by (metis alt_bfs_valid_input.alt_bfs_invar_init is_discovered_def alt_bfs_valid_input.completeness) }
+      by (metis alt_bfs_valid_input.alt_bfs_invar_init is_discovered_def alt_bfs_valid_input.alt_loop_complete) }
   thus ?thesis
     using graph_matching_M_tbd
     by force

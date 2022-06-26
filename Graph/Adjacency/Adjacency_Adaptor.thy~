@@ -5,10 +5,6 @@ theory Adjacency_Adaptor
     Undirected_Adjacency
 begin
 
-subsection \<open>Edges\<close>
-
-subsection \<open>Vertices\<close>
-
 lemma (in adjacency) V_eq_dV:
   shows "V G = dV G"
 proof -
@@ -22,8 +18,6 @@ lemma (in adjacency) adjacency_subset_V:
   shows "set (adjacency_list G v) \<subseteq> V G"
   using adjacency_subset_dV
   by (simp add: V_eq_dV)
-
-subsection \<open>\<close>
 
 lemma (in symmetric_adjacency) dE_eq_dEs:
   shows "dE G = dEs"

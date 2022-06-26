@@ -4,22 +4,168 @@ theory Alternating_Path
     Odd_Cycle
 begin
 
-lemma \<^marker>\<open>tag invisible\<close> alt_list_tl:
-  assumes "l \<noteq> []"
-  assumes "alt_list P1 P2 l"
-  shows "alt_list P2 P1 (tl l)"
+lemma \<^marker>\<open>tag invisible\<close> even_if_last:
+  assumes "alt_list P Q l"
+  assumes "\<forall>x\<in>set l. P x \<longleftrightarrow> \<not> Q x"
+  assumes "Q (last l)"
+  shows "even (length l)"
   using assms
-  by (auto intro: alt_list_split_2[where ?l1.0 = "[hd l]"])
+  by (cases "l = []") (auto intro: alternating_list_odd_last)
 
-lemma \<^marker>\<open>tag invisible\<close> alt_list_butlast:
+lemma \<^marker>\<open>tag invisible\<close> odd_if_last:
+  assumes "alt_list P Q l"
+  assumes "\<forall>x\<in>set l. P x \<longleftrightarrow> \<not> Q x"
+  assumes "P (last l)"
   assumes "l \<noteq> []"
-  assumes "alt_list P1 P2 l"
-  shows "alt_list P1 P2 (butlast l)"
-proof (rule conjunct1, rule alt_list_append_1)
-  show "alt_list P1 P2 (butlast l @ [last l])"
+  shows "odd (length l)"
+  using assms
+  by (auto intro: alternating_list_even_last)
+
+text \<open>
+An alternating path w.r.t.\ a matching @{term M} is a path that alternates between edges in
+@{term M} and edges not in @{term M}. We generalize this definition to arbitrary predicates
+@{term P}, @{term Q}: @{term alt_list}. The special case of an alternating path w.r.t.\ a matching
+@{term M} can then be obtained by instantiating the predicates as follows: @{term Berge.alt_path}.
+\<close>
+
+definition alt_path :: "('a set \<Rightarrow> bool) \<Rightarrow> ('a set \<Rightarrow> bool) \<Rightarrow> 'a graph \<Rightarrow> 'a path \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
+  "alt_path P Q G p u v \<equiv> alt_list P Q (edges_of_path p) \<and> walk_betw G u p v"
+
+lemma \<^marker>\<open>tag invisible\<close> alt_pathD:
+  assumes "alt_path P Q G p u v"
+  shows
+    "alt_list P Q (edges_of_path p)"
+    "walk_betw G u p v"
+  using assms
+  by (simp add: alt_path_def)+
+
+lemma \<^marker>\<open>tag invisible\<close> alt_pathI:
+  assumes "alt_list P Q (edges_of_path p)"
+  assumes "walk_betw G u p v"
+  shows "alt_path P Q G p u v"
+  using assms
+  by (simp add: alt_path_def)
+
+lemma two_alt_pathsD:
+  assumes "alt_path P Q G p u v"
+  assumes "alt_path P Q G q u v"
+  assumes "\<not> (\<exists>c. path G c \<and> odd_cycle c)"
+  shows "odd (path_length p) = odd (path_length q)"
+proof (standard, goal_cases)
+  case odd: 1
+  show ?case
+  proof (rule ccontr)
+    assume not_odd: "\<not> odd (path_length q)"
+    have path: "walk_betw G u (p @ tl (rev q)) u"
+      using assms(1, 2)
+      by (auto dest: alt_pathD(2) intro: walk_symmetric walk_transitive)
+    moreover have "odd_cycle (p @ tl (rev q))"
+    proof (rule odd_cycleI, goal_cases)
+      case 1
+      show ?case
+        using odd not_odd
+        by (simp add: edges_of_path_length)
+    next
+      case 2
+      show ?case
+        using path
+        by (simp add: walk_between_nonempty_path(3, 4))
+    qed
+    ultimately show False
+      using assms(3)
+      by fast
+  qed
+next
+  case odd: 2
+  show ?case
+  proof (rule ccontr)
+  assume not_odd: "\<not> odd (path_length p)"
+    have path: "walk_betw G u (q @ tl (rev p)) u"
+      using assms(1, 2)
+      by (auto dest: alt_pathD(2) intro: walk_symmetric walk_transitive)
+    moreover have "odd_cycle (q @ tl (rev p))"
+    proof (rule odd_cycleI, goal_cases)
+      case 1
+      show ?case
+        using odd not_odd
+        by (simp add: edges_of_path_length)
+    next
+      case 2
+      show ?case
+        using path
+        by (simp add: walk_between_nonempty_path(3, 4))
+    qed
+    ultimately show False
+      using assms(3)
+      by fast
+  qed
+qed
+
+lemma \<^marker>\<open>tag invisible\<close> alt_path_snoc_snoc:
+  assumes "alt_path P Q G (p @ [v, v']) u w"
+  shows "alt_path P Q G (p @ [v, w]) u w"
+proof -
+  have "v' = w"
+    using assms
+    by (fastforce dest: alt_pathD(2) walk_between_nonempty_path(4))
+  thus ?thesis
     using assms
     by simp
 qed
+
+lemma \<^marker>\<open>tag invisible\<close> alt_path_refl:
+  assumes "v \<in> Vs G"
+  shows "alt_path P Q G [v] v v"
+  using assms
+  by (auto simp add: alt_list_empty intro: walk_reflexive alt_pathI)
+
+lemma \<^marker>\<open>tag invisible\<close> alt_list_revI:
+  assumes "alt_list P Q l"
+  shows "alt_list P Q (rev l) \<or> alt_list Q P (rev l)"
+  using assms
+  by (auto intro: alt_list_rev alt_list_rev_even)
+
+text \<open>As is the case for paths, we can reverse alternating paths.\<close>
+
+lemma alt_path_rev_oddI:
+  assumes "alt_path P Q G p u v"
+  assumes "odd (path_length p)"
+  shows "alt_path P Q G (rev p) v u"
+proof (rule alt_pathI, goal_cases)
+  case 1
+  show ?case
+    using assms
+    by (auto simp add: edges_of_path_rev[symmetric] dest: alt_pathD(1) intro: alt_list_rev)
+next
+  case 2
+  show ?case
+    using assms(1)
+    by (intro alt_pathD(2) walk_symmetric)
+qed
+
+lemma alt_path_rev_evenI:
+  assumes "alt_path P Q G p u v"
+  assumes "even (path_length p)"
+  shows "alt_path Q P G (rev p) v u"
+proof (rule alt_pathI, goal_cases)
+  case 1
+  show ?case
+    using assms
+    by (auto simp add: edges_of_path_rev[symmetric] dest: alt_pathD(1) intro: alt_list_rev_even)
+next
+  case 2
+  show ?case
+    using assms(1)
+    by (intro alt_pathD(2) walk_symmetric)
+qed
+
+lemma alt_path_revI:
+  assumes "alt_path P Q G p u v"
+  shows "alt_path P Q G (rev p) v u \<or> alt_path Q P G (rev p) v u"
+  using assms
+  by (auto intro: alt_path_rev_oddI alt_path_rev_evenI)
+
+text \<^marker>\<open>tag invisible\<close> \<open>We can concatenate alternating paths.\<close>
 
 lemma \<^marker>\<open>tag invisible\<close> alt_list_append_2':
   assumes "alt_list P1 P2 l1"
@@ -53,55 +199,7 @@ proof -
     by (intro alt_list_append_3)
 qed
 
-(* TODO Definition. *)
-text \<open>
-We generalize this definition to arbitrary predicates @{term P}, @{term Q}: @{term alt_list}. We
-then obtain an alternating path w.r.t.\ a matching @{term M} by instantiating the predicates as
-follows: @{term Berge.alt_path}.
-\<close>
-
-definition alt_path :: "('a set \<Rightarrow> bool) \<Rightarrow> ('a set \<Rightarrow> bool) \<Rightarrow> 'a graph \<Rightarrow> 'a path \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
-  "alt_path P Q G p u v \<equiv> alt_list P Q (edges_of_path p) \<and> walk_betw G u p v"
-
-lemma alt_pathD:
-  assumes "alt_path P Q G p u v"
-  shows
-    "alt_list P Q (edges_of_path p)"
-    "walk_betw G u p v"
-  using assms
-  by (simp add: alt_path_def)+
-
-lemma alt_pathI:
-  assumes "alt_list P Q (edges_of_path p)"
-  assumes "walk_betw G u p v"
-  shows "alt_path P Q G p u v"
-  using assms
-  by (simp add: alt_path_def)
-
-lemma alt_path_snoc_snoc:
-  assumes "alt_path P Q G (p @ [v, v']) u w"
-  shows "alt_path P Q G (p @ [v, w]) u w"
-proof -
-  have "v' = w"
-    using assms
-    by (fastforce dest: alt_pathD(2) walk_between_nonempty_path(4))
-  thus ?thesis
-    using assms
-    by simp
-qed
-
-subsection \<open>\<close>
-
-lemma alt_path_refl:
-  assumes "v \<in> Vs G"
-  shows "alt_path P Q G [v] v v"
-  using assms
-  by (auto simp add: alt_list_empty intro: walk_reflexive alt_pathI)
-
-subsection \<open>\<close>
-
-(* TODO *)
-lemma alt_path_ConsI:
+lemma \<^marker>\<open>tag invisible\<close> alt_path_ConsI:
   assumes "alt_path P Q G p v w"
   assumes "{u, v} \<in> G"
   assumes "Q {u, v}"
@@ -124,9 +222,7 @@ next
     by (auto intro: walk_betw_ConsI dest: alt_pathD(2))
 qed
 
-subsection \<open>\<close>
-
-lemma alt_path_snoc:
+lemma \<^marker>\<open>tag invisible\<close> alt_path_snocI:
   assumes alt_path: "alt_path P (Not \<circ> P) G (vs @ [v'', v']) u v'"
   assumes alt: "P {v'', v'} = (Not \<circ> P) {v', v}"
   assumes edge: "{v', v} \<in> G"
@@ -172,9 +268,46 @@ next
     by (auto dest: edges_are_walks walk_transitive)
 qed
 
-(**)
+lemma \<^marker>\<open>tag invisible\<close> alt_path_snoc_oddI:
+  assumes "alt_path P Q G p u v"
+  assumes "odd (path_length p)"
+  assumes "{v, w} \<in> G"
+  assumes "Q {v, w}"
+  shows "alt_path P Q G (p @ [w]) u w"
+proof -
+  have "alt_path P Q G (rev p) v u"
+    using assms(1, 2)
+    by (intro alt_path_rev_oddI)
+  moreover have
+    "{w, v} \<in> G"
+    "Q {w, v}"
+    using assms(3, 4)
+    by (metis doubleton_eq_iff)+
+  ultimately have "alt_path Q P G (w # rev p) w u"
+    by (intro alt_path_ConsI)
+  thus ?thesis
+    using assms(2)
+    by (auto simp add: edges_of_path_length dest: alt_path_rev_evenI)
+qed
 
-subsection \<open>\<close>
+lemma \<^marker>\<open>tag invisible\<close> alt_list_tl:
+  assumes "l \<noteq> []"
+  assumes "alt_list P1 P2 l"
+  shows "alt_list P2 P1 (tl l)"
+  using assms
+  by (auto intro: alt_list_split_2[where ?l1.0 = "[hd l]"])
+
+lemma \<^marker>\<open>tag invisible\<close> alt_list_butlast:
+  assumes "l \<noteq> []"
+  assumes "alt_list P1 P2 l"
+  shows "alt_list P1 P2 (butlast l)"
+proof (rule conjunct1, rule alt_list_append_1)
+  show "alt_list P1 P2 (butlast l @ [last l])"
+    using assms
+    by simp
+qed
+
+text \<open>And we can split alternating paths.\<close>
 
 lemma alt_path_pref:
   assumes "alt_path P Q G (p @ v # q) u w"
@@ -241,153 +374,6 @@ next
     by (fastforce dest: alt_pathD(2) intro: walk_suff)
 qed
 
-subsection \<open>\<close>
-
-lemma even_if_last:
-  assumes "alt_list P Q l"
-  assumes "\<forall>x\<in>set l. P x \<longleftrightarrow> \<not> Q x"
-  assumes "Q (last l)"
-  shows "even (length l)"
-  using assms
-  by (cases "l = []") (auto intro: alternating_list_odd_last)
-
-lemma odd_if_last:
-  assumes "alt_list P Q l"
-  assumes "\<forall>x\<in>set l. P x \<longleftrightarrow> \<not> Q x"
-  assumes "P (last l)"
-  assumes "l \<noteq> []"
-  shows "odd (length l)"
-  using assms
-  by (auto intro: alternating_list_even_last)
-
-section \<open>Reversing alternating paths\<close>
-
-(* TODO Move. *)
-lemma alt_list_revI:
-  assumes "alt_list P Q l"
-  shows "alt_list P Q (rev l) \<or> alt_list Q P (rev l)"
-  using assms
-  by (auto intro: alt_list_rev alt_list_rev_even)
-
-lemma alt_path_rev_oddI:
-  assumes "alt_path P Q G p u v"
-  assumes "odd (path_length p)"
-  shows "alt_path P Q G (rev p) v u"
-proof (rule alt_pathI, goal_cases)
-  case 1
-  show ?case
-    using assms
-    by (auto simp add: edges_of_path_rev[symmetric] dest: alt_pathD(1) intro: alt_list_rev)
-next
-  case 2
-  show ?case
-    using assms(1)
-    by (intro alt_pathD(2) walk_symmetric)
-qed
-
-lemma alt_path_rev_evenI:
-  assumes "alt_path P Q G p u v"
-  assumes "even (path_length p)"
-  shows "alt_path Q P G (rev p) v u"
-proof (rule alt_pathI, goal_cases)
-  case 1
-  show ?case
-    using assms
-    by (auto simp add: edges_of_path_rev[symmetric] dest: alt_pathD(1) intro: alt_list_rev_even)
-next
-  case 2
-  show ?case
-    using assms(1)
-    by (intro alt_pathD(2) walk_symmetric)
-qed
-
-lemma alt_path_revI:
-  assumes "alt_path P Q G p u v"
-  shows "alt_path P Q G (rev p) v u \<or> alt_path Q P G (rev p) v u"
-  using assms
-  by (auto intro: alt_path_rev_oddI alt_path_rev_evenI)
-
-section \<open>\<close>
-
-(**)
-lemma alt_path_snoc_oddI:
-  assumes "alt_path P Q G p u v"
-  assumes "odd (path_length p)"
-  assumes "{v, w} \<in> G"
-  assumes "Q {v, w}"
-  shows "alt_path P Q G (p @ [w]) u w"
-proof -
-  have "alt_path P Q G (rev p) v u"
-    using assms(1, 2)
-    by (intro alt_path_rev_oddI)
-  moreover have
-    "{w, v} \<in> G"
-    "Q {w, v}"
-    using assms(3, 4)
-    by (metis doubleton_eq_iff)+
-  ultimately have "alt_path Q P G (w # rev p) w u"
-    by (intro alt_path_ConsI)
-  thus ?thesis
-    using assms(2)
-    by (auto simp add: edges_of_path_length dest: alt_path_rev_evenI)
-qed
-
-(* TODO Rename. *)
-lemma tbd':
-  assumes "alt_path P Q G p u v"
-  assumes "alt_path P Q G q u v"
-  assumes "\<not> (\<exists>c. path G c \<and> odd_cycle c)"
-  shows "odd (path_length p) = odd (path_length q)"
-proof (standard, goal_cases)
-  case odd: 1
-  show ?case
-  proof (rule ccontr)
-    assume not_odd: "\<not> odd (path_length q)"
-    have path: "walk_betw G u (p @ tl (rev q)) u"
-      using assms(1, 2)
-      by (auto dest: alt_pathD(2) intro: walk_symmetric walk_transitive)
-    moreover have "odd_cycle (p @ tl (rev q))"
-    proof (rule odd_cycleI, goal_cases)
-      case 1
-      show ?case
-        using odd not_odd
-        by (simp add: edges_of_path_length)
-    next
-      case 2
-      show ?case
-        using path
-        by (simp add: walk_between_nonempty_path(3, 4))
-    qed
-    ultimately show False
-      using assms(3)
-      by fast
-  qed
-next
-  case odd: 2
-  show ?case
-  proof (rule ccontr)
-  assume not_odd: "\<not> odd (path_length p)"
-    have path: "walk_betw G u (q @ tl (rev p)) u"
-      using assms(1, 2)
-      by (auto dest: alt_pathD(2) intro: walk_symmetric walk_transitive)
-    moreover have "odd_cycle (q @ tl (rev p))"
-    proof (rule odd_cycleI, goal_cases)
-      case 1
-      show ?case
-        using odd not_odd
-        by (simp add: edges_of_path_length)
-    next
-      case 2
-      show ?case
-        using path
-        by (simp add: walk_between_nonempty_path(3, 4))
-    qed
-    ultimately show False
-      using assms(3)
-      by fast
-  qed
-qed
-
 lemma alt_path_subst_pref:
   assumes "alt_path P Q G (p @ v # q) u w"
   assumes "alt_path P Q G p' u v"
@@ -403,7 +389,7 @@ proof (rule alt_pathI, goal_cases)
       by (fastforce simp add: edges_of_path_append_2[of "v # q"] dest: alt_pathD(1) intro: alt_list_split_2)
     moreover have "odd (path_length p')"
       using assms True
-      by (auto dest: alt_path_pref tbd')
+      by (auto dest: alt_path_pref two_alt_pathsD)
     ultimately have "alt_list P Q (edges_of_path p' @ edges_of_path (v # q))"
       using assms(2)
       by (auto dest: alt_pathD(1) intro: alt_list_append_2)
@@ -417,7 +403,7 @@ proof (rule alt_pathI, goal_cases)
       by (fastforce simp add: edges_of_path_append_2[of "v # q"] dest: alt_pathD(1) intro: alt_list_split_1)
     moreover have "even (path_length p')"
       using assms False
-      by (auto dest: alt_path_pref tbd')
+      by (auto dest: alt_path_pref two_alt_pathsD)
     ultimately have "alt_list P Q (edges_of_path p' @ edges_of_path (v # q))"
       using assms(2)
       by (auto dest: alt_pathD(1) intro: alt_list_append_3)
@@ -437,12 +423,10 @@ next
     by (auto dest: walk_transitive)
 qed
 
-section \<open>Distinct alternating directed paths\<close>
-
 definition distinct_alt_path :: "('a set \<Rightarrow> bool) \<Rightarrow> ('a set \<Rightarrow> bool) \<Rightarrow> 'a graph \<Rightarrow> 'a path \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
   "distinct_alt_path P Q G p u v \<equiv> alt_path P Q G p u v \<and> distinct p"
 
-lemma distinct_alt_pathD:
+lemma \<^marker>\<open>tag invisible\<close> distinct_alt_pathD:
   assumes "distinct_alt_path P Q G p u v"
   shows
     "alt_path P Q G p u v"
@@ -450,12 +434,17 @@ lemma distinct_alt_pathD:
   using assms
   by (simp add: distinct_alt_path_def)+
 
-lemma distinct_alt_pathI:
+lemma \<^marker>\<open>tag invisible\<close> distinct_alt_pathI:
   assumes "alt_path P Q G p u v"
   assumes "distinct p"
   shows "distinct_alt_path P Q G p u v"
   using assms
   by (simp add: distinct_alt_path_def)
+
+text \<open>
+A simple alternating path (@{term distinct_alt_path}) is an alternating path in which all vertices
+are distinct.
+\<close>
 
 lemma (in finite_graph) distinct_alt_paths_finite:
   shows "finite {p. distinct_alt_path P Q G p u v}"
@@ -469,10 +458,7 @@ proof -
     by (rule finite_subset)
 qed
 
-subsection \<open>\<close>
-
-(* TODO Move somewhere else. *)
-lemma alt_list_decomp:
+lemma \<^marker>\<open>tag invisible\<close> alt_list_decomp:
   assumes alt_list: "alt_list P Q (l1 @ l2 @ l3)"
   assumes even: "even (length l2)"
   shows "alt_list P Q (l1 @ l3)"
@@ -506,7 +492,7 @@ next
     by (intro alt_list_append_3) simp+
 qed
 
-lemma (in graph) alt_path_decomp:
+lemma \<^marker>\<open>tag invisible\<close> (in graph) alt_path_decomp:
   assumes "alt_path P Q G p u v"
   assumes "\<not> distinct p"
   assumes "closed_path_decomp G p = (q, r, s)"
@@ -537,7 +523,13 @@ next
     by (intro walk_transitive)
 qed
 
-lemma (in graph) alt_path_to_distinct_is_distinct_alt_path:
+text \<open>
+If there are no odd-length cycles, we can transform any alternating path into a simple alternating
+path by repeatedly removing cycles. Removing an odd-length cycle, however, may destroy the
+alternation of the path.
+\<close>
+
+lemma (in graph) distinct_alt_path_alt_path_to_distinct:
   assumes "alt_path P Q G p u v"
   assumes "\<not> (\<exists>c. path G c \<and> odd_cycle c)"
   shows "distinct_alt_path P Q G (path_to_distinct p) u v"
@@ -567,7 +559,7 @@ proof -
   qed
 qed
 
-section \<open>Reachability\<close>
+text \<open>Finally, we define reachability via alternating paths in the natural way.\<close>
 
 definition alt_reachable :: "('a set \<Rightarrow> bool) \<Rightarrow> ('a set \<Rightarrow> bool) \<Rightarrow> 'a graph \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
   "alt_reachable P Q G u v \<equiv> \<exists>p. alt_path P Q G p u v"

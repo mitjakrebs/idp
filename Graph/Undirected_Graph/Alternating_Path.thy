@@ -21,11 +21,12 @@ lemma \<^marker>\<open>tag invisible\<close> odd_if_last:
   using assms
   by (auto intro: alternating_list_even_last)
 
-(* TODO Definition. *)
 text \<open>
-We generalize this definition to arbitrary predicates @{term P}, @{term Q}: @{term alt_list}. The
-special case of an alternating path w.r.t.\ a matching @{term M} can then be obtained by
-instantiating the predicates as follows: @{term Berge.alt_path}.
+An alternating path w.r.t.\ a matching @{term M} is a path that alternates between edges in
+@{term M} and edges not in @{term M}. We generalize this definition to arbitrary predicates
+@{term P}, @{term Q}: @{thm alt_list.simps}. The special case of an alternating path w.r.t.\ a
+matching @{term M} can then be obtained by instantiating the predicates as follows:
+@{abbrev Berge.alt_path}.
 \<close>
 
 definition alt_path :: "('a set \<Rightarrow> bool) \<Rightarrow> ('a set \<Rightarrow> bool) \<Rightarrow> 'a graph \<Rightarrow> 'a path \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
@@ -119,15 +120,15 @@ lemma \<^marker>\<open>tag invisible\<close> alt_path_refl:
   using assms
   by (auto simp add: alt_list_empty intro: walk_reflexive alt_pathI)
 
-text \<open>As is the case for paths, we can reverse alternating paths.\<close>
-
 lemma \<^marker>\<open>tag invisible\<close> alt_list_revI:
   assumes "alt_list P Q l"
   shows "alt_list P Q (rev l) \<or> alt_list Q P (rev l)"
   using assms
   by (auto intro: alt_list_rev alt_list_rev_even)
 
-lemma \<^marker>\<open>tag invisible\<close> alt_path_rev_oddI:
+text \<open>As is the case for paths, we can reverse alternating paths.\<close>
+
+lemma alt_path_rev_oddI:
   assumes "alt_path P Q G p u v"
   assumes "odd (path_length p)"
   shows "alt_path P Q G (rev p) v u"
@@ -143,7 +144,7 @@ next
     by (intro alt_pathD(2) walk_symmetric)
 qed
 
-lemma \<^marker>\<open>tag invisible\<close> alt_path_rev_evenI:
+lemma alt_path_rev_evenI:
   assumes "alt_path P Q G p u v"
   assumes "even (path_length p)"
   shows "alt_path Q P G (rev p) v u"
@@ -159,13 +160,13 @@ next
     by (intro alt_pathD(2) walk_symmetric)
 qed
 
-lemma \<^marker>\<open>tag invisible\<close> alt_path_revI:
+lemma alt_path_revI:
   assumes "alt_path P Q G p u v"
   shows "alt_path P Q G (rev p) v u \<or> alt_path Q P G (rev p) v u"
   using assms
   by (auto intro: alt_path_rev_oddI alt_path_rev_evenI)
 
-text \<open>We can concatenate alternating paths.\<close>
+text \<^marker>\<open>tag invisible\<close> \<open>We can concatenate alternating paths.\<close>
 
 lemma \<^marker>\<open>tag invisible\<close> alt_list_append_2':
   assumes "alt_list P1 P2 l1"
@@ -199,7 +200,7 @@ proof -
     by (intro alt_list_append_3)
 qed
 
-lemma alt_path_ConsI:
+lemma \<^marker>\<open>tag invisible\<close> alt_path_ConsI:
   assumes "alt_path P Q G p v w"
   assumes "{u, v} \<in> G"
   assumes "Q {u, v}"
@@ -222,7 +223,7 @@ next
     by (auto intro: walk_betw_ConsI dest: alt_pathD(2))
 qed
 
-lemma alt_path_snocI:
+lemma \<^marker>\<open>tag invisible\<close> alt_path_snocI:
   assumes alt_path: "alt_path P (Not \<circ> P) G (vs @ [v'', v']) u v'"
   assumes alt: "P {v'', v'} = (Not \<circ> P) {v', v}"
   assumes edge: "{v', v} \<in> G"
@@ -268,7 +269,7 @@ next
     by (auto dest: edges_are_walks walk_transitive)
 qed
 
-lemma alt_path_snoc_oddI:
+lemma \<^marker>\<open>tag invisible\<close> alt_path_snoc_oddI:
   assumes "alt_path P Q G p u v"
   assumes "odd (path_length p)"
   assumes "{v, w} \<in> G"
@@ -426,11 +427,6 @@ qed
 definition distinct_alt_path :: "('a set \<Rightarrow> bool) \<Rightarrow> ('a set \<Rightarrow> bool) \<Rightarrow> 'a graph \<Rightarrow> 'a path \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
   "distinct_alt_path P Q G p u v \<equiv> alt_path P Q G p u v \<and> distinct p"
 
-text \<open>
-A simple alternating path (@{term distinct_alt_path}) is an alternating path in which all vertices
-are distinct.
-\<close>
-
 lemma \<^marker>\<open>tag invisible\<close> distinct_alt_pathD:
   assumes "distinct_alt_path P Q G p u v"
   shows
@@ -445,6 +441,11 @@ lemma \<^marker>\<open>tag invisible\<close> distinct_alt_pathI:
   shows "distinct_alt_path P Q G p u v"
   using assms
   by (simp add: distinct_alt_path_def)
+
+text \<open>
+A simple alternating path (@{term distinct_alt_path}) is an alternating path in which all vertices
+are distinct.
+\<close>
 
 lemma (in finite_graph) distinct_alt_paths_finite:
   shows "finite {p. distinct_alt_path P Q G p u v}"

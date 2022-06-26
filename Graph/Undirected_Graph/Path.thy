@@ -6,7 +6,7 @@ begin
 
 text \<open>
 A path (@{term path} and @{term walk_betw}) is a sequence $v_0,\dots,v_k$ of vertices such that
-${v_{i-1},v_i}$ is an edge for every $i=1,\dots,k$.
+$\{v_{i-1},v_i\}$ is an edge for every $i=1,\dots,k$.
 \<close>
 
 type_synonym 'a path = "'a list"
@@ -369,10 +369,10 @@ fun is_closed_path_decomp :: "'a graph \<Rightarrow> 'a path \<Rightarrow> 'a pa
 definition closed_path_decomp :: "'a graph \<Rightarrow> 'a path \<Rightarrow> 'a path \<times> 'a path \<times> 'a path" where
   "closed_path_decomp G p \<equiv> SOME qrs. is_closed_path_decomp G p qrs"
 
+text \<open>A simple path is a path in which all vertices are distinct.\<close>
+
 definition distinct_path :: "'a graph \<Rightarrow> 'a path \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" where
   "distinct_path G p u v \<equiv> walk_betw G u p v \<and> distinct p"
-
-text \<open>A simple path (@{term distinct_path}) is a path in which all vertices are distinct.\<close>
 
 lemma \<^marker>\<open>tag invisible\<close> distinct_pathD:
   assumes "distinct_path G p u v"

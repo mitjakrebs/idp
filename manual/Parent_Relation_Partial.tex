@@ -2,23 +2,16 @@
 \begin{isabellebody}%
 \setisabellecontext{Parent{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Partial}%
 %
-\isadelimtheory
+\isadeliminvisible
 %
-\endisadelimtheory
+\endisadeliminvisible
 %
-\isatagtheory
+\isataginvisible
 \isacommand{theory}\isamarkupfalse%
 \ Parent{\isacharunderscore}{\kern0pt}Relation{\isacharunderscore}{\kern0pt}Partial\isanewline
 \ \ \isakeyword{imports}\isanewline
 \ \ \ \ Parent{\isacharunderscore}{\kern0pt}Relation\isanewline
-\isakeyword{begin}%
-\endisatagtheory
-{\isafoldtheory}%
-%
-\isadelimtheory
-\isanewline
-%
-\endisadelimtheory
+\isakeyword{begin}\isanewline
 \isanewline
 \isacommand{partial{\isacharunderscore}{\kern0pt}function}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}tailrec{\isacharparenright}{\kern0pt}\ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ \isakeyword{where}\isanewline
@@ -31,7 +24,14 @@
 \isacommand{lemma}\isamarkupfalse%
 \ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}follow{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}parent\ m{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{shows}\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ a\ m\ v\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}\ {\isacharat}{\kern0pt}\ a{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}partial\ a\ m\ v\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}\ {\isacharat}{\kern0pt}\ a{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
 %
 \isadelimproof
 %
@@ -92,11 +92,24 @@
 \isanewline
 %
 \endisadelimproof
+%
+\isadeliminvisible
 \isanewline
+%
+\endisadeliminvisible
+%
+\isataginvisible
 \isacommand{lemma}\isamarkupfalse%
 \ rev{\isacharunderscore}{\kern0pt}follow{\isacharunderscore}{\kern0pt}eq{\isacharunderscore}{\kern0pt}rev{\isacharunderscore}{\kern0pt}follow{\isacharcolon}{\kern0pt}\isanewline
 \ \ \isakeyword{assumes}\ {\isachardoublequoteopen}parent\ m{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{shows}\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow\ m\ v\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{shows}\ {\isachardoublequoteopen}rev{\isacharunderscore}{\kern0pt}follow\ m\ v\ {\isacharequal}{\kern0pt}\ rev\ {\isacharparenleft}{\kern0pt}parent{\isachardot}{\kern0pt}follow\ m\ v{\isacharparenright}{\kern0pt}{\isachardoublequoteclose}%
+\endisataginvisible
+{\isafoldinvisible}%
+%
+\isadeliminvisible
+\isanewline
+%
+\endisadeliminvisible
 %
 \isadelimproof
 \ \ %
@@ -117,43 +130,43 @@
 \isanewline
 \isanewline
 %
-\isadelimtheory
+\isadeliminvisible
 \isanewline
 %
-\endisadelimtheory
+\endisadeliminvisible
 %
-\isatagtheory
+\isataginvisible
 \isacommand{end}\isamarkupfalse%
 %
-\endisatagtheory
-{\isafoldtheory}%
+\endisataginvisible
+{\isafoldinvisible}%
 %
-\isadelimtheory
+\isadeliminvisible
 %
-\endisadelimtheory
+\endisadeliminvisible
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/Documents/1_projects/2022_idp/thys/Map/Parent_Relation_Partial.thy%:%
+%:%file=~/Documents/1_projects/2022_idp/thys/BFS/Parent_Relation_Partial.thy%:%
 %:%10=1%:%
 %:%11=1%:%
 %:%12=2%:%
 %:%13=3%:%
 %:%14=4%:%
-%:%19=4%:%
-%:%22=5%:%
-%:%23=6%:%
-%:%24=6%:%
-%:%25=7%:%
-%:%26=8%:%
-%:%27=9%:%
-%:%28=9%:%
-%:%29=10%:%
-%:%30=11%:%
-%:%31=12%:%
-%:%32=12%:%
-%:%33=13%:%
-%:%34=14%:%
+%:%15=5%:%
+%:%16=6%:%
+%:%17=6%:%
+%:%18=7%:%
+%:%19=8%:%
+%:%20=9%:%
+%:%21=9%:%
+%:%22=10%:%
+%:%23=11%:%
+%:%24=12%:%
+%:%25=12%:%
+%:%26=13%:%
+%:%27=14%:%
+%:%32=14%:%
 %:%41=15%:%
 %:%42=15%:%
 %:%43=16%:%
@@ -201,18 +214,19 @@
 %:%85=35%:%
 %:%86=36%:%
 %:%92=36%:%
-%:%95=37%:%
-%:%96=38%:%
-%:%97=38%:%
-%:%98=39%:%
-%:%99=40%:%
-%:%102=41%:%
-%:%106=41%:%
-%:%107=41%:%
-%:%108=42%:%
-%:%109=42%:%
-%:%114=42%:%
-%:%117=43%:%
-%:%118=71%:%
-%:%121=72%:%
-%:%126=73%:%
+%:%97=37%:%
+%:%102=38%:%
+%:%103=38%:%
+%:%104=39%:%
+%:%105=40%:%
+%:%110=40%:%
+%:%115=41%:%
+%:%119=41%:%
+%:%120=41%:%
+%:%121=42%:%
+%:%122=42%:%
+%:%127=42%:%
+%:%130=43%:%
+%:%131=71%:%
+%:%134=72%:%
+%:%139=73%:%

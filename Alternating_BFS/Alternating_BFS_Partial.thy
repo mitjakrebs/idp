@@ -1,7 +1,16 @@
+subsection \<open>Implementation of the algorithm\<close>
+
 theory Alternating_BFS_Partial
   imports
     Alternating_BFS
 begin
+
+text \<open>
+As is the case for BFS, we verified only partial termination and correctness of loop
+@{term alt_bfs.alt_loop}, since we assumed an appropriate input as specified via locale
+@{locale alt_bfs_valid_input}. To obtain executable code, we make this explicit and use a partial
+function.
+\<close>
 
 partial_function (in alt_bfs) (tailrec) alt_loop_partial where
   "alt_loop_partial G1 G2 src s =

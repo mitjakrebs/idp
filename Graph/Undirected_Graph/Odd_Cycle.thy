@@ -4,12 +4,12 @@ theory Odd_Cycle
 begin
 
 text \<open>
-We redefine odd cycles--compared to the definition in session @{session AGF}--to also include loops
-for the following reason. We show that to find a shortest alternating path it suffices to consider a
-finite number of alternating paths. For this, we show that if there are no odd cycles, we can
-transform any alternating path into a simple alternating path by repeatedly removing cycles. If we
-do not consider loops as odd cycles, however, and hence do not exclude them, removing a single loop
-may destroy the alternation of the path.
+We redefine odd-length cycles--compared to the definition in session @{session AGF}--to also include
+loops for the following reason. We show that to find a shortest alternating path it suffices to
+consider a finite number of alternating paths. For this, we show that if there are no odd-length
+cycles, we can transform any alternating path into a simple alternating path by repeatedly removing
+cycles. If we do not consider loops as odd cycles, however, and hence do not exclude them, removing
+a single loop may destroy the alternation of the path.
 \<close>
 
 definition odd_cycle where

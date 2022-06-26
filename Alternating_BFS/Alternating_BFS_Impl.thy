@@ -4,6 +4,11 @@ theory Alternating_BFS_Impl
     "../BFS/BFS_Impl"
 begin
 
+text \<open>
+We now show that our specification of the modified BFS in locale @{locale alt_bfs} can be
+implemented via red-black trees.
+\<close>
+
 global_interpretation A: alt_bfs where
   Map_empty = empty and
   Map_update = update and
@@ -37,7 +42,7 @@ global_interpretation A: alt_bfs where
   ..
 
 declare A.alt_loop_partial.simps [code]
-thm A.alt_loop_partial.simps
-value "alt_bfs_partial (update (4::nat) (RBT_Set.insert (3::nat) empty) (update (3::nat) (RBT_Set.insert (4::nat) empty) empty)) (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) 1"
+thm \<^marker>\<open>tag invisible\<close> A.alt_loop_partial.simps
+value \<^marker>\<open>tag invisible\<close> "alt_bfs_partial (update (4::nat) (RBT_Set.insert (3::nat) empty) (update (3::nat) (RBT_Set.insert (4::nat) empty) empty)) (update (2::nat) (RBT_Set.insert (1::nat) empty) (update (1::nat) (RBT_Set.insert (2::nat) empty) empty)) 1"
 
 end

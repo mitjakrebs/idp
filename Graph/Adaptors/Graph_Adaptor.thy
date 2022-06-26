@@ -8,7 +8,7 @@ begin
 
 text \<open>
 An undirected graph can be viewed as a symmetric directed graph. Session @{session AGF} shows how to
-transform a @{type graph} into a symmetric @{type dgraph}. We extend, or rather, redo (parts of)
+transform a @{type graph} into a symmetric @{type dgraph}. We extend, or rather redo, (parts of)
 their theory. Our issue with their theory is that the lemmas are inside a locale that assumes that
 the graph does not have loops. Most--if not all--of the lemmas hold even if the graph contains
 loops, though.

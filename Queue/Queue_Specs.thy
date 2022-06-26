@@ -1,6 +1,15 @@
+section \<open>Queue\<close>
+
+text \<open>This section considers first-in first-out queues from three levels of abstraction.\<close>
+
 theory Queue_Specs
   imports Main
 begin
+
+text \<open>
+On the high level, a queue is a list (@{type list}). On the medium level, a queue is specified via
+the following interface.
+\<close>
 
 locale Queue =
   fixes empty :: "'q"
@@ -19,7 +28,7 @@ locale Queue =
   assumes invar_snoc: "invar q \<Longrightarrow> invar (snoc q x)"
   assumes invar_tail: "\<lbrakk> invar q; list q \<noteq> Nil \<rbrakk> \<Longrightarrow> invar (tail q)"
 
-lemma (in Queue) list_queue:
+lemma \<^marker>\<open>tag invisible\<close> (in Queue) list_queue:
   assumes "invar q"
   assumes "list q \<noteq> []"
   shows "list q = head q # list (tail q)"

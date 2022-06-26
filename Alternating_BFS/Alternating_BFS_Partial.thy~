@@ -48,13 +48,13 @@ lemma (in alt_bfs_valid_input) alt_bfs_partial_eq_alt_bfs:
   by (simp add: alt_bfs_partial_def alt_bfs_def alt_loop_partial_eq_alt_loop)
 
 theorem (in alt_bfs_valid_input) alt_bfs_partial_correct:
-  shows "shortest_alt_path_Map P'' G src (alt_bfs_partial G1 G2 src)"
+  shows "is_shortest_alt_path_Map P'' G src (alt_bfs_partial G1 G2 src)"
   using alt_bfs_correct
   by (simp add: alt_bfs_partial_eq_alt_bfs)
 
 corollary (in alt_bfs) alt_bfs_partial_correct:
   assumes "alt_bfs_valid_input' G1 G2 src"
-  shows "shortest_alt_path_Map (\<lambda>e. e \<in> G.E G2) (G.union G1 G2) src (alt_bfs_partial G1 G2 src)"
+  shows "is_shortest_alt_path_Map (\<lambda>e. e \<in> G.E G2) (G.union G1 G2) src (alt_bfs_partial G1 G2 src)"
   using assms
   by (intro alt_bfs_valid_input.alt_bfs_partial_correct)
 

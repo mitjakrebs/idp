@@ -22,7 +22,7 @@
 %
 \begin{isamarkuptext}%
 A path (\isa{path} and \isa{walk{\isacharunderscore}{\kern0pt}betw}) is a sequence $v_0,\dots,v_k$ of vertices such that
-${v_{i-1},v_i}$ is an edge for every $i=1,\dots,k$.%
+$\{v_{i-1},v_i\}$ is an edge for every $i=1,\dots,k$.%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{type{\isacharunderscore}{\kern0pt}synonym}\isamarkupfalse%
 \ {\isacharprime}{\kern0pt}a\ path\ {\isacharequal}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ list{\isachardoublequoteclose}\isanewline
@@ -1219,16 +1219,16 @@ And we can split paths.%
 \isanewline
 \isacommand{definition}\isamarkupfalse%
 \ closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ graph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ path\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ path\ {\isasymtimes}\ {\isacharprime}{\kern0pt}a\ path\ {\isasymtimes}\ {\isacharprime}{\kern0pt}a\ path{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
-\ \ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isasymequiv}\ SOME\ qrs{\isachardot}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ qrs{\isachardoublequoteclose}\isanewline
-\isanewline
+\ \ {\isachardoublequoteopen}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ {\isasymequiv}\ SOME\ qrs{\isachardot}{\kern0pt}\ is{\isacharunderscore}{\kern0pt}closed{\isacharunderscore}{\kern0pt}path{\isacharunderscore}{\kern0pt}decomp\ G\ p\ qrs{\isachardoublequoteclose}%
+\begin{isamarkuptext}%
+A simple path is a path in which all vertices are distinct.%
+\end{isamarkuptext}\isamarkuptrue%
 \isacommand{definition}\isamarkupfalse%
 \ distinct{\isacharunderscore}{\kern0pt}path\ {\isacharcolon}{\kern0pt}{\isacharcolon}{\kern0pt}\ {\isachardoublequoteopen}{\isacharprime}{\kern0pt}a\ graph\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ path\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ {\isacharprime}{\kern0pt}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ \isakeyword{where}\isanewline
-\ \ {\isachardoublequoteopen}distinct{\isacharunderscore}{\kern0pt}path\ G\ p\ u\ v\ {\isasymequiv}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v\ {\isasymand}\ distinct\ p{\isachardoublequoteclose}%
-\begin{isamarkuptext}%
-A simple path (\isa{distinct{\isacharunderscore}{\kern0pt}path}) is a path in which all vertices are distinct.%
-\end{isamarkuptext}\isamarkuptrue%
+\ \ {\isachardoublequoteopen}distinct{\isacharunderscore}{\kern0pt}path\ G\ p\ u\ v\ {\isasymequiv}\ walk{\isacharunderscore}{\kern0pt}betw\ G\ u\ p\ v\ {\isasymand}\ distinct\ p{\isachardoublequoteclose}\isanewline
 %
 \isadeliminvisible
+\isanewline
 %
 \endisadeliminvisible
 %
@@ -1243,9 +1243,9 @@ A simple path (\isa{distinct{\isacharunderscore}{\kern0pt}path}) is a path in wh
 {\isafoldinvisible}%
 %
 \isadeliminvisible
+\isanewline
 %
 \endisadeliminvisible
-\isanewline
 %
 \isadelimproof
 \ \ %
@@ -1260,9 +1260,9 @@ A simple path (\isa{distinct{\isacharunderscore}{\kern0pt}path}) is a path in wh
 {\isafoldproof}%
 %
 \isadelimproof
+\isanewline
 %
 \endisadelimproof
-\isanewline
 %
 \isadeliminvisible
 \isanewline
@@ -1279,9 +1279,9 @@ A simple path (\isa{distinct{\isacharunderscore}{\kern0pt}path}) is a path in wh
 {\isafoldinvisible}%
 %
 \isadeliminvisible
+\isanewline
 %
 \endisadeliminvisible
-\isanewline
 %
 \isadelimproof
 \ \ %
@@ -1981,31 +1981,31 @@ The length of a \isa{path} is the number of its edges.%
 %:%1220=369%:%
 %:%1221=369%:%
 %:%1222=370%:%
-%:%1223=371%:%
 %:%1224=372%:%
-%:%1225=372%:%
-%:%1226=373%:%
+%:%1226=374%:%
+%:%1227=374%:%
 %:%1228=375%:%
+%:%1231=376%:%
 %:%1236=377%:%
 %:%1237=377%:%
 %:%1238=378%:%
 %:%1239=379%:%
 %:%1240=380%:%
 %:%1241=381%:%
-%:%1248=381%:%
+%:%1246=381%:%
 %:%1251=382%:%
 %:%1255=382%:%
 %:%1256=382%:%
 %:%1257=383%:%
 %:%1258=383%:%
-%:%1265=383%:%
+%:%1263=383%:%
 %:%1268=384%:%
 %:%1273=385%:%
 %:%1274=385%:%
 %:%1275=386%:%
 %:%1276=387%:%
 %:%1277=388%:%
-%:%1284=388%:%
+%:%1282=388%:%
 %:%1287=389%:%
 %:%1291=389%:%
 %:%1292=389%:%

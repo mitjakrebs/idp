@@ -3,8 +3,6 @@ theory Weighted_Dpath
     Dpath
 begin
 
-text \<open>This theory formalizes weighted directed paths.\<close>
-
 type_synonym 'a weight_fun = "'a \<times> 'a \<Rightarrow> nat"
 
 definition edges_weight :: "'a weight_fun \<Rightarrow> ('a \<times> 'a) list \<Rightarrow> nat" where
@@ -12,10 +10,6 @@ definition edges_weight :: "'a weight_fun \<Rightarrow> ('a \<times> 'a) list \<
 
 definition dpath_weight :: "'a weight_fun \<Rightarrow> 'a dpath \<Rightarrow> nat" where
   "dpath_weight f p = edges_weight f (edges_of_dpath p)"
-
-section \<open>@{term dpath}, @{term dpath_bet}\<close>
-
-subsection \<open>\<close>
 
 lemma edges_weight_Nil [simp]:
   shows "edges_weight f [] = 0"
@@ -28,8 +22,6 @@ lemma dpath_weight_Nil [simp]:
 lemma edges_weight_Cons [simp]:
   shows "edges_weight f (x # xs) = f x + edges_weight f xs"
   by (simp add: edges_weight_def)
-
-subsection \<open>Appending\<close>
 
 lemma edges_weight_append [simp]:
   shows "edges_weight f (xs @ ys) = edges_weight f xs + edges_weight f ys"
@@ -73,8 +65,6 @@ proof -
     .
 qed
 
-subsection \<open>Decomposing\<close>
-
 lemma dpath_weight_closed_dpath_bet_decomp:
   assumes "dpath_bet G p u v"
   assumes "\<not> distinct p"
@@ -89,8 +79,6 @@ proof -
   thus ?thesis
     by (auto simp add: dpath_bet_nonempty_dpath(3, 4) intro: dpath_weight_append_append)
 qed
-
-section \<open>@{term distinct_dpath_bet}\<close>
 
 lemma dpath_weight_ge_dpath_weight_dpath_bet_to_distinct:
   assumes "dpath_bet G p u v"
@@ -123,8 +111,6 @@ next
   finally show ?case
     .
 qed
-
-section \<open>\<close>
 
 lemma dpath_length_eq_dpath_weight:
   shows "dpath_length p = dpath_weight (\<lambda>_. 1) p"

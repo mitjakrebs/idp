@@ -8,7 +8,7 @@
 %
 \isatagdocument
 %
-\isamarkupsection{Edmonds-Karp algorithm%
+\isamarkupsection{Shortest augmenting path algorithm%
 }
 \isamarkuptrue%
 %
@@ -30,9 +30,8 @@ are no augmenting paths. We claim that the algorithm specified below, in each it
 just any augmenting path but a shortest one. We do not verify this claim, however, as the
 distinction is not relevant for the correctness of the algorithm.
 
-The algorithm is an adaptation of the Edmonds-Karp algorithm, which solves the
-maximum flow problem, to the maximum cardinality matching problem in bipartite graphs, which reduces
-to the maximum flow problem.%
+Hence, the algorithm takes the same general approach as the Edmonds-Karp algorithm, which solves the
+maximum flow problem, to which the maximum cardinality matching problem reduces.%
 \end{isamarkuptext}\isamarkuptrue%
 %
 \isadelimtheory
@@ -106,7 +105,7 @@ relation such that any path from \isa{src} induced by the parent relation is a s
 alternating path, that is, it alternates between edges in \isa{G{\isadigit{2}}} and \isa{G{\isadigit{1}}} and is shortest
 among all such paths.
 
-Let $(\isa{L},\isa{R},\isa{G})$ be a bipartite graph and \isa{M} be a matching in \isa{G}.
+Let $(\isa{L}\cup \isa{R},\isa{G})$ be a bipartite graph and \isa{M} be a matching in \isa{G}.
 Recall that an augmenting path in \isa{G} w.r.t.\ \isa{M} is a path between two free vertices
 that alternates between edges not in \isa{M} and edges in \isa{M}. Since \isa{G} is bipartite,
 any such path is between a free vertex in \isa{L} and a free vertex in \isa{R} (every augmenting
@@ -264,12 +263,12 @@ until there are no augmenting paths. And there are no augmenting paths if
 \endisadelimdocument
 %
 \begin{isamarkuptext}%
-Algorithm \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}edmonds{\isacharunderscore}{\kern0pt}karp} expects an input \isa{G}, \isa{L}, \isa{R},
-\isa{s}, \isa{t} such that
+Algorithm \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}edmonds{\isacharunderscore}{\kern0pt}karp} expects an input $\langle \isa{G},\isa{L},\isa{R},
+\isa{s},\isa{t}\rangle$ such that
 
 %
 \begin{itemize}%
-\item $(\isa{L},\isa{R},\isa{G})$ is a bipartite graph, and
+\item $(\isa{L}\cup \isa{R},\isa{G})$ is a bipartite graph, and
 
 \item \isa{s} and \isa{t} are two new vertices, that is, vertices not in \isa{G},%
 \end{itemize}
@@ -766,7 +765,7 @@ and the correctness theorem will assume such an input. Let us formally specify t
 \endisadelimproof
 %
 \begin{isamarkuptext}%
-As was the case for locale \isa{alt{\isacharunderscore}{\kern0pt}bfs}, graph \isa{G} is represented as an
+As is the case for locale \isa{alt{\isacharunderscore}{\kern0pt}bfs}, graph \isa{G} is represented as an
 \isa{adjacency}, that is, as a \isa{Map{\isacharunderscore}{\kern0pt}by{\isacharunderscore}{\kern0pt}Ordered} mapping a vertex to its adjacency, which
 is represented as a \isa{Set{\isacharunderscore}{\kern0pt}by{\isacharunderscore}{\kern0pt}Ordered}. And sets \isa{L} and \isa{R} are represented as
 \isa{Set{\isacharunderscore}{\kern0pt}by{\isacharunderscore}{\kern0pt}Ordered}s.%
@@ -792,7 +791,8 @@ is represented as a \isa{Set{\isacharunderscore}{\kern0pt}by{\isacharunderscore}
 \begin{isamarkuptext}%
 Unfolding the definition of algorithm \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}edmonds{\isacharunderscore}{\kern0pt}karp}, we see that recursive
 function \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}loop{\isacharprime}{\kern0pt}} lies at the heart of the algorithm. It expects an input
-\isa{G}, \isa{L}, \isa{R}, \isa{s}, \isa{t}, \isa{M} such that
+$\langle \isa{G},\isa{L},\isa{R},\isa{s},\isa{t},\isa{M}\rangle$, which constitutes the
+program state, such that
 
 %
 \begin{itemize}%
@@ -802,9 +802,9 @@ function \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}lo
 \end{itemize}
 
 
-Let us now formally specify the assumptions on \isa{M}. As \isa{M} is the only data structure
-that is subject to change from one iteration to the next, these assumptions constitute the loop
-invariants of \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}loop{\isacharprime}{\kern0pt}}.%
+Let us now formally specify the assumptions on \isa{M}. As \isa{M} is the only state variable
+that is subject to change from one iteration to the next, these assumptions constitute the
+(non-trivial) loop invariants of \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}loop{\isacharprime}{\kern0pt}}.%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{locale}\isamarkupfalse%
 \ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharunderscore}{\kern0pt}invar\ {\isacharequal}{\kern0pt}\ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input\ \isakeyword{where}\isanewline
@@ -2336,7 +2336,7 @@ We first prove that graph \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isacha
 \endisadelimproof
 %
 \begin{isamarkuptext}%
-We now show that graph \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G{\isadigit{1}}} comprises all edges not in the current matching.%
+Next, we show that graph \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G{\isadigit{1}}} comprises all edges not in the current matching.%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharparenright}{\kern0pt}\ E{\isadigit{1}}{\isacharunderscore}{\kern0pt}cong{\isacharcolon}{\kern0pt}\isanewline
@@ -2741,8 +2741,8 @@ input graph.%
 \endisadelimproof
 %
 \begin{isamarkuptext}%
-We are now able to show that \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G{\isadigit{1}}}, \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G{\isadigit{2}}}, \isa{s} constitutes
-a valid input for algorithm \isa{alt{\isacharunderscore}{\kern0pt}bfs{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs}.%
+We are now ready to show that $\langle \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G{\isadigit{1}}},\isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G{\isadigit{2}}},\isa{s}\rangle$
+constitutes a valid input for algorithm \isa{alt{\isacharunderscore}{\kern0pt}bfs{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs}.%
 \end{isamarkuptext}\isamarkuptrue%
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}{\kern0pt}\isakeyword{in}\ edmonds{\isacharunderscore}{\kern0pt}karp{\isacharunderscore}{\kern0pt}invar{\isacharunderscore}{\kern0pt}not{\isacharunderscore}{\kern0pt}done{\isacharunderscore}{\kern0pt}{\isadigit{1}}{\isacharparenright}{\kern0pt}\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isacharcolon}{\kern0pt}\isanewline
@@ -3096,7 +3096,7 @@ of graphs \isa{edmonds{\isacharunderscore}{\kern0pt}karp{\isachardot}{\kern0pt}G
 \ \ \isacommand{unfolding}\isamarkupfalse%
 \ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}def\isanewline
 \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}invar{\isacharunderscore}{\kern0pt}init\ is{\isacharunderscore}{\kern0pt}discovered{\isacharunderscore}{\kern0pt}def\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}soundness{\isacharparenright}{\kern0pt}%
+\ {\isacharparenleft}{\kern0pt}metis\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}invar{\isacharunderscore}{\kern0pt}init\ is{\isacharunderscore}{\kern0pt}discovered{\isacharunderscore}{\kern0pt}def\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}loop{\isacharunderscore}{\kern0pt}sound{\isacharparenright}{\kern0pt}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -7600,7 +7600,7 @@ still need to show that if the algorithm doesn't find an augmenting path, then t
 \ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
 \ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}def\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}{\kern0pt}metis\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}invar{\isacharunderscore}{\kern0pt}init\ is{\isacharunderscore}{\kern0pt}discovered{\isacharunderscore}{\kern0pt}def\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}completeness{\isacharparenright}{\kern0pt}\ \isacommand{{\isacharbraceright}{\kern0pt}}\isamarkupfalse%
+\ {\isacharparenleft}{\kern0pt}metis\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}invar{\isacharunderscore}{\kern0pt}init\ is{\isacharunderscore}{\kern0pt}discovered{\isacharunderscore}{\kern0pt}def\ alt{\isacharunderscore}{\kern0pt}bfs{\isacharunderscore}{\kern0pt}valid{\isacharunderscore}{\kern0pt}input{\isachardot}{\kern0pt}alt{\isacharunderscore}{\kern0pt}loop{\isacharunderscore}{\kern0pt}complete{\isacharparenright}{\kern0pt}\ \isacommand{{\isacharbraceright}{\kern0pt}}\isamarkupfalse%
 \isanewline
 \ \ \isacommand{thus}\isamarkupfalse%
 \ {\isacharquery}{\kern0pt}thesis\isanewline
@@ -7804,16 +7804,16 @@ We finally have everything to state and prove the correctness theorem for algori
 %:%32=13%:%
 %:%33=14%:%
 %:%34=15%:%
-%:%35=16%:%
-%:%43=19%:%
+%:%42=18%:%
+%:%43=18%:%
 %:%44=19%:%
 %:%45=20%:%
 %:%46=21%:%
 %:%47=22%:%
 %:%48=23%:%
-%:%49=24%:%
-%:%63=26%:%
-%:%73=28%:%
+%:%62=25%:%
+%:%72=27%:%
+%:%73=27%:%
 %:%74=28%:%
 %:%75=29%:%
 %:%76=30%:%
@@ -7835,13 +7835,13 @@ We finally have everything to state and prove the correctness theorem for algori
 %:%92=46%:%
 %:%93=47%:%
 %:%94=48%:%
-%:%95=49%:%
+%:%95=48%:%
 %:%96=49%:%
 %:%97=50%:%
 %:%98=51%:%
-%:%99=52%:%
+%:%99=51%:%
 %:%100=52%:%
-%:%101=53%:%
+%:%102=55%:%
 %:%103=56%:%
 %:%104=57%:%
 %:%105=58%:%
@@ -7876,94 +7876,94 @@ We finally have everything to state and prove the correctness theorem for algori
 %:%134=87%:%
 %:%135=88%:%
 %:%136=89%:%
-%:%137=90%:%
-%:%139=93%:%
+%:%138=92%:%
+%:%139=92%:%
 %:%140=93%:%
-%:%141=94%:%
-%:%143=96%:%
-%:%145=98%:%
+%:%142=95%:%
+%:%144=97%:%
+%:%145=97%:%
 %:%146=98%:%
-%:%147=99%:%
+%:%148=101%:%
 %:%149=102%:%
-%:%150=103%:%
-%:%152=106%:%
+%:%151=105%:%
+%:%152=105%:%
 %:%153=106%:%
-%:%154=107%:%
+%:%155=109%:%
 %:%156=110%:%
-%:%157=111%:%
-%:%159=114%:%
+%:%158=113%:%
+%:%159=113%:%
 %:%160=114%:%
 %:%161=115%:%
 %:%162=116%:%
-%:%163=117%:%
+%:%163=116%:%
 %:%164=117%:%
-%:%165=118%:%
+%:%166=120%:%
 %:%167=121%:%
-%:%168=122%:%
-%:%172=123%:%
-%:%174=124%:%
-%:%177=127%:%
+%:%171=122%:%
+%:%173=123%:%
+%:%176=126%:%
+%:%177=126%:%
 %:%178=127%:%
 %:%179=128%:%
 %:%180=129%:%
-%:%181=130%:%
+%:%181=129%:%
 %:%182=130%:%
 %:%183=131%:%
-%:%184=132%:%
+%:%184=135%:%
 %:%185=136%:%
-%:%186=137%:%
+%:%186=136%:%
 %:%187=137%:%
 %:%188=138%:%
 %:%189=139%:%
 %:%190=140%:%
 %:%191=141%:%
-%:%192=142%:%
+%:%192=141%:%
 %:%193=142%:%
-%:%194=143%:%
-%:%197=146%:%
-%:%200=147%:%
-%:%204=147%:%
-%:%205=147%:%
-%:%210=147%:%
-%:%213=148%:%
+%:%196=145%:%
+%:%199=146%:%
+%:%203=146%:%
+%:%204=146%:%
+%:%209=146%:%
+%:%212=147%:%
+%:%213=152%:%
 %:%214=153%:%
-%:%215=154%:%
+%:%215=153%:%
 %:%216=154%:%
 %:%217=155%:%
 %:%218=156%:%
 %:%219=157%:%
-%:%220=158%:%
+%:%220=157%:%
 %:%221=158%:%
 %:%222=159%:%
 %:%223=160%:%
 %:%224=161%:%
-%:%225=162%:%
+%:%225=161%:%
 %:%226=162%:%
 %:%227=163%:%
 %:%228=164%:%
 %:%229=165%:%
-%:%230=166%:%
+%:%230=165%:%
 %:%231=166%:%
 %:%232=167%:%
 %:%233=168%:%
 %:%234=169%:%
-%:%235=170%:%
+%:%235=169%:%
 %:%236=170%:%
 %:%237=171%:%
 %:%238=172%:%
-%:%239=173%:%
+%:%239=172%:%
 %:%240=173%:%
 %:%241=174%:%
 %:%242=175%:%
-%:%243=176%:%
-%:%251=178%:%
-%:%255=180%:%
+%:%250=177%:%
+%:%254=179%:%
+%:%266=182%:%
 %:%267=183%:%
-%:%268=184%:%
-%:%272=185%:%
-%:%274=186%:%
-%:%278=189%:%
-%:%280=192%:%
+%:%271=184%:%
+%:%273=185%:%
+%:%277=188%:%
+%:%279=191%:%
+%:%280=191%:%
 %:%281=192%:%
 %:%282=193%:%
 %:%283=194%:%
@@ -7978,175 +7978,175 @@ We finally have everything to state and prove the correctness theorem for algori
 %:%292=203%:%
 %:%293=204%:%
 %:%294=205%:%
-%:%295=206%:%
-%:%298=207%:%
-%:%303=208%:%
+%:%297=206%:%
+%:%302=207%:%
+%:%303=207%:%
 %:%304=208%:%
-%:%305=209%:%
+%:%312=216%:%
 %:%313=217%:%
 %:%314=218%:%
-%:%315=219%:%
+%:%315=218%:%
 %:%316=219%:%
-%:%317=220%:%
-%:%322=220%:%
-%:%327=221%:%
-%:%331=221%:%
+%:%321=219%:%
+%:%326=220%:%
+%:%330=220%:%
+%:%331=220%:%
 %:%332=221%:%
-%:%333=222%:%
-%:%334=222%:%
-%:%339=222%:%
-%:%344=223%:%
-%:%349=224%:%
+%:%333=221%:%
+%:%338=221%:%
+%:%343=222%:%
+%:%348=223%:%
+%:%349=223%:%
 %:%350=224%:%
-%:%351=225%:%
-%:%356=225%:%
-%:%361=226%:%
-%:%365=226%:%
+%:%355=224%:%
+%:%360=225%:%
+%:%364=225%:%
+%:%365=225%:%
 %:%366=226%:%
-%:%367=227%:%
-%:%368=227%:%
-%:%373=227%:%
-%:%378=228%:%
-%:%383=229%:%
+%:%367=226%:%
+%:%372=226%:%
+%:%377=227%:%
+%:%382=228%:%
+%:%383=228%:%
 %:%384=229%:%
-%:%385=230%:%
-%:%390=230%:%
-%:%395=231%:%
-%:%399=231%:%
+%:%389=229%:%
+%:%394=230%:%
+%:%398=230%:%
+%:%399=230%:%
 %:%400=231%:%
-%:%401=232%:%
-%:%402=232%:%
-%:%407=232%:%
-%:%412=233%:%
-%:%417=234%:%
+%:%401=231%:%
+%:%406=231%:%
+%:%411=232%:%
+%:%416=233%:%
+%:%417=233%:%
 %:%418=234%:%
-%:%419=235%:%
-%:%424=235%:%
-%:%429=236%:%
-%:%433=236%:%
+%:%423=234%:%
+%:%428=235%:%
+%:%432=235%:%
+%:%433=235%:%
 %:%434=236%:%
-%:%435=237%:%
-%:%436=237%:%
-%:%441=237%:%
-%:%446=238%:%
-%:%451=239%:%
+%:%435=236%:%
+%:%440=236%:%
+%:%445=237%:%
+%:%450=238%:%
+%:%451=238%:%
 %:%452=239%:%
-%:%453=240%:%
-%:%458=240%:%
-%:%463=241%:%
-%:%467=241%:%
+%:%457=239%:%
+%:%462=240%:%
+%:%466=240%:%
+%:%467=240%:%
 %:%468=241%:%
-%:%469=242%:%
+%:%469=241%:%
 %:%470=242%:%
-%:%471=243%:%
-%:%472=243%:%
-%:%477=243%:%
-%:%482=244%:%
-%:%487=245%:%
+%:%471=242%:%
+%:%476=242%:%
+%:%481=243%:%
+%:%486=244%:%
+%:%487=244%:%
 %:%488=245%:%
-%:%489=246%:%
-%:%494=246%:%
-%:%499=247%:%
-%:%503=247%:%
+%:%493=245%:%
+%:%498=246%:%
+%:%502=246%:%
+%:%503=246%:%
 %:%504=247%:%
-%:%505=248%:%
-%:%506=248%:%
-%:%511=248%:%
-%:%516=249%:%
-%:%521=250%:%
+%:%505=247%:%
+%:%510=247%:%
+%:%515=248%:%
+%:%520=249%:%
+%:%521=249%:%
 %:%522=250%:%
-%:%523=251%:%
-%:%528=251%:%
-%:%533=252%:%
-%:%537=252%:%
+%:%527=250%:%
+%:%532=251%:%
+%:%536=251%:%
+%:%537=251%:%
 %:%538=252%:%
-%:%539=253%:%
+%:%539=252%:%
 %:%540=253%:%
-%:%541=254%:%
-%:%542=254%:%
-%:%547=254%:%
-%:%552=255%:%
-%:%557=256%:%
+%:%541=253%:%
+%:%546=253%:%
+%:%551=254%:%
+%:%556=255%:%
+%:%557=255%:%
 %:%558=256%:%
-%:%559=257%:%
-%:%564=257%:%
-%:%569=258%:%
-%:%573=258%:%
+%:%563=256%:%
+%:%568=257%:%
+%:%572=257%:%
+%:%573=257%:%
 %:%574=258%:%
-%:%575=259%:%
+%:%575=258%:%
 %:%576=259%:%
-%:%577=260%:%
-%:%578=260%:%
-%:%583=260%:%
-%:%588=261%:%
-%:%593=262%:%
+%:%577=259%:%
+%:%582=259%:%
+%:%587=260%:%
+%:%592=261%:%
+%:%593=261%:%
 %:%594=262%:%
-%:%595=263%:%
-%:%600=263%:%
-%:%605=264%:%
-%:%609=264%:%
+%:%599=262%:%
+%:%604=263%:%
+%:%608=263%:%
+%:%609=263%:%
 %:%610=264%:%
-%:%611=265%:%
-%:%612=265%:%
-%:%617=265%:%
-%:%622=266%:%
-%:%627=267%:%
+%:%611=264%:%
+%:%616=264%:%
+%:%621=265%:%
+%:%626=266%:%
+%:%627=266%:%
 %:%628=267%:%
-%:%629=268%:%
-%:%634=268%:%
-%:%639=269%:%
-%:%643=269%:%
+%:%633=267%:%
+%:%638=268%:%
+%:%642=268%:%
+%:%643=268%:%
 %:%644=269%:%
-%:%645=270%:%
-%:%646=270%:%
-%:%651=270%:%
-%:%656=271%:%
-%:%661=272%:%
+%:%645=269%:%
+%:%650=269%:%
+%:%655=270%:%
+%:%660=271%:%
+%:%661=271%:%
 %:%662=272%:%
-%:%663=273%:%
-%:%668=273%:%
-%:%673=274%:%
-%:%677=274%:%
+%:%667=272%:%
+%:%672=273%:%
+%:%676=273%:%
+%:%677=273%:%
 %:%678=274%:%
-%:%679=275%:%
-%:%680=275%:%
-%:%685=275%:%
-%:%690=276%:%
-%:%695=277%:%
+%:%679=274%:%
+%:%684=274%:%
+%:%689=275%:%
+%:%694=276%:%
+%:%695=276%:%
 %:%696=277%:%
-%:%697=278%:%
-%:%702=278%:%
-%:%707=279%:%
-%:%711=279%:%
+%:%701=277%:%
+%:%706=278%:%
+%:%710=278%:%
+%:%711=278%:%
 %:%712=279%:%
-%:%713=280%:%
-%:%714=280%:%
-%:%719=280%:%
-%:%724=281%:%
-%:%729=282%:%
+%:%713=279%:%
+%:%718=279%:%
+%:%723=280%:%
+%:%728=281%:%
+%:%729=281%:%
 %:%730=282%:%
-%:%731=283%:%
-%:%736=283%:%
-%:%745=284%:%
+%:%735=282%:%
+%:%744=283%:%
+%:%745=283%:%
 %:%746=284%:%
-%:%747=285%:%
+%:%747=284%:%
 %:%748=285%:%
-%:%749=286%:%
+%:%749=285%:%
 %:%750=286%:%
-%:%751=287%:%
+%:%751=286%:%
 %:%752=287%:%
-%:%753=288%:%
+%:%753=287%:%
 %:%754=288%:%
-%:%755=289%:%
+%:%755=288%:%
 %:%756=289%:%
-%:%757=290%:%
+%:%757=289%:%
 %:%758=290%:%
-%:%759=291%:%
+%:%768=293%:%
 %:%769=294%:%
 %:%770=295%:%
 %:%771=296%:%
-%:%772=297%:%
-%:%781=300%:%
+%:%780=299%:%
+%:%792=302%:%
 %:%793=303%:%
 %:%794=304%:%
 %:%795=305%:%

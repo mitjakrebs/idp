@@ -14,7 +14,7 @@ type_synonym 'a dgraph = "'a edge set"
 locale dgraph =
   fixes G :: "'a dgraph"
 
-text \<open>Let us identify a few special types of graphs.\<close>
+text \<open>Let us identify a couple of special types of graphs.\<close>
 
 locale finite_dgraph = dgraph G for G +
   assumes finite_edges: "finite G"

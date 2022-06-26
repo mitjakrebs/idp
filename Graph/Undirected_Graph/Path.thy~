@@ -6,7 +6,7 @@ begin
 
 text \<open>
 A path (@{term path} and @{term walk_betw}) is a sequence $v_0,\dots,v_k$ of vertices such that
-${v_{i-1},v_i}$ is an edge for every $i=1,\dots,k$.
+$\{v_{i-1},v_i\}$ is an edge for every $i=1,\dots,k$.
 \<close>
 
 type_synonym 'a path = "'a list"
@@ -39,6 +39,17 @@ lemma pathI:
   shows "path G p"
   using assms
   by (induct p rule: edges_of_path.induct) simp+
+
+lemma \<^marker>\<open>tag invisible\<close> pathD_2:
+  assumes "path G p"
+  assumes "Suc i < length p"
+  shows "{p ! i, p ! (Suc i)} \<in> G"
+  using assms
+proof (induct p arbitrary: i rule: edges_of_path.induct)
+  case 3
+  thus ?case
+    by (auto simp add: less_Suc_eq_0_disj)
+qed simp_all
 
 lemma \<^marker>\<open>tag invisible\<close> edges_of_path_tl:
   shows "edges_of_path (tl p) = tl (edges_of_path p)"

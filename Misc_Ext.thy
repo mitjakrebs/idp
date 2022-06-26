@@ -1,13 +1,13 @@
-theory Misc_Ext
+theory \<^marker>\<open>tag invisible\<close> Misc_Ext
   imports
     "HOL-Library.Extended_Nat"
     "HOL-Data_Structures.List_Ins_Del"
     "HOL-Data_Structures.Set_Specs"
 begin
 
-section \<open>@{type enat}\<close>
+subsection \<^marker>\<open>tag invisible\<close> \<open>@{type enat}\<close>
 
-lemma enat_add_strict_right_mono:
+lemma \<^marker>\<open>tag invisible\<close> enat_add_strict_right_mono:
   fixes a b c :: enat
   assumes "a < b"
   assumes "c \<noteq> \<infinity>"
@@ -15,7 +15,7 @@ lemma enat_add_strict_right_mono:
   using assms
   by (metis enat_add_left_cancel_less add.commute)
 
-lemma enat_add_strict_left_mono:
+lemma \<^marker>\<open>tag invisible\<close> enat_add_strict_left_mono:
   fixes a b c :: enat
   assumes "b < c"
   assumes "a \<noteq> \<infinity>"
@@ -23,7 +23,7 @@ lemma enat_add_strict_left_mono:
   using assms
   by (simp add: enat_add_left_cancel_less)
 
-lemma INF_in_image:
+lemma \<^marker>\<open>tag invisible\<close> INF_in_image:
   fixes f :: "'a \<Rightarrow> enat"
   assumes S_finite: "finite S"
   assumes S_non_empty: "S \<noteq> {}"
@@ -46,11 +46,11 @@ proof -
     by simp
 qed
 
-section \<open>@{type list}\<close>
+subsection \<^marker>\<open>tag invisible\<close> \<open>@{type list}\<close>
 
-subsection \<open>@{term length}\<close>
+subsubsection \<^marker>\<open>tag invisible\<close> \<open>@{term length}\<close>
 
-lemma length_ge_2D:
+lemma \<^marker>\<open>tag invisible\<close> length_ge_2D:
   assumes "2 \<le> length l"
   shows
     "l \<noteq> []"
@@ -77,7 +77,7 @@ next
     by force
 qed
 
-lemma length_ge_2E:
+lemma \<^marker>\<open>tag invisible\<close> length_ge_2E:
   assumes "2 \<le> length l"
   obtains x xs y where
     "l = x # xs @ [y]"
@@ -99,15 +99,15 @@ next
     by (auto simp add: Cons[symmetric] intro: that)
 qed
 
-lemma length_butlast_tl:
+lemma \<^marker>\<open>tag invisible\<close> length_butlast_tl:
   assumes "2 \<le> length l"
   shows "length (butlast (tl l)) = length l - 2"
   using assms
   by (auto simp add: tl_def elim: length_ge_2E)
 
-subsection \<open>@{term distinct}\<close>
+subsubsection \<^marker>\<open>tag invisible\<close> \<open>@{term distinct}\<close>
 
-lemma distinct_ins_listD:
+lemma \<^marker>\<open>tag invisible\<close> distinct_ins_listD:
   assumes "distinct (ins_list x xs)"
   shows "distinct xs"
   using assms
@@ -149,7 +149,7 @@ next
   qed
 qed
 
-lemma distinct_ins_listI:
+lemma \<^marker>\<open>tag invisible\<close> distinct_ins_listI:
   assumes "Sorted_Less.sorted xs"
   assumes "distinct xs"
   shows "distinct (ins_list x xs)"
@@ -190,29 +190,29 @@ next
   qed
 qed
 
-lemma distinct_ins_list_cong:
+lemma \<^marker>\<open>tag invisible\<close> distinct_ins_list_cong:
   assumes "Sorted_Less.sorted xs"
   shows "distinct (ins_list x xs) = distinct xs"
   using assms
   by (auto intro: distinct_ins_listD distinct_ins_listI)
 
-lemma distinct_imp_hd_not_mem_set_tl:
+lemma \<^marker>\<open>tag invisible\<close> distinct_imp_hd_not_mem_set_tl:
   assumes "l \<noteq> []"
   assumes "distinct l"
   shows "hd l \<notin> set (tl l)"
   using assms
   by (induct l) simp+
 
-lemma distinct_imp_last_not_mem_set_butlast:
+lemma \<^marker>\<open>tag invisible\<close> distinct_imp_last_not_mem_set_butlast:
   assumes "l \<noteq> []"
   assumes "distinct l"
   shows "last l \<notin> set (butlast l)"
   using assms
   by (induct l) auto
 
-subsection \<open>@{term sorted_wrt}\<close>
+subsubsection \<^marker>\<open>tag invisible\<close> \<open>@{term sorted_wrt}\<close>
 
-lemma sorted_wrt_imp_hd:
+lemma \<^marker>\<open>tag invisible\<close> sorted_wrt_imp_hd:
   assumes l_sorted_wrt: "sorted_wrt P l"
   assumes x_mem_l: "x \<in> set l"
   assumes x_not_hd: "x \<noteq> hd l"
@@ -236,7 +236,7 @@ proof -
     by (auto simp add: hd_eq_0th x_eq_ith intro: sorted_wrt_nth_less)
 qed
 
-lemma sorted_wrt_imp_last_aux:
+lemma \<^marker>\<open>tag invisible\<close> sorted_wrt_imp_last_aux:
   assumes x_mem_l: "x \<in> set l"
   assumes x_neq_last: "x \<noteq> last l"
   obtains i where
@@ -263,7 +263,7 @@ proof -
     by (intro that)
 qed
 
-lemma sorted_wrt_imp_last:
+lemma \<^marker>\<open>tag invisible\<close> sorted_wrt_imp_last:
   assumes l_sorted_wrt: "sorted_wrt P l"
   assumes x_mem_l: "x \<in> set l"
   assumes x_neq_last: "x \<noteq> last l"
@@ -284,15 +284,23 @@ proof -
     by (auto simp add: x_eq_ith last_eq intro: sorted_wrt_nth_less)
 qed
 
-lemma sorted_wrt_if:
+lemma \<^marker>\<open>tag invisible\<close> sorted_wrt_if:
   assumes "\<And>x y. x \<in> set l \<Longrightarrow> y \<in> set l \<Longrightarrow> P x y"
   shows "sorted_wrt P l"
   using assms
   by (simp add: sorted_wrt_iff_nth_less)
 
-subsection \<open>\<close>
+subsubsection \<^marker>\<open>tag invisible\<close> \<open>@{term sorted}\<close>
 
-lemma list_split_tbd:
+lemma \<^marker>\<open>tag invisible\<close> sorted_imp_distinct:
+  assumes "sorted l"
+  shows "distinct l"
+  using assms
+  by (simp add: strict_sorted_sorted_wrt[symmetric] strict_sorted_iff)
+
+subsubsection \<^marker>\<open>tag invisible\<close> \<open>\<close>
+
+lemma \<^marker>\<open>tag invisible\<close> list_split_tbd:
   assumes "l \<noteq> []"
   assumes "hd l \<noteq> last l"
   obtains l' where
@@ -312,7 +320,7 @@ proof
     by (simp add: last_tl)
 qed
 
-lemma butlast_tl_conv:
+lemma \<^marker>\<open>tag invisible\<close> butlast_tl_conv:
   assumes "l1 \<noteq> []"
   assumes "l2 \<noteq> []"
   assumes "last l1 = hd l2"
@@ -330,9 +338,9 @@ proof -
     .
 qed
 
-section \<open>@{term Set_by_Ordered}\<close>
+subsection \<^marker>\<open>tag invisible\<close> \<open>@{term Set_by_Ordered}\<close>
 
-lemma (in Set_by_Ordered) inorder_distinct:
+lemma \<^marker>\<open>tag invisible\<close> (in Set_by_Ordered) inorder_distinct:
   assumes "invar s"
   shows "distinct (inorder s)"
   using assms
@@ -364,4 +372,4 @@ next
     by (simp add: invar_def Cons.hyps(2) ins_list_Cons)
 qed
 
-end
+end \<^marker>\<open>tag invisible\<close> 

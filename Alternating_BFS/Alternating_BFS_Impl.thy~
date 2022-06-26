@@ -1,7 +1,7 @@
 theory Alternating_BFS_Impl
   imports
     Alternating_BFS_Partial
-    BFS_Impl
+    "../BFS/BFS_Impl"
 begin
 
 global_interpretation A: alt_bfs where
